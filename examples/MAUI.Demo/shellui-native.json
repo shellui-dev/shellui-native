@@ -1,0 +1,12 @@
+{
+  "Schema": "https://native.shellui.dev/schema.json",
+  "Style": "default",
+  "ComponentsPath": "Components/UI",
+  "TargetPlatform": 1,
+  "Theme": {
+    "Enabled": true,
+    "Style": "default",
+    "SyncWithShellUI": true
+  },
+  "InstalledComponents": []
+}
