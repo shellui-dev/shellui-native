@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ui="clr-namespace:MAUI.Demo.Components.UI"
+             x:Class="MAUI.Demo.Pages.HomePage"
+             Title="ShellUI Native Demo">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- Hero Section -->
+            <Label Text="ShellUI Native"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource ShellUIForeground}" />
+            
+            <Label Text="Beautiful, native components for .NET MAUI"
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource ShellUIMutedForeground}" />
+
+            <!-- Quick Demo -->
+            <Frame BackgroundColor="{StaticResource ShellUICard}"
+                   BorderColor="{StaticResource ShellUIBorder}"
+                   CornerRadius="8"
+                   Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Button Variants" 
+                           FontSize="18" 
+                           FontAttributes="Bold" />
+                    
+                    <ui:Button Variant="Default" Text="Default Button" />
+                    <ui:Button Variant="Destructive" Text="Destructive" />
+                    <ui:Button Variant="Outline" Text="Outline" />
+                    <ui:Button Variant="Secondary" Text="Secondary" />
+                    <ui:Button Variant="Ghost" Text="Ghost" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Navigation Links -->
+            <Label Text="Explore Components"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,20,0,0" />
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource ShellUISecondary}" CornerRadius="8" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Buttons" FontAttributes="Bold" />
+                        <Label Text="5 variants, 4 sizes" FontSize="12" TextColor="{StaticResource ShellUIMutedForeground}" />
+                    </VerticalStackLayout>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnButtonsClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+                
+                <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource ShellUISecondary}" CornerRadius="8" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Forms" FontAttributes="Bold" />
+                        <Label Text="Input, Checkbox, Switch" FontSize="12" TextColor="{StaticResource ShellUIMutedForeground}" />
+                    </VerticalStackLayout>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnFormsClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+                
+                <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource ShellUISecondary}" CornerRadius="8" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="Cards" FontAttributes="Bold" />
+                        <Label Text="Header, Content, Footer" FontSize="12" TextColor="{StaticResource ShellUIMutedForeground}" />
+                    </VerticalStackLayout>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCardsClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+                
+                <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource ShellUISecondary}" CornerRadius="8" Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="More..." FontAttributes="Bold" />
+                        <Label Text="Coming soon" FontSize="12" TextColor="{StaticResource ShellUIMutedForeground}" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ui="clr-namespace:MAUI.Demo.Components.UI"
+             x:Class="MAUI.Demo.Pages.ButtonsPage"
+             Title="Buttons">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
+            
+            <!-- Variants Section -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Variants" FontSize="20" FontAttributes="Bold" />
+                <Label Text="Different visual styles for various contexts" 
+                       TextColor="{StaticResource ShellUIMutedForeground}" />
+                
+                <ui:Button Variant="Default" Text="Default" />
+                <ui:Button Variant="Destructive" Text="Destructive" />
+                <ui:Button Variant="Outline" Text="Outline" />
+                <ui:Button Variant="Secondary" Text="Secondary" />
+                <ui:Button Variant="Ghost" Text="Ghost" />
+            </VerticalStackLayout>
+
+            <BoxView HeightRequest="1" Color="{StaticResource ShellUIBorder}" />
+
+            <!-- Sizes Section -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Sizes" FontSize="20" FontAttributes="Bold" />
+                <Label Text="Small, default, large, and icon sizes" 
+                       TextColor="{StaticResource ShellUIMutedForeground}" />
+                
+                <ui:Button Size="Sm" Text="Small" />
+                <ui:Button Size="Default" Text="Default" />
+                <ui:Button Size="Lg" Text="Large" />
+                <ui:Button Size="Icon" Text="⚡" />
+            </VerticalStackLayout>
+
+            <BoxView HeightRequest="1" Color="{StaticResource ShellUIBorder}" />
+
+            <!-- States Section -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="States" FontSize="20" FontAttributes="Bold" />
+                <Label Text="Loading and disabled states" 
+                       TextColor="{StaticResource ShellUIMutedForeground}" />
+                
+                <ui:Button Text="Loading..." IsLoading="True" />
+                <ui:Button Text="Disabled" IsEnabled="False" />
+            </VerticalStackLayout>
+
+            <BoxView HeightRequest="1" Color="{StaticResource ShellUIBorder}" />
+
+            <!-- Interactive Demo -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Interactive" FontSize="20" FontAttributes="Bold" />
+                <Label Text="Click to see events in action" 
+                       TextColor="{StaticResource ShellUIMutedForeground}" />
+                
+                <ui:Button x:Name="InteractiveButton" 
+                           Variant="Default" 
+                           Text="Click Me!" 
+                           Clicked="OnInteractiveClicked" />
+                
+                <Label x:Name="ClickCountLabel" 
+                       Text="Clicks: 0" 
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
