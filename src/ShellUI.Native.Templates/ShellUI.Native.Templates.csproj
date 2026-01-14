@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Internal library - bundled with CLI, not published separately -->
+    <IsPackable>false</IsPackable>
+    <Description>Component templates for ShellUI Native. Contains 70+ native UI component templates.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShellUI.Native.Core\ShellUI.Native.Core.csproj" />
+  </ItemGroup>
+
+</Project>
