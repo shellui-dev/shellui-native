@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Internal library - bundled with CLI, not published separately -->
+    <IsPackable>false</IsPackable>
+    <Description>Core models and interfaces for ShellUI Native component library.</Description>
+  </PropertyGroup>
+
+</Project>
