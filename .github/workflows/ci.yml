@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+
+    - name: Restore dependencies (src only)
+      run: dotnet restore src/
+
+    - name: Build library projects
+      run: dotnet build src/ --no-restore --configuration Release
+
+    - name: Pack CLI tool
+      run: dotnet pack src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-restore --configuration Release -o ./nupkg
+
+    - name: Upload CLI package
+      uses: actions/upload-artifact@v4
+      with:
+        name: shellui-native-cli
+        path: ./nupkg/*.nupkg
+
+  # Separate job for MAUI examples (requires workloads)
+  build-examples:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+
+    - name: Install MAUI workload
+      run: dotnet workload install maui
+
+    - name: Restore examples
+      run: dotnet restore examples/MAUI.Demo/MAUI.Demo.csproj
+
+    - name: Build MAUI Demo (Windows)
+      run: dotnet build examples/MAUI.Demo/MAUI.Demo.csproj --configuration Release --framework net8.0-windows10.0.19041.0

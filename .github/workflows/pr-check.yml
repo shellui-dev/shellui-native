@@ -1,0 +1,44 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Quick validation for PRs
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Check formatting
+      run: dotnet format src/ --verify-no-changes --verbosity diagnostic
+      continue-on-error: true
+
+    - name: Restore
+      run: dotnet restore src/
+
+    - name: Build
+      run: dotnet build src/ --no-restore --configuration Release --warnaserror
+
+    - name: Check for package vulnerabilities
+      run: dotnet list src/ package --vulnerable --include-transitive
+      continue-on-error: true
+
+  # Label PR based on files changed
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+    - uses: actions/labeler@v5
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"

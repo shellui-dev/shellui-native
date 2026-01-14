@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.event.repository.fork == false
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Restore dependencies
+      run: dotnet restore src/
+
+    - name: Build
+      run: dotnet build src/ --no-restore --configuration Release
+
+    - name: Pack CLI tool
+      run: dotnet pack src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-restore --configuration Release -o ./nupkg
+
+    - name: Publish CLI to NuGet
+      run: |
+        dotnet nuget push ./nupkg/ShellUI.Native.CLI.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ShellUI Native v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## ShellUI Native v${{ steps.version.outputs.VERSION }}
+          
+          ### Installation
+          ```bash
+          dotnet tool install -g ShellUI.Native.CLI
+          ```
+          
+          ### Quick Start
+          ```bash
+          cd YourMAUIProject
+          shellui-native init --yes
+          shellui-native add button input card
+          ```
+          
+          See the [documentation](https://github.com/shellui-dev/shellui-native) for usage.
+        draft: false
+        prerelease: ${{ contains(github.ref, '-') }}
+        files: |
+          ./nupkg/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

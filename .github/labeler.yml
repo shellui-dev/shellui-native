@@ -1,0 +1,26 @@
+# Labels for PR auto-labeling
+
+cli:
+  - changed-files:
+    - any-glob-to-any-file: 'src/ShellUI.Native.CLI/**'
+
+core:
+  - changed-files:
+    - any-glob-to-any-file: 'src/ShellUI.Native.Core/**'
+
+templates:
+  - changed-files:
+    - any-glob-to-any-file: 'src/ShellUI.Native.Templates/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**'
+    - any-glob-to-any-file: '**/*.md'
+
+examples:
+  - changed-files:
+    - any-glob-to-any-file: 'examples/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
