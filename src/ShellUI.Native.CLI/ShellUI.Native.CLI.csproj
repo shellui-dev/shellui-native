@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShellUI.Native.Core\ShellUI.Native.Core.csproj" />
+    <ProjectReference Include="..\ShellUI.Native.Templates\ShellUI.Native.Templates.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    
+    <!-- CLI Tool Configuration -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>shellui-native</ToolCommandName>
+    <PackageId>ShellUI.Native.CLI</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>CLI tool for ShellUI Native - Cross-platform component library inspired by shadcn/ui</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
