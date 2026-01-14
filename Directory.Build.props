@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Centralized ShellUI Native Version - Update this single file to version all components -->
+  <PropertyGroup>
+    <ShellUINativeVersion>0.0.1</ShellUINativeVersion>
+    <ShellUINativeVersionSuffix></ShellUINativeVersionSuffix>
+  </PropertyGroup>
+
+  <!-- Common properties for all ShellUI Native projects -->
+  <PropertyGroup>
+    <Version>$(ShellUINativeVersion)</Version>
+    <Version Condition="'$(ShellUINativeVersionSuffix)' != ''">$(ShellUINativeVersion)-$(ShellUINativeVersionSuffix)</Version>
+    <AssemblyVersion>$(ShellUINativeVersion)</AssemblyVersion>
+    <FileVersion>$(ShellUINativeVersion)</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+  </PropertyGroup>
+
+  <!-- Common package metadata -->
+  <PropertyGroup>
+    <Authors>ShellUI</Authors>
+    <Company>ShellUI</Company>
+    <Product>ShellUI Native</Product>
+    <Copyright>© $([System.DateTime]::Now.Year) ShellUI. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>maui;winui;wpf;ui;components;shadcn;native;cross-platform</PackageTags>
+    <RepositoryUrl>https://github.com/shellui-dev/shellui-native</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!-- Common build settings -->
+  <PropertyGroup>
+    <!-- Supports .NET 8.0 and later (including .NET 9, 10, etc.) -->
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+</Project>
