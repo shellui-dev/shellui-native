@@ -16,20 +16,20 @@
 
 </div>
 
-ShellUI Native is the native cross-platform extension of ShellUI, bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by shadcn/ui's approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
+ShellUI Native is the native cross-platform extension of [ShellUI](https://shellui.dev/), bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by [shadcn/ui](https://ui.shadcn.com/)'s approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
 
 ## Features
 
 - **Copy & Own** - Components are copied to your project, giving you full control
 - **Platform Native** - Pure native controls, no web views, no CSS overhead
 - **Lightweight & Fast** - No Tailwind/CSS processing, native styling baked in
-- **Consistent Design** - Same design tokens as ShellUI Blazor
+- **Consistent Design** - Same design tokens as [ShellUI Blazor](https://shellui.dev/)
 - **CLI-First** - Simple command-line interface for adding components
 - **Composable** - Build complex UIs from simple components
 
 ## No Tailwind Required!
 
-Unlike ShellUI Blazor, **ShellUI Native does not use Tailwind CSS**. Native platforms (MAUI/WinUI/WPF) use XAML styles and ResourceDictionaries, not CSS. The design tokens (colors, spacing, radii) are identical to ShellUI's Tailwind theme but implemented as native styles - making your app **lightweight and fast** with zero CSS processing overhead.
+Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tailwind CSS**. Native platforms (MAUI/WinUI/WPF) use XAML styles and ResourceDictionaries, not CSS. The design tokens (colors, spacing, radii) are identical to ShellUI's Tailwind theme but implemented as native styles - making your app **lightweight and fast** with zero CSS processing overhead.
 
 ## Quick Start
 
@@ -71,7 +71,7 @@ For **Blazor Hybrid** apps, you can use both libraries:
 └─────────────────────────────────────────┘
 ```
 
-- **ShellUI (Blazor)** - For components inside the BlazorWebView (HTML/CSS/Razor)
+- **[ShellUI (Blazor)](https://shellui.dev/)** - For components inside the BlazorWebView (HTML/CSS/Razor)
 - **ShellUI Native** - For native MAUI controls outside the WebView
 
 They're separate rendering contexts with no conflict. Install what you need based on your app architecture.

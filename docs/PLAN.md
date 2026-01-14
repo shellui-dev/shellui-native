@@ -2,9 +2,9 @@
 
 ## Overview
 
-**ShellUI Native** is the native cross-platform extension of ShellUI, bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by shadcn/ui's approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
+**ShellUI Native** is the native cross-platform extension of [ShellUI](https://shellui.dev/), bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by [shadcn/ui](https://ui.shadcn.com/)'s approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
 
-**ShellUI (Blazor) Reference:** This plan builds upon the successful ShellUI Blazor implementation, adapting its patterns and architecture for native platforms while maintaining design consistency.
+**[ShellUI (Blazor)](https://shellui.dev/) Reference:** This plan builds upon the successful ShellUI Blazor implementation, adapting its patterns and architecture for native platforms while maintaining design consistency.
 
 ## Vision
 

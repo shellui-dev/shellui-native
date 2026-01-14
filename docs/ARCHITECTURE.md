@@ -2,13 +2,13 @@
 
 ## Overview
 
-ShellUI Native follows a modular architecture designed to support multiple native platforms while maintaining a consistent developer experience and design system.
+ShellUI Native follows a modular architecture designed to support multiple native platforms while maintaining a consistent developer experience and design system. It is the native counterpart to [ShellUI (Blazor)](https://shellui.dev/), inspired by [shadcn/ui](https://ui.shadcn.com/)'s copy-and-own approach.
 
 ## Key Difference from ShellUI Blazor: No Tailwind!
 
 **ShellUI Native does NOT use Tailwind CSS.** Native platforms use XAML styles, not CSS.
 
-| Aspect | ShellUI Blazor | ShellUI Native |
+| Aspect | [ShellUI Blazor](https://shellui.dev/) | ShellUI Native |
 |--------|---------------|----------------|
 | Styling | Tailwind CSS | XAML Styles/ResourceDictionary |
 | Rendering | HTML/CSS in browser | Native platform controls |
@@ -98,7 +98,7 @@ The CLI detects project types by examining the .csproj file:
 
 ## Theming System
 
-Unlike ShellUI Blazor which uses CSS variables, ShellUI Native uses platform-native theming:
+Unlike [ShellUI Blazor](https://shellui.dev/) which uses CSS variables, ShellUI Native uses platform-native theming:
 
 - **MAUI** - ResourceDictionary with Colors, Styles
 - **WinUI** - XAML Resources and ThemeResources

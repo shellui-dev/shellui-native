@@ -1,6 +1,6 @@
 # Blazor MAUI Hybrid Guide
 
-How to use ShellUI libraries in Blazor Hybrid applications.
+How to use [ShellUI](https://shellui.dev/) libraries in Blazor Hybrid applications.
 
 ## Understanding Hybrid Architecture
 
@@ -30,7 +30,7 @@ A Blazor Hybrid app has two distinct rendering contexts:
 
 ## Which Library to Use?
 
-### Use ShellUI (Blazor) When:
+### Use [ShellUI (Blazor)](https://shellui.dev/) When:
 - Building UI inside the `BlazorWebView`
 - Working with Razor components
 - Need Tailwind CSS styling
@@ -48,7 +48,7 @@ A Blazor Hybrid app has two distinct rendering contexts:
 If your app is primarily Blazor with minimal native UI:
 
 ```bash
-# Just install ShellUI Blazor
+# Just install ShellUI Blazor (https://github.com/shellui-dev/shellui)
 dotnet tool install -g ShellUI.CLI
 cd YourHybridApp
 shellui init --yes
@@ -132,7 +132,7 @@ YourHybridApp/
 
 ## Recommendations
 
-1. **Start with Blazor** - Most hybrid apps are Blazor-heavy. Start with ShellUI Blazor only.
+1. **Start with Blazor** - Most hybrid apps are Blazor-heavy. Start with [ShellUI Blazor](https://shellui.dev/) only.
 
 2. **Add Native as Needed** - Only add ShellUI Native when you need truly native controls.
 
