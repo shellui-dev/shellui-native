@@ -1,6 +1,20 @@
-# ShellUI Native
+<div align="center">
 
-> One design system, every platform
+```
+███████╗██╗  ██╗███████╗██╗     ██╗     ██╗   ██╗██╗         ███╗   ██╗ █████╗ ████████╗██╗██╗   ██╗███████╗
+██╔════╝██║  ██║██╔════╝██║     ██║     ██║   ██║██║         ████╗  ██║██╔══██╗╚══██╔══╝██║██║   ██║██╔════╝
+███████╗███████║█████╗  ██║     ██║     ██║   ██║██║ ██████╗ ██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗  
+╚════██║██╔══██║██╔══╝  ██║     ██║     ██║   ██║██║ ╚═════╝ ██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝  
+███████║██║  ██║███████╗███████╗███████╗╚██████╔╝██║         ██║ ╚████║██║  ██║   ██║   ██║ ╚████╔╝ ███████╗
+╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═╝         ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
+```
+
+**One design system, every platform**
+
+[![NuGet](https://img.shields.io/nuget/v/ShellUI.Native.CLI.svg)](https://www.nuget.org/packages/ShellUI.Native.CLI)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
+
+</div>
 
 ShellUI Native is the native cross-platform extension of ShellUI, bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by shadcn/ui's approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
 
