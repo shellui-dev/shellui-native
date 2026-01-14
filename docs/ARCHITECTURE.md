@@ -143,7 +143,7 @@ public partial class Button : ContentView
 All packages share a single version defined in `Directory.Build.props`:
 
 ```xml
-<ShellUINativeVersion>0.1.0</ShellUINativeVersion>
+<ShellUINativeVersion>0.0.1</ShellUINativeVersion>
 ```
 
 Component metadata reads this version at runtime, ensuring consistency across all installed components.

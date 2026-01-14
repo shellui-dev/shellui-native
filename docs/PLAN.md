@@ -194,7 +194,7 @@ dotnet run
 
 ## Related Projects
 
-- [ShellUI (Blazor)](https://github.com/shellui-dev/shellui) - Blazor component library
+- [ShellUI (Blazor)](https://shellui.dev/) - Blazor component library
 - [shadcn/ui](https://ui.shadcn.com/) - The original inspiration
 
 ## License
