@@ -8,5 +8,69 @@
     "Style": "default",
     "SyncWithShellUI": true
   },
-  "InstalledComponents": []
+  "InstalledComponents": [
+    {
+      "Name": "button-variants",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.2937345Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "button",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.3489588Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "input",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.4100152Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "label",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.4384876Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "card-header",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.4616458Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "card-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.4824528Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "card-footer",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.508642Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "card",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.5301356Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "badge",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-01-14T17:39:57.5612938Z",
+      "IsCustomized": false
+    }
+  ]
 }
