@@ -2,22 +2,35 @@
 
 public partial class MainPage : ContentPage
 {
-	int count = 0;
+    int clickCount = 0;
 
-	public MainPage()
-	{
-		InitializeComponent();
-	}
+    public MainPage()
+    {
+        InitializeComponent();
+    }
 
-	private void OnCounterClicked(object? sender, EventArgs e)
-	{
-		count++;
+    private void OnButtonClicked(object? sender, EventArgs e)
+    {
+        clickCount++;
+        if (sender is Components.UI.Button btn)
+        {
+            StatusLabel.Text = $"Clicked: {btn.Text} (Total: {clickCount})";
+        }
+    }
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
+    private async void OnLoadingClicked(object? sender, EventArgs e)
+    {
+        if (sender is Components.UI.Button btn)
+        {
+            btn.IsLoading = true;
+            btn.Text = "Loading...";
+            StatusLabel.Text = "Loading started...";
 
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+            await Task.Delay(2000); // Simulate async operation
+
+            btn.IsLoading = false;
+            btn.Text = "Click to Load";
+            StatusLabel.Text = "Loading complete!";
+        }
+    }
 }
