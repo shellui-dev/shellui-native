@@ -28,10 +28,8 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
-  <!-- Common build settings -->
+  <!-- Common build settings (TargetFramework should be set per-project) -->
   <PropertyGroup>
-    <!-- Supports .NET 8.0 and later (including .NET 9, 10, etc.) -->
-    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>

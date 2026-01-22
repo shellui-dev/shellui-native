@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34525.116
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11310.294 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellUI.Native.Core", "src\ShellUI.Native.Core\ShellUI.Native.Core.csproj", "{A1B2C3D4-E5F6-1234-5678-9ABCDEF01234}"
 EndProject
@@ -15,10 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D4E5F6A1-B2C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E5F6A1B2-C3D4-5678-9ABC-DEF012345678}"
 	ProjectSection(SolutionItems) = preProject
-		docs\README.md = docs\README.md
 		docs\ARCHITECTURE.md = docs\ARCHITECTURE.md
-		docs\PLAN.md = docs\PLAN.md
 		docs\BLAZOR_HYBRID.md = docs\BLAZOR_HYBRID.md
+		docs\PLAN.md = docs\PLAN.md
+		docs\README.md = docs\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{F6A7B8C9-D0E1-2345-6789-ABC012345678}"
@@ -44,6 +43,12 @@ Global
 		{C3D4E5F6-A1B2-3456-789A-BCDEF0123456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3D4E5F6-A1B2-3456-789A-BCDEF0123456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3D4E5F6-A1B2-3456-789A-BCDEF0123456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5E6F7A8-B9C0-1234-5678-DEF012345678}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
