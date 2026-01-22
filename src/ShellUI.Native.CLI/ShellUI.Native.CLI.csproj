@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
     
     <!-- CLI Tool Configuration -->
