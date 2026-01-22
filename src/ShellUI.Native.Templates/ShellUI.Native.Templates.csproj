@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <!-- Internal library - bundled with CLI, not published separately -->
     <IsPackable>false</IsPackable>
     <Description>Component templates for ShellUI Native. Contains 70+ native UI component templates.</Description>

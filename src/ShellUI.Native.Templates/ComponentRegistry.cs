@@ -8,10 +8,23 @@ public static class ComponentRegistry
 {
     public static readonly Dictionary<string, ComponentMetadata> Components = new()
     {
+        // Core utilities
         { "shell", ShellTemplate.Metadata },
+        
+        // Form components
         { "button", ButtonTemplate.Metadata },
-        { "button-variants", ButtonVariantsTemplate.Metadata }
-        // More components will be added as we implement them
+        { "button-variants", ButtonVariantsTemplate.Metadata },
+        { "input", InputTemplate.Metadata },
+        { "label", LabelTemplate.Metadata },
+        
+        // Layout components
+        { "card", CardTemplate.Metadata },
+        { "card-header", CardHeaderTemplate.Metadata },
+        { "card-content", CardContentTemplate.Metadata },
+        { "card-footer", CardFooterTemplate.Metadata },
+        
+        // Data display
+        { "badge", BadgeTemplate.Metadata }
     };
 
     public static string? GetComponentContent(string componentName)
@@ -21,6 +34,13 @@ public static class ComponentRegistry
             "shell" => ShellTemplate.Content,
             "button" => ButtonTemplate.Content,
             "button-variants" => ButtonVariantsTemplate.Content,
+            "input" => InputTemplate.Content,
+            "label" => LabelTemplate.Content,
+            "card" => CardTemplate.Content,
+            "card-header" => CardHeaderTemplate.Content,
+            "card-content" => CardContentTemplate.Content,
+            "card-footer" => CardFooterTemplate.Content,
+            "badge" => BadgeTemplate.Content,
             _ => null
         };
     }
