@@ -16,15 +16,22 @@ public static class ComponentRegistry
         { "button-variants", ButtonVariantsTemplate.Metadata },
         { "input", InputTemplate.Metadata },
         { "label", LabelTemplate.Metadata },
+        { "checkbox", CheckboxTemplate.Metadata },
+        { "switch", SwitchTemplate.Metadata },
         
         // Layout components
         { "card", CardTemplate.Metadata },
         { "card-header", CardHeaderTemplate.Metadata },
         { "card-content", CardContentTemplate.Metadata },
         { "card-footer", CardFooterTemplate.Metadata },
+        { "separator", SeparatorTemplate.Metadata },
         
         // Data display
-        { "badge", BadgeTemplate.Metadata }
+        { "badge", BadgeTemplate.Metadata },
+        { "progress", ProgressTemplate.Metadata },
+        
+        // Feedback
+        { "alert", AlertTemplate.Metadata }
     };
 
     public static string? GetComponentContent(string componentName)
@@ -36,11 +43,16 @@ public static class ComponentRegistry
             "button-variants" => ButtonVariantsTemplate.Content,
             "input" => InputTemplate.Content,
             "label" => LabelTemplate.Content,
+            "checkbox" => CheckboxTemplate.Content,
+            "switch" => SwitchTemplate.Content,
             "card" => CardTemplate.Content,
             "card-header" => CardHeaderTemplate.Content,
             "card-content" => CardContentTemplate.Content,
             "card-footer" => CardFooterTemplate.Content,
+            "separator" => SeparatorTemplate.Content,
             "badge" => BadgeTemplate.Content,
+            "progress" => ProgressTemplate.Content,
+            "alert" => AlertTemplate.Content,
             _ => null
         };
     }
