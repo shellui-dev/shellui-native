@@ -19,7 +19,9 @@ public static class CardTemplate
 
     public static string Content => @"namespace YourProjectNamespace.Components.UI;
 
-// Card container component
+// Card container - compositional children via Dependencies (CardHeader, CardContent, CardFooter)
+// Usage: <Card><CardHeader /><CardContent /><CardFooter /></Card>
+[ContentProperty(nameof(Children))]
 public partial class Card : ContentView
 {
     public static readonly BindableProperty VariantProperty =
@@ -45,67 +47,35 @@ public partial class Card : ContentView
         set => SetValue(IsPressableProperty, value);
     }
 
+    /// <summary>Children collection for CardHeader, CardContent, CardFooter (compositional pattern)</summary>
+    public IList<IView> Children => _contentStack.Children;
+
     public event EventHandler? Clicked;
 
     public Card()
     {
-        _contentStack = new VerticalStackLayout
-        {
-            Spacing = 0
-        };
-
-        _border = new Border
-        {
-            Content = _contentStack,
-            Padding = 0
-        };
+        _contentStack = new VerticalStackLayout { Spacing = 0 };
+        _border = new Border { Content = _contentStack, Padding = 0 };
 
         var tapGesture = new TapGestureRecognizer();
         tapGesture.Tapped += (s, e) =>
         {
-            if (IsPressable)
-                Clicked?.Invoke(this, EventArgs.Empty);
+            if (IsPressable) Clicked?.Invoke(this, EventArgs.Empty);
         };
         _border.GestureRecognizers.Add(tapGesture);
-
         Content = _border;
         UpdateVisualState();
     }
 
-    /*
-     * Override to add children to the internal stack layout
-     * This allows CardHeader, CardContent, CardFooter to be nested inside
-     */
-    protected override void OnChildAdded(Element child)
-    {
-        base.OnChildAdded(child);
-        if (child is View view && child != _border)
-        {
-            _contentStack.Children.Add(view);
-        }
-    }
-
-    protected override void OnChildRemoved(Element child, int oldLogicalIndex)
-    {
-        base.OnChildRemoved(child, oldLogicalIndex);
-        if (child is View view)
-        {
-            _contentStack.Children.Remove(view);
-        }
-    }
-
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Card card)
-            card.UpdateVisualState();
+        if (bindable is Card card) card.UpdateVisualState();
     }
 
     private void UpdateVisualState()
     {
-        // Design tokens matching ShellUI theme
         var backgroundColor = Color.FromArgb(""#FFFFFF"");
         var borderColor = Color.FromArgb(""#E5E7EB"");
-        
         _border.BackgroundColor = backgroundColor;
         _border.StrokeShape = new RoundRectangle { CornerRadius = 8 };
 
@@ -116,13 +86,11 @@ public partial class Card : ContentView
                 _border.StrokeThickness = 1;
                 _border.Shadow = null;
                 break;
-
             case CardVariant.Bordered:
                 _border.Stroke = borderColor;
                 _border.StrokeThickness = 2;
                 _border.Shadow = null;
                 break;
-
             case CardVariant.Elevated:
                 _border.Stroke = Colors.Transparent;
                 _border.StrokeThickness = 0;
