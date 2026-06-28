@@ -1,0 +1,56 @@
+using Microsoft.Maui.Controls.Shapes;
+
+namespace MAUI.Demo.Components.UI;
+
+public partial class TimePicker : ContentView
+{
+    public static readonly BindableProperty TimeProperty =
+        BindableProperty.Create(nameof(Time), typeof(TimeSpan), typeof(TimePicker), 
+            DateTime.Now.TimeOfDay, BindingMode.TwoWay, propertyChanged: OnTimeChanged);
+
+    public TimeSpan Time
+    {
+        get => (TimeSpan)GetValue(TimeProperty);
+        set => SetValue(TimeProperty, value);
+    }
+
+    public event EventHandler? TimeChanged;
+
+    private readonly Microsoft.Maui.Controls.TimePicker _picker;
+    private readonly Border _border;
+
+    public TimePicker()
+    {
+        _picker = new Microsoft.Maui.Controls.TimePicker();
+        _picker.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(Microsoft.Maui.Controls.TimePicker.Time))
+            {
+                Time = _picker.Time ?? TimeSpan.Zero;
+                TimeChanged?.Invoke(this, EventArgs.Empty);
+            }
+        };
+        _border = new Border
+        {
+            Content = _picker,
+            Padding = new Thickness(12, 0),
+            HeightRequest = 40,
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = 6 }
+        };
+        Content = _border;
+    }
+
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == TimeProperty.PropertyName && _picker.Time != Time)
+            _picker.Time = Time;
+    }
+
+    private static void OnTimeChanged(BindableObject b, object o, object n)
+    {
+        if (b is TimePicker tp && n is TimeSpan ts && tp._picker.Time != ts)
+            tp._picker.Time = ts;
+    }
+}

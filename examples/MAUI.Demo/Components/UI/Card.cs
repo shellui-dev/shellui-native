@@ -3,11 +3,12 @@ using Microsoft.Maui.Controls.Shapes;
 namespace MAUI.Demo.Components.UI;
 
 // Card - A container component with header, content, footer slots
-// Usage: <Card><Card.Header /><Card.Body /><Card.Footer /></Card>
+// Usage: <Card><CardHeader /><CardContent /><CardFooter /></Card>
+[ContentProperty(nameof(CardContent))]
 public partial class Card : ContentView
 {
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(CardVariant), typeof(Card), 
+        BindableProperty.Create(nameof(Variant), typeof(CardVariant), typeof(Card),
             CardVariant.Default, propertyChanged: OnVisualChanged);
 
     public static readonly BindableProperty IsPressableProperty =
@@ -30,13 +31,12 @@ public partial class Card : ContentView
 
     public event EventHandler? Clicked;
 
-    // Expose the container for adding child components
     public IList<IView> CardContent => _container.Children;
 
     public Card()
     {
         _container = new VerticalStackLayout { Spacing = 0 };
-        
+
         _border = new Border
         {
             Content = _container,
@@ -48,10 +48,10 @@ public partial class Card : ContentView
         _border.GestureRecognizers.Add(tap);
 
         Content = _border;
-        
+
         if (Application.Current != null)
             Application.Current.RequestedThemeChanged += (s, e) => UpdateVisuals();
-        
+
         UpdateVisuals();
     }
 
@@ -67,7 +67,7 @@ public partial class Card : ContentView
             case CardVariant.Default:
                 _border.Stroke = ShellTheme.Border;
                 _border.StrokeThickness = 1;
-                _border.Shadow = new Shadow { Opacity = 0 }; // No shadow
+                _border.Shadow = new Shadow { Opacity = 0 };
                 break;
             case CardVariant.Elevated:
                 _border.Stroke = Colors.Transparent;
@@ -82,96 +82,97 @@ public partial class Card : ContentView
                 break;
         }
     }
+}
 
-    // Nested component: Card.Header
-    public class Header : ContentView
+// Standalone CardHeader - use ui:CardHeader to avoid XAML parsing "Card.Header" as property
+public class CardHeader : ContentView
+{
+    public static readonly BindableProperty TitleProperty =
+        BindableProperty.Create(nameof(Title), typeof(string), typeof(CardHeader), "", propertyChanged: OnTextChanged);
+
+    public static readonly BindableProperty DescriptionProperty =
+        BindableProperty.Create(nameof(Description), typeof(string), typeof(CardHeader), "", propertyChanged: OnTextChanged);
+
+    private readonly Label _title;
+    private readonly Label _description;
+
+    public string Title { get => (string)GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
+    public string Description { get => (string)GetValue(DescriptionProperty); set => SetValue(DescriptionProperty, value); }
+
+    public CardHeader()
     {
-        public static readonly BindableProperty TitleProperty =
-            BindableProperty.Create(nameof(Title), typeof(string), typeof(Header), "", propertyChanged: OnTextChanged);
-        
-        public static readonly BindableProperty DescriptionProperty =
-            BindableProperty.Create(nameof(Description), typeof(string), typeof(Header), "", propertyChanged: OnTextChanged);
+        _title = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold };
+        _description = new Label { FontSize = 14, IsVisible = false };
 
-        private readonly Label _title;
-        private readonly Label _description;
-
-        public string Title { get => (string)GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
-        public string Description { get => (string)GetValue(DescriptionProperty); set => SetValue(DescriptionProperty, value); }
-
-        public Header()
+        Content = new VerticalStackLayout
         {
-            _title = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold };
-            _description = new Label { FontSize = 14, IsVisible = false };
+            Spacing = 4,
+            Padding = new Thickness(16, 16, 16, 8),
+            Children = { _title, _description }
+        };
 
-            Content = new VerticalStackLayout
-            {
-                Spacing = 4,
-                Padding = new Thickness(16, 16, 16, 8),
-                Children = { _title, _description }
-            };
+        if (Application.Current != null)
+            Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
+        UpdateColors();
+    }
 
-            if (Application.Current != null)
-                Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
-            UpdateColors();
-        }
-
-        private static void OnTextChanged(BindableObject b, object o, object n)
+    private static void OnTextChanged(BindableObject b, object o, object n)
+    {
+        if (b is CardHeader h)
         {
-            if (b is Header h)
-            {
-                h._title.Text = h.Title;
-                h._description.Text = h.Description;
-                h._description.IsVisible = !string.IsNullOrEmpty(h.Description);
-            }
-        }
-
-        private void UpdateColors()
-        {
-            _title.TextColor = ShellTheme.Foreground;
-            _description.TextColor = ShellTheme.ForegroundMuted;
+            h._title.Text = h.Title;
+            h._description.Text = h.Description;
+            h._description.IsVisible = !string.IsNullOrEmpty(h.Description);
         }
     }
 
-    // Nested component: Card.Body
-    public class Body : ContentView
+    private void UpdateColors()
     {
-        public Body()
+        _title.TextColor = ShellTheme.Foreground;
+        _description.TextColor = ShellTheme.ForegroundMuted;
+    }
+}
+
+// Standalone CardContent - body area (inherits ContentProperty from ContentView)
+public class CardContent : ContentView
+{
+    public CardContent()
+    {
+        Padding = new Thickness(16, 8);
+    }
+}
+
+// Standalone CardFooter - footer area with action buttons
+[ContentProperty(nameof(FooterContent))]
+public class CardFooter : ContentView
+{
+    private readonly BoxView _separator;
+    private readonly HorizontalStackLayout _content;
+
+    public IList<IView> FooterContent => _content.Children;
+
+    public CardFooter()
+    {
+        _separator = new BoxView { HeightRequest = 1, HorizontalOptions = LayoutOptions.Fill };
+        _content = new HorizontalStackLayout
         {
-            Padding = new Thickness(16, 8);
-        }
+            Spacing = 8,
+            Padding = new Thickness(16, 12),
+            HorizontalOptions = LayoutOptions.End
+        };
+
+        Content = new VerticalStackLayout
+        {
+            Spacing = 0,
+            Children = { _separator, _content }
+        };
+
+        if (Application.Current != null)
+            Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
+        UpdateColors();
     }
 
-    // Nested component: Card.Footer
-    public class Footer : ContentView
-    {
-        private readonly BoxView _separator;
-        private readonly HorizontalStackLayout _content;
-
-        public IList<IView> FooterContent => _content.Children;
-
-        public Footer()
-        {
-            _separator = new BoxView { HeightRequest = 1, HorizontalOptions = LayoutOptions.Fill };
-            _content = new HorizontalStackLayout
-            {
-                Spacing = 8,
-                Padding = new Thickness(16, 12),
-                HorizontalOptions = LayoutOptions.End
-            };
-
-            Content = new VerticalStackLayout
-            {
-                Spacing = 0,
-                Children = { _separator, _content }
-            };
-
-            if (Application.Current != null)
-                Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
-            UpdateColors();
-        }
-
-        private void UpdateColors() => _separator.BackgroundColor = ShellTheme.Border;
-    }
+    private void UpdateColors() => _separator.BackgroundColor = ShellTheme.Border;
 }
 
 public enum CardVariant { Default, Elevated }
