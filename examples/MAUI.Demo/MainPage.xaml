@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:ui="clr-namespace:MAUI.Demo.Components.UI"
@@ -136,6 +136,125 @@
                 <ui:ShellLabel Text="Large (Lg)" Size="Lg" />
                 <ui:ShellLabel Text="Extra Large (Xl)" Size="Xl" />
             </VerticalStackLayout>
+
+            <!-- Card -->
+            <Label Text="Card" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Card Variant="Elevated">
+                <ui:CardHeader Title="Card Title" Description="Optional description" />
+                <ui:CardContent>
+                    <Label Text="Card body content goes here. Use CardHeader, CardContent, CardFooter." />
+                </ui:CardContent>
+                <ui:CardFooter>
+                    <ui:Button Text="Action" Clicked="OnButtonClicked" />
+                </ui:CardFooter>
+            </ui:Card>
+
+            <!-- Separator -->
+            <Label Text="Separator" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Separator Orientation="Horizontal" />
+
+            <!-- Checkbox & Switch -->
+            <Label Text="Checkbox &amp; Switch" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <VerticalStackLayout Spacing="12">
+                <ui:Checkbox x:Name="CheckDemo" Label="Accept terms" IsChecked="True" />
+                <ui:Switch x:Name="SwitchDemo" Label="Enable notifications" IsToggled="True" />
+            </VerticalStackLayout>
+
+            <!-- Progress -->
+            <Label Text="Progress" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <VerticalStackLayout Spacing="12">
+                <ui:Progress Value="75" Maximum="100" ShowLabel="True" />
+                <ui:Progress Value="50" Variant="Success" />
+            </VerticalStackLayout>
+
+            <!-- Alert -->
+            <Label Text="Alert" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <VerticalStackLayout Spacing="8">
+                <ui:Alert Title="Success!" Message="Operation completed" Variant="Success" />
+                <ui:Alert Title="Warning" Message="Please review" Variant="Warning" />
+            </VerticalStackLayout>
+
+            <!-- P2 Form: Textarea, Slider, Select, RadioGroup, DatePicker, TimePicker -->
+            <Label Text="Textarea" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Textarea x:Name="NotesInput" Placeholder="Enter notes..." />
+
+            <Label Text="Slider" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Slider x:Name="VolumeSlider" Value="50" Minimum="0" Maximum="100" />
+
+            <Label Text="Select" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Select x:Name="CountrySelect" SelectedIndex="0" />
+
+            <Label Text="Radio Group" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:RadioGroup x:Name="RadioGroupDemo">
+                <ui:RadioGroupItem Value="a" Text="Option A" />
+                <ui:RadioGroupItem Value="b" Text="Option B" />
+                <ui:RadioGroupItem Value="c" Text="Option C" />
+            </ui:RadioGroup>
+
+            <Label Text="Date &amp; Time Picker" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <VerticalStackLayout Spacing="12">
+                <ui:DatePicker x:Name="DatePickerDemo" />
+                <ui:TimePicker x:Name="TimePickerDemo" />
+            </VerticalStackLayout>
+
+            <!-- Overlays: Dialog, Drawer, Sheet, Dropdown, Popover -->
+            <Label Text="Dialog" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Dialog x:Name="DemoDialog" OpenChanged="OnDialogOpenChanged">
+                <ui:DialogTrigger>
+                    <ui:Button Text="Open Dialog" Clicked="OnDialogTriggerClicked" />
+                </ui:DialogTrigger>
+                <ui:DialogContent>
+                    <ui:DialogHeader>
+                        <ui:DialogTitle Text="Dialog Title" />
+                        <ui:DialogDescription Text="This is a modal dialog." />
+                    </ui:DialogHeader>
+                    <Label Text="Modal content appears here." />
+                    <ui:DialogFooter>
+                        <ui:Button Text="Close" Clicked="OnDialogClose" />
+                    </ui:DialogFooter>
+                </ui:DialogContent>
+            </ui:Dialog>
+
+            <Label Text="Drawer" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Drawer x:Name="DemoDrawer" Side="Bottom">
+                <ui:DrawerTrigger>
+                    <ui:Button Text="Open Drawer" Clicked="OnDrawerTriggerClicked" />
+                </ui:DrawerTrigger>
+                <ui:DrawerContent>
+                    <Label Text="Drawer content - slide from bottom" FontAttributes="Bold" />
+                </ui:DrawerContent>
+            </ui:Drawer>
+
+            <Label Text="Sheet" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Sheet x:Name="DemoSheet" Side="Right">
+                <ui:SheetTrigger>
+                    <ui:Button Text="Open Sheet" Clicked="OnSheetTriggerClicked" />
+                </ui:SheetTrigger>
+                <ui:SheetContent>
+                    <Label Text="Sheet content" FontAttributes="Bold" />
+                </ui:SheetContent>
+            </ui:Sheet>
+
+            <Label Text="Dropdown" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Dropdown>
+                <ui:DropdownTrigger>
+                    <ui:Button Text="Menu" Clicked="OnButtonClicked" />
+                </ui:DropdownTrigger>
+                <ui:DropdownContent>
+                    <ui:DropdownItem Text="Option 1" Clicked="OnDropdownItem" />
+                    <ui:DropdownItem Text="Option 2" Clicked="OnDropdownItem" />
+                </ui:DropdownContent>
+            </ui:Dropdown>
+
+            <Label Text="Popover" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Popover>
+                <ui:PopoverTrigger>
+                    <ui:Button Text="Show Info" Clicked="OnButtonClicked" />
+                </ui:PopoverTrigger>
+                <ui:PopoverContent>
+                    <Label Text="Popover content - floating panel" />
+                </ui:PopoverContent>
+            </ui:Popover>
 
             <!-- Status Label -->
             <Label x:Name="StatusLabel" 

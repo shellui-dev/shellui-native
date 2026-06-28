@@ -71,6 +71,244 @@
       "Platform": 1,
       "InstalledAt": "2026-01-14T17:39:57.5612938Z",
       "IsCustomized": false
+    },
+    {
+      "Name": "element-extensions",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.887146Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.9089148Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.9258129Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-header",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.9429284Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-footer",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.9582491Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-title",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.973307Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-description",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:41.9847782Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog-close",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0019669Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dialog",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0231352Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "drawer-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0401837Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "drawer-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0588529Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "drawer",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0748947Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "sheet-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.0941834Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "sheet-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.1126708Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "sheet",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.1334918Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dropdown-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.1516135Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dropdown-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.1741259Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dropdown-item",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.1935056Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "dropdown",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2089514Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "popover-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2240589Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "popover-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2425529Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "popover",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2593878Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "textarea",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2769185Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "slider",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.2951411Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "select",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.3197141Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "radio-group-item",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.3421939Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "radio-group",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.3598065Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "date-picker",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.3785484Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "time-picker",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.4024263Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "checkbox",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.4210971Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "switch",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.4412633Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "separator",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.4592599Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "progress",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.4829334Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "alert",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-02-12T20:26:42.505863Z",
+      "IsCustomized": false
     }
   ]
 }

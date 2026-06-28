@@ -1,4 +1,4 @@
-﻿namespace MAUI.Demo;
+namespace MAUI.Demo;
 
 public partial class MainPage : ContentPage
 {
@@ -7,6 +7,7 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+        CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany" };
     }
 
     private void OnButtonClicked(object? sender, EventArgs e)
@@ -33,4 +34,11 @@ public partial class MainPage : ContentPage
             StatusLabel.Text = "Loading complete!";
         }
     }
+
+    private void OnDialogTriggerClicked(object? sender, EventArgs e) => DemoDialog.SetOpen(true);
+    private void OnDialogClose(object? sender, EventArgs e) => DemoDialog.SetOpen(false);
+    private void OnDialogOpenChanged(object? sender, bool e) { }
+    private void OnDrawerTriggerClicked(object? sender, EventArgs e) => DemoDrawer.SetOpen(true);
+    private void OnSheetTriggerClicked(object? sender, EventArgs e) => DemoSheet.SetOpen(true);
+    private void OnDropdownItem(object? sender, EventArgs e) => StatusLabel.Text = "Dropdown item clicked";
 }
