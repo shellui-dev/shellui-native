@@ -16,15 +16,26 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: |
-          8.0.x
-          9.0.x
+        dotnet-version: 10.0.x
 
-    - name: Restore dependencies (src only)
-      run: dotnet restore src/
+    - name: Restore dependencies (src + tests)
+      run: |
+        dotnet restore src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj
+        dotnet restore tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj
 
     - name: Build library projects
-      run: dotnet build src/ --no-restore --configuration Release
+      run: dotnet build src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj --configuration Release --no-restore --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          tests/**/TestResults/**
 
     - name: Pack CLI tool
       run: dotnet pack src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-restore --configuration Release -o ./nupkg
@@ -45,8 +56,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: |
-          8.0.x
+        dotnet-version: 10.0.x
 
     - name: Install MAUI workload
       run: dotnet workload install maui
@@ -55,4 +65,4 @@ jobs:
       run: dotnet restore examples/MAUI.Demo/MAUI.Demo.csproj
 
     - name: Build MAUI Demo (Windows)
-      run: dotnet build examples/MAUI.Demo/MAUI.Demo.csproj --configuration Release --framework net8.0-windows10.0.19041.0
+      run: dotnet build examples/MAUI.Demo/MAUI.Demo.csproj --configuration Release --framework net10.0-windows10.0.19041.0
