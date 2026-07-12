@@ -32,7 +32,7 @@ public static class ProjectDetector
         };
     }
 
-    private static NativePlatform DetectPlatform(XDocument doc, string csprojPath)
+    internal static NativePlatform DetectPlatform(XDocument doc, string csprojPath)
     {
         var sdk = doc.Root?.Attribute("Sdk")?.Value ?? "";
         
@@ -43,6 +43,16 @@ public static class ProjectDetector
         var useMaui = doc.Descendants("UseMaui").FirstOrDefault()?.Value;
         if (useMaui?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
             return NativePlatform.MAUI;
+
+        // Check for Avalonia (PackageReference-based, no dedicated SDK)
+        var hasAvaloniaPackage = doc.Descendants("PackageReference")
+            .Any(e => (e.Attribute("Include")?.Value ?? "").StartsWith("Avalonia", StringComparison.OrdinalIgnoreCase));
+        if (hasAvaloniaPackage)
+            return NativePlatform.Avalonia;
+
+        var projectDir = Path.GetDirectoryName(csprojPath) ?? ".";
+        if (File.Exists(Path.Combine(projectDir, "App.axaml")))
+            return NativePlatform.Avalonia;
 
         // Check for WinUI
         var useWinUI = doc.Descendants("UseWinUI").FirstOrDefault()?.Value;

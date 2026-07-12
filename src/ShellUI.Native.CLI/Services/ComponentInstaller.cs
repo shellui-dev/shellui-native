@@ -30,6 +30,12 @@ public static class ComponentInstaller
 
         var projectInfo = ProjectDetector.DetectProject();
 
+        if (config.TargetPlatform != NativePlatform.MAUI)
+        {
+            AnsiConsole.MarkupLine($"[yellow]Warning:[/] component templates are currently MAUI-only. " +
+                $"'{config.TargetPlatform}' support is planned but not yet implemented — installed files will contain MAUI code.");
+        }
+
         // Parse comma-separated components
         var componentList = new List<string>();
         foreach (var comp in components)

@@ -35,6 +35,7 @@ public static class InitService
                     var platformName = projectInfo.Platform switch
                     {
                         NativePlatform.MAUI => ".NET MAUI",
+                        NativePlatform.Avalonia => "Avalonia UI",
                         NativePlatform.WinUI => "WinUI 3",
                         NativePlatform.WPF => "WPF",
                         _ => "Unknown"
@@ -58,11 +59,12 @@ public static class InitService
             var selection = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("[yellow]Could not auto-detect platform. Please select:[/]")
-                    .AddChoices(new[] { "MAUI", "WinUI", "WPF" }));
+                    .AddChoices(new[] { "MAUI", "Avalonia", "WinUI", "WPF" }));
 
             projectInfo.Platform = selection switch
             {
                 "MAUI" => NativePlatform.MAUI,
+                "Avalonia" => NativePlatform.Avalonia,
                 "WinUI" => NativePlatform.WinUI,
                 "WPF" => NativePlatform.WPF,
                 _ => NativePlatform.MAUI
