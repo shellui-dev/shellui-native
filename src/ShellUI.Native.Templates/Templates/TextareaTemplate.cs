@@ -15,7 +15,8 @@ public static class TextareaTemplate
         Tags = new List<string> { "form", "input", "multiline", "textarea" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class Textarea : ContentView
 {

@@ -17,7 +17,8 @@ public static class AlertTemplate
         Tags = new List<string> { "feedback", "alert", "notification", "message", "banner" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Alert component for notifications and feedback
 public partial class Alert : ContentView

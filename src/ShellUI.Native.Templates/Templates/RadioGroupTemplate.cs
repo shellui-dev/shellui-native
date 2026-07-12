@@ -34,7 +34,7 @@ public partial class RadioGroup : ContentView
 
     private readonly VerticalStackLayout _stack;
 
-    public IList<IView> Children => _stack.Children;
+    public new IList<IView> Children => _stack.Children;
 
     public RadioGroup()
     {

@@ -22,7 +22,7 @@ public partial class DialogFooter : ContentView
 {
     private readonly HorizontalStackLayout _stack;
 
-    public IList<IView> Children => _stack.Children;
+    public new IList<IView> Children => _stack.Children;
 
     public DialogFooter()
     {

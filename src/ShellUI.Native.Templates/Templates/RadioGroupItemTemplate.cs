@@ -15,7 +15,8 @@ public static class RadioGroupItemTemplate
         Tags = new List<string> { "form", "radio", "option" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class RadioGroupItem : ContentView
 {

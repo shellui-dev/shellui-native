@@ -17,7 +17,8 @@ public static class CardTemplate
         Tags = new List<string> { "layout", "container", "card", "panel", "surface" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Card container - compositional children via Dependencies (CardHeader, CardContent, CardFooter)
 // Usage: <Card><CardHeader /><CardContent /><CardFooter /></Card>
@@ -48,7 +49,7 @@ public partial class Card : ContentView
     }
 
     /// <summary>Children collection for CardHeader, CardContent, CardFooter (compositional pattern)</summary>
-    public IList<IView> Children => _contentStack.Children;
+    public new IList<IView> Children => _contentStack.Children;
 
     public event EventHandler? Clicked;
 

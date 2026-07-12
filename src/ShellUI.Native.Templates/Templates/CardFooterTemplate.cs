@@ -74,7 +74,7 @@ public partial class CardFooter : ContentView
     /*
      * Allow children to be added to the flex layout
      */
-    public IList<IView> Children => _flexLayout.Children;
+    public new IList<IView> Children => _flexLayout.Children;
 
     private static void OnOrientationChanged(BindableObject bindable, object oldValue, object newValue)
     {

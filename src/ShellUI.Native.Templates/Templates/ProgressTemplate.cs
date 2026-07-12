@@ -17,7 +17,8 @@ public static class ProgressTemplate
         Tags = new List<string> { "progress", "loading", "indicator", "bar" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Progress bar component
 public partial class Progress : ContentView

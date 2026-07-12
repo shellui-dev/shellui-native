@@ -15,7 +15,8 @@ public static class DatePickerTemplate
         Tags = new List<string> { "form", "date", "picker" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class DatePicker : ContentView
 {

@@ -17,7 +17,8 @@ public static class InputTemplate
         Tags = new List<string> { "form", "input", "text", "field", "entry" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Text input component with validation states
 public partial class Input : ContentView

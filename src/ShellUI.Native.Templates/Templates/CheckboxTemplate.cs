@@ -17,7 +17,8 @@ public static class CheckboxTemplate
         Tags = new List<string> { "form", "checkbox", "input", "selection" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Checkbox component with label support
 public partial class Checkbox : ContentView
@@ -34,7 +35,7 @@ public partial class Checkbox : ContentView
         BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Checkbox), 
             false, propertyChanged: OnVisualPropertyChanged);
 
-    public static readonly BindableProperty IsEnabledProperty =
+    public static new readonly BindableProperty IsEnabledProperty =
         BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Checkbox), 
             true, propertyChanged: OnIsEnabledChanged);
 

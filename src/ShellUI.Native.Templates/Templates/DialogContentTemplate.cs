@@ -15,7 +15,8 @@ public static class DialogContentTemplate
         Tags = new List<string> { "overlay", "dialog", "content" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Modal content overlay - backdrop + centered box. Usage: <DialogContent><DialogHeader />...</DialogContent>
 [ContentProperty(nameof(Children))]
@@ -26,7 +27,7 @@ public partial class DialogContent : ContentView
     private readonly Border _modalBox;
     private readonly VerticalStackLayout _body;
 
-    public IList<IView> Children => _body.Children;
+    public new IList<IView> Children => _body.Children;
 
     public DialogContent()
     {

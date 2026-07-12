@@ -15,7 +15,8 @@ public static class SheetContentTemplate
         Tags = new List<string> { "overlay", "sheet", "content" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 [ContentProperty(nameof(Children))]
 public partial class SheetContent : ContentView
@@ -25,7 +26,7 @@ public partial class SheetContent : ContentView
     private readonly Border _panel;
     private readonly VerticalStackLayout _body;
 
-    public IList<IView> Children => _body.Children;
+    public new IList<IView> Children => _body.Children;
 
     public SheetContent()
     {

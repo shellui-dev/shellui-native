@@ -15,7 +15,8 @@ public static class SelectTemplate
         Tags = new List<string> { "form", "select", "picker", "dropdown" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class Select : ContentView
 {

@@ -17,7 +17,8 @@ public static class BadgeTemplate
         Tags = new List<string> { "status", "indicator", "badge", "tag", "chip" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 // Badge status indicator component
 public partial class Badge : ContentView

@@ -15,7 +15,8 @@ public static class PopoverTemplate
         Tags = new List<string> { "overlay", "popover", "floating" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class Popover : Grid
 {

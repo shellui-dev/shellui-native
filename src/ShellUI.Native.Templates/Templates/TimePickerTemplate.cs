@@ -15,7 +15,8 @@ public static class TimePickerTemplate
         Tags = new List<string> { "form", "time", "picker" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+namespace YourProjectNamespace.Components.UI;
 
 public partial class TimePicker : ContentView
 {
