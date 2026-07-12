@@ -5,7 +5,7 @@ public partial class DialogHeader : ContentView
 {
     private readonly VerticalStackLayout _stack;
 
-    public IList<IView> Children => _stack.Children;
+    public new IList<IView> Children => _stack.Children;
 
     public DialogHeader()
     {

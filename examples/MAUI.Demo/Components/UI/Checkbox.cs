@@ -17,7 +17,7 @@ public partial class Checkbox : ContentView
         BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Checkbox), 
             false, propertyChanged: OnVisualPropertyChanged);
 
-    public static readonly BindableProperty IsEnabledProperty =
+    public static new readonly BindableProperty IsEnabledProperty =
         BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Checkbox), 
             true, propertyChanged: OnIsEnabledChanged);
 

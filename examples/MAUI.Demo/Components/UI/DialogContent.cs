@@ -11,7 +11,7 @@ public partial class DialogContent : ContentView
     private readonly Border _modalBox;
     private readonly VerticalStackLayout _body;
 
-    public IList<IView> Children => _body.Children;
+    public new IList<IView> Children => _body.Children;
 
     public DialogContent()
     {

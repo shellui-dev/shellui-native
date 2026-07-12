@@ -13,8 +13,8 @@ public partial class Switch : ContentView
         BindableProperty.Create(nameof(Label), typeof(string), typeof(Switch), 
             string.Empty, propertyChanged: OnLabelChanged);
 
-    public static readonly BindableProperty IsEnabledProperty =
-        BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Switch), 
+    public static new readonly BindableProperty IsEnabledProperty =
+        BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Switch),
             true, propertyChanged: OnIsEnabledChanged);
 
     private readonly Border _track;
@@ -103,7 +103,7 @@ public partial class Switch : ContentView
     private void AnimateToggle()
     {
         var targetX = IsToggled ? TrackWidth - ThumbSize - ThumbOffset : ThumbOffset;
-        _thumb.TranslateTo(targetX, 0, 200, Easing.CubicOut);
+        _ = _thumb.TranslateToAsync(targetX, 0, 200, Easing.CubicOut);
     }
 
     private static void OnIsToggledChanged(BindableObject bindable, object oldValue, object newValue)

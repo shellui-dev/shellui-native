@@ -10,7 +10,7 @@ public partial class DrawerContent : ContentView
     private readonly Border _panel;
     private readonly VerticalStackLayout _body;
 
-    public IList<IView> Children => _body.Children;
+    public new IList<IView> Children => _body.Children;
 
     public DrawerContent()
     {
