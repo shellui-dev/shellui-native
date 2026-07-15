@@ -12,7 +12,7 @@ class Program
     {
         var rootCommand = new RootCommand("ShellUI Native - CLI-first cross-platform component library")
         {
-            Description = "Add beautiful, accessible components to your MAUI, WinUI, or WPF app. Inspired by shadcn/ui."
+            Description = "Add beautiful, accessible components to your MAUI or Avalonia app. Inspired by shadcn/ui."
         };
 
         rootCommand.AddCommand(CreateInitCommand());
