@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/ARCHITECTURE.md" />
+    <File Path="docs/BLAZOR_HYBRID.md" />
+    <File Path="docs/PLAN.md" />
+    <File Path="docs/README.md" />
+  </Folder>
+  <Folder Name="/examples/">
+    <File Path="examples/README.md" />
+    <Project Path="examples/MAUI.Demo/MAUI.Demo.csproj">
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj" />
+    <Project Path="src/ShellUI.Native.Core/ShellUI.Native.Core.csproj" />
+    <Project Path="src/ShellUI.Native.Templates/ShellUI.Native.Templates.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj" />
+  </Folder>
+</Solution>
