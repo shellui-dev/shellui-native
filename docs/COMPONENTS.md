@@ -133,6 +133,108 @@ shellui-native add label
 
 ---
 
+### Textarea
+Multi-line text input.
+
+```bash
+shellui-native add textarea
+```
+
+**Properties:** `Text` (two-way), `Placeholder`, `MaxLength`, `IsReadOnly`, `HasError`
+
+**Usage:**
+```xml
+<ui:Textarea Placeholder="Write a message..." Text="{Binding Body}" />
+```
+
+---
+
+### Slider
+Range slider input.
+
+```bash
+shellui-native add slider
+```
+
+**Properties:** `Value` (two-way), `Minimum`, `Maximum`
+
+**Usage:**
+```xml
+<ui:Slider Value="{Binding Volume}" Minimum="0" Maximum="100" />
+```
+
+---
+
+### Select
+Dropdown select / picker.
+
+```bash
+shellui-native add select
+```
+
+**Properties:** `SelectedIndex` (two-way), `Items` (ObservableCollection), `Placeholder`
+
+**Usage:**
+```xml
+<ui:Select Placeholder="Choose one" SelectedIndex="{Binding Choice}" />
+```
+
+---
+
+### RadioGroup
+Radio button group. Uses compositional pattern.
+
+```bash
+shellui-native add radio-group
+```
+
+**Auto-installs:** `radio-group-item`
+
+**Properties:** `Value` (two-way — matches the `Value` of the selected item)
+
+**Usage:**
+```xml
+<ui:RadioGroup Value="{Binding SelectedPlan}">
+    <ui:RadioGroupItem Value="basic" Label="Basic" />
+    <ui:RadioGroupItem Value="pro" Label="Pro" />
+    <ui:RadioGroupItem Value="enterprise" Label="Enterprise" />
+</ui:RadioGroup>
+```
+
+---
+
+### DatePicker
+Date selection picker.
+
+```bash
+shellui-native add date-picker
+```
+
+**Properties:** `Date` (two-way, `DateTime`), `MinimumDate`, `MaximumDate`, `Format`
+
+**Usage:**
+```xml
+<ui:DatePicker Date="{Binding DueDate}" Format="MMM dd, yyyy" />
+```
+
+---
+
+### TimePicker
+Time selection picker.
+
+```bash
+shellui-native add time-picker
+```
+
+**Properties:** `Time` (two-way, `TimeSpan`), `Format`
+
+**Usage:**
+```xml
+<ui:TimePicker Time="{Binding Reminder}" Format="h:mm tt" />
+```
+
+---
+
 ## Layout Components
 
 ### Card
@@ -287,20 +389,7 @@ shellui-native add progress
 ---
 
 ### Skeleton
-*(Coming Soon)* - Loading placeholder animation.
-
-```bash
-shellui-native add skeleton
-```
-
----
-
-### Progress
-*(Coming Soon)* - Progress bar indicator.
-
-```bash
-shellui-native add progress
-```
+*(Planned — P3.6, see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md))* — Loading placeholder animation.
 
 ---
 
@@ -481,9 +570,11 @@ When you add a component, its dependencies are automatically installed:
 
 Components are organized into the following categories:
 
-- **Form Components**: `button`, `input`, `label`, `checkbox`, `switch`
-- **Layout Components**: `card`, `card-header`, `card-content`, `card-footer`, `separator`
+- **Form Components**: `button`, `input`, `label`, `checkbox`, `switch`, `textarea`, `slider`, `select`, `radio-group` (+ `radio-group-item`), `date-picker`, `time-picker`
+- **Layout Components**: `card` (+ `card-header`, `card-content`, `card-footer`), `separator`
 - **Data Display**: `badge`, `progress`
 - **Feedback**: `alert`
 - **Overlay**: `dialog`, `drawer`, `sheet`, `dropdown`, `popover` (+ their trigger/content sub-components)
-- **Utility**: `shell`
+- **Utility**: `shell`, `element-extensions` (auto-installed by overlay components)
+
+For P3+ components (Tabs, Accordion, Tooltip, Toast, Skeleton, Table, etc.) see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).

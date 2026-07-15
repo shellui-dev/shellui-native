@@ -16,7 +16,7 @@
 
 </div>
 
-ShellUI Native is the native cross-platform extension of [ShellUI](https://shellui.dev/), bringing the same design system and component philosophy to MAUI, WinUI, WPF, and other native platforms. Inspired by [shadcn/ui](https://ui.shadcn.com/)'s approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
+ShellUI Native is the native cross-platform extension of [ShellUI](https://shellui.dev/), bringing the same design system and component philosophy to MAUI, Avalonia, and other native platforms. Inspired by [shadcn/ui](https://ui.shadcn.com/)'s approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
 
 ## Features
 
@@ -29,7 +29,7 @@ ShellUI Native is the native cross-platform extension of [ShellUI](https://shell
 
 ## No Tailwind Required!
 
-Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tailwind CSS**. Native platforms (MAUI/WinUI/WPF) use XAML styles and ResourceDictionaries, not CSS. The design tokens (colors, spacing, radii) are identical to ShellUI's Tailwind theme but implemented as native styles - making your app **lightweight and fast** with zero CSS processing overhead.
+Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tailwind CSS**. Native platforms (MAUI/Avalonia/WinUI) use XAML styles and ResourceDictionaries, not CSS. The design tokens (colors, spacing, radii) are identical to ShellUI's Tailwind theme but implemented as native styles - making your app **lightweight and fast** with zero CSS processing overhead.
 
 ## Quick Start
 
@@ -37,7 +37,7 @@ Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tai
 # Install the CLI tool
 dotnet tool install -g ShellUI.Native.CLI
 
-# Initialize in your MAUI/WinUI/WPF project
+# Initialize in your MAUI or Avalonia project
 shellui-native init --yes
 
 # Add components
@@ -51,9 +51,12 @@ shellui-native list
 
 | Platform | Status | .NET Version |
 |----------|--------|--------------|
-| .NET MAUI | Active | .NET 8.0+ (including 9, 10, etc.) |
-| WinUI 3 | Planned | .NET 8.0+ |
-| WPF | Planned | .NET 8.0+ |
+| .NET MAUI | Active (Phase 1) | .NET 10.0 |
+| Avalonia UI | Planned (Phase 2) | .NET 10.0 (Avalonia 11+) |
+| WinUI 3 | Conditional (Phase 3) | .NET 10.0 |
+
+WPF is intentionally not on this list — it's recognized for project detection only, not an
+active component target. See [PLAN.md](./PLAN.md) and [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) for the rationale.
 
 ## Blazor MAUI Hybrid Projects
 
@@ -80,8 +83,10 @@ They're separate rendering contexts with no conflict. Install what you need base
 
 - [Getting Started](./QUICKSTART.md)
 - [Component List](./COMPONENTS.md)
-- [Theming](./THEMING.md)
+- [Components Roadmap](./COMPONENTS_ROADMAP.md) — prioritized P0–P7 backlog
+- [Development Plan](./DEVELOPMENT_PLAN.md) — branch strategy & phase breakdown
 - [Architecture](./ARCHITECTURE.md)
+- [Plan](./PLAN.md) — high-level strategy
 
 ## Example Usage
 

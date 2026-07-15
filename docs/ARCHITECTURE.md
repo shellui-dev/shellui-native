@@ -21,14 +21,18 @@ The design tokens (colors, spacing, typography) are **identical** to maintain vi
 
 ```
 shellui-native/
-├── Directory.Build.props          # Centralized versioning
-├── ShellUI.Native.sln
+├── Directory.Build.props          # Centralized versioning + package metadata
+├── global.json                    # Pins .NET 10 SDK
+├── ShellUI.Native.slnx            # XML-format solution (post .NET 9)
 ├── src/
 │   ├── ShellUI.Native.Core/       # Shared models and abstractions
-│   ├── ShellUI.Native.Templates/  # Component templates
+│   ├── ShellUI.Native.Templates/  # Component templates (MAUI today; per-platform planned)
 │   ├── ShellUI.Native.CLI/        # Command-line tool
-│   └── ShellUI.Native.MAUI/       # Reference implementation (optional)
-├── samples/
+│   ├── ShellUI.Native.MAUI/       # MAUI reference implementation (optional)
+│   └── ShellUI.Native.Avalonia/   # Avalonia reference implementation (planned, Phase 2)
+├── tests/
+│   └── ShellUI.Native.Tests/      # xUnit — registry invariants, template hygiene, ProjectDetector
+├── examples/
 │   └── MAUI.Demo/
 └── docs/
 ```
@@ -69,6 +73,13 @@ public class ButtonTemplate
 }
 ```
 
+**Gap today (Template System v2 target):** `Content` is a single MAUI-flavored string, and
+`ComponentRegistry.GetComponentContent` has no platform parameter — it can't yet return
+different code for Avalonia vs. MAUI. Adding Avalonia support requires evolving this to
+something like `ButtonTemplate.Content(NativePlatform)` or per-platform static properties
+(`ButtonTemplate.MauiContent` / `ButtonTemplate.AvaloniaContent`) selected by
+`config.TargetPlatform`. See [PLAN.md](./PLAN.md) and [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md).
+
 ### 2. Namespace Replacement
 
 When components are installed, the placeholder `YourProjectNamespace` is replaced with the actual project namespace detected from the .csproj file.
@@ -81,7 +92,8 @@ Components can declare dependencies on other components. The CLI automatically i
 
 The `shellui-native.json` file tracks:
 
-- Target platform (MAUI, WinUI, WPF)
+- Target platform (MAUI, Avalonia, WinUI, or WPF — see `NativePlatform` in
+  [ShellUINativeConfig.cs](../src/ShellUI.Native.Core/Models/ShellUINativeConfig.cs))
 - Components path
 - Installed components with versions
 - Theme settings
@@ -93,16 +105,29 @@ The CLI detects project types by examining the .csproj file:
 | Detection | Platform |
 |-----------|----------|
 | `UseMaui=true` or SDK contains "Maui" | MAUI |
+| `PackageReference` starting with "Avalonia", or an `App.axaml` file present | Avalonia |
 | `UseWinUI=true` | WinUI 3 |
-| `UseWPF=true` or SDK contains "Wpf" | WPF |
+| `UseWPF=true` or SDK contains "Wpf" | WPF (detection only — see [PLAN.md](./PLAN.md)) |
+
+Detection order matters: MAUI is checked first (via SDK/`UseMaui`), then Avalonia (via
+`PackageReference`/`App.axaml`, since Avalonia has no dedicated SDK), then WinUI/WPF. See
+[`ProjectDetector.cs`](../src/ShellUI.Native.CLI/Services/ProjectDetector.cs).
+
+**Current limitation:** detection recognizes Avalonia/WinUI/WPF projects, but
+[`ComponentRegistry`](../src/ShellUI.Native.Templates/ComponentRegistry.cs) only has MAUI
+templates today. `shellui-native add` prints a warning and installs MAUI code regardless of
+detected platform until per-platform templates exist (see "Component Templates" in Core
+Concepts above, and Template System v2 in [PLAN.md](./PLAN.md)).
 
 ## Theming System
 
 Unlike [ShellUI Blazor](https://shellui.dev/) which uses CSS variables, ShellUI Native uses platform-native theming:
 
 - **MAUI** - ResourceDictionary with Colors, Styles
+- **Avalonia** - `Styles`/`ResourceDictionary` with `DynamicResource`, plus Avalonia's built-in
+  Fluent/Simple theme variants for light/dark switching
 - **WinUI** - XAML Resources and ThemeResources
-- **WPF** - ResourceDictionary with DynamicResource
+- **WPF** - ResourceDictionary with DynamicResource (existing apps only, not an active target)
 
 Design tokens are mapped from the ShellUI CSS variables to native equivalents:
 
@@ -137,6 +162,34 @@ public partial class Button : ContentView
     }
 }
 ```
+
+## Component Pattern (Avalonia, planned)
+
+Avalonia components will follow the `StyledProperty`/`TemplatedControl` pattern instead of
+MAUI's `BindableProperty`/`ContentView` — the same property-driven visual-state approach, just
+Avalonia's equivalent APIs:
+
+```csharp
+public partial class Button : TemplatedControl
+{
+    public static readonly StyledProperty<ButtonVariant> VariantProperty =
+        AvaloniaProperty.Register<Button, ButtonVariant>(nameof(Variant), ButtonVariant.Default);
+
+    public ButtonVariant Variant
+    {
+        get => GetValue(VariantProperty);
+        set => SetValue(VariantProperty, value);
+    }
+
+    static Button()
+    {
+        VariantProperty.Changed.AddClassHandler<Button>((button, _) => button.UpdateVisualState());
+    }
+}
+```
+
+Not implemented yet — this illustrates the target shape once Template System v2 lands and
+`ShellUI.Native.Avalonia` is scaffolded.
 
 ## Versioning Strategy
 
