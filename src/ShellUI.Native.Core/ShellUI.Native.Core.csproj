@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- Internal library - bundled with CLI, not published separately -->
     <IsPackable>false</IsPackable>
     <Description>Core models and interfaces for ShellUI Native component library.</Description>

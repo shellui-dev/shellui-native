@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:local="clr-namespace:MAUI.Demo.Pages"
-       x:Class="MAUI.Demo.AppShell"
-       Shell.FlyoutBehavior="Flyout"
-       Title="ShellUI Native Demo">
+<Shell
+    x:Class="MAUI.Demo.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MAUI.Demo"
+    Title="MAUI.Demo">
 
-    <FlyoutItem Title="Home" Icon="{StaticResource HomeIcon}">
-        <ShellContent ContentTemplate="{DataTemplate local:HomePage}" Route="home" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Buttons" Icon="{StaticResource ButtonIcon}">
-        <ShellContent ContentTemplate="{DataTemplate local:ButtonsPage}" Route="buttons" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Forms" Icon="{StaticResource FormIcon}">
-        <ShellContent ContentTemplate="{DataTemplate local:FormsPage}" Route="forms" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Cards" Icon="{StaticResource CardIcon}">
-        <ShellContent ContentTemplate="{DataTemplate local:CardsPage}" Route="cards" />
-    </FlyoutItem>
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
 
 </Shell>

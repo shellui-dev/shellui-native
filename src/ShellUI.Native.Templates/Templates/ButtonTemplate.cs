@@ -17,7 +17,8 @@ public static class ButtonTemplate
         Tags = new List<string> { "form", "input", "interactive", "button", "action" }
     };
 
-    public static string Content => @"using YourProjectNamespace.Components.UI.Variants;
+    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+using YourProjectNamespace.Components.UI.Variants;
 
 namespace YourProjectNamespace.Components.UI;
 

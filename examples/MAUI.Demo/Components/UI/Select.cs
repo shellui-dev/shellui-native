@@ -1,0 +1,69 @@
+using Microsoft.Maui.Controls.Shapes;
+
+namespace MAUI.Demo.Components.UI;
+
+public partial class Select : ContentView
+{
+    public static readonly BindableProperty SelectedIndexProperty =
+        BindableProperty.Create(nameof(SelectedIndex), typeof(int), typeof(Select), 
+            -1, BindingMode.TwoWay, propertyChanged: OnSelectedChanged);
+
+    public static readonly BindableProperty ItemsSourceProperty =
+        BindableProperty.Create(nameof(ItemsSource), typeof(IList<string>), typeof(Select), 
+            null, propertyChanged: OnItemsChanged);
+
+    public int SelectedIndex
+    {
+        get => (int)GetValue(SelectedIndexProperty);
+        set => SetValue(SelectedIndexProperty, value);
+    }
+
+    public IList<string>? ItemsSource
+    {
+        get => (IList<string>?)GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    public string? SelectedItem => SelectedIndex >= 0 && ItemsSource != null && SelectedIndex < ItemsSource.Count 
+        ? ItemsSource[SelectedIndex] : null;
+
+    public event EventHandler? SelectedIndexChanged;
+
+    private readonly Microsoft.Maui.Controls.Picker _picker;
+    private readonly Border _border;
+
+    public Select()
+    {
+        _picker = new Microsoft.Maui.Controls.Picker { Title = "Select...", BackgroundColor = Colors.Transparent };
+        _picker.SelectedIndexChanged += (s, e) =>
+        {
+            SelectedIndex = _picker.SelectedIndex;
+            SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
+        };
+        _border = new Border
+        {
+            Content = _picker,
+            Padding = new Thickness(12, 0),
+            HeightRequest = 40,
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = 6 }
+        };
+        Content = _border;
+    }
+
+    private static void OnItemsChanged(BindableObject b, object o, object n)
+    {
+        if (b is Select s && n is IList<string> list)
+        {
+            s._picker.ItemsSource = (System.Collections.IList)list;
+            if (s.SelectedIndex >= 0 && s.SelectedIndex < list.Count)
+                s._picker.SelectedIndex = s.SelectedIndex;
+        }
+    }
+
+    private static void OnSelectedChanged(BindableObject b, object o, object n)
+    {
+        if (b is Select s && (int)n != s._picker.SelectedIndex)
+            s._picker.SelectedIndex = (int)n;
+    }
+}
