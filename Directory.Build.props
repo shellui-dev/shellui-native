@@ -23,7 +23,7 @@
     <Copyright>© $([System.DateTime]::Now.Year) ShellUI. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageTags>maui;winui;wpf;ui;components;shadcn;native;cross-platform</PackageTags>
+    <PackageTags>maui;avalonia;winui;ui;components;shadcn;native;cross-platform</PackageTags>
     <RepositoryUrl>https://github.com/shellui-dev/shellui-native</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
