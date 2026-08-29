@@ -74,7 +74,19 @@ public static class ComponentRegistry
         // Navigation / Layout - P3
         { "collapsible", (CollapsibleTemplate.Metadata, CollapsibleTemplate.Contents) },
         { "collapsible-trigger", (CollapsibleTriggerTemplate.Metadata, CollapsibleTriggerTemplate.Contents) },
-        { "collapsible-content", (CollapsibleContentTemplate.Metadata, CollapsibleContentTemplate.Contents) }
+        { "collapsible-content", (CollapsibleContentTemplate.Metadata, CollapsibleContentTemplate.Contents) },
+        { "accordion", (AccordionTemplate.Metadata, AccordionTemplate.Contents) },
+        { "accordion-item", (AccordionItemTemplate.Metadata, AccordionItemTemplate.Contents) },
+        { "accordion-trigger", (AccordionTriggerTemplate.Metadata, AccordionTriggerTemplate.Contents) },
+        { "accordion-content", (AccordionContentTemplate.Metadata, AccordionContentTemplate.Contents) },
+        { "tabs", (TabsTemplate.Metadata, TabsTemplate.Contents) },
+        { "tabs-list", (TabsListTemplate.Metadata, TabsListTemplate.Contents) },
+        { "tabs-trigger", (TabsTriggerTemplate.Metadata, TabsTriggerTemplate.Contents) },
+        { "tabs-content", (TabsContentTemplate.Metadata, TabsContentTemplate.Contents) },
+        { "breadcrumb", (BreadcrumbTemplate.Metadata, BreadcrumbTemplate.Contents) },
+        { "breadcrumb-item", (BreadcrumbItemTemplate.Metadata, BreadcrumbItemTemplate.Contents) },
+        { "skeleton", (SkeletonTemplate.Metadata, SkeletonTemplate.Contents) },
+        { "scroll-area", (ScrollAreaTemplate.Metadata, ScrollAreaTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
