@@ -4,7 +4,7 @@ Living document tracking **branches**, **phases**, and **feature implementations
 ShellUI Native. Companion to [PLAN.md](./PLAN.md) (long-term strategy) and
 [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md) (prioritized component backlog).
 
-Last revised: **2026-08-29**.
+Last revised: **2026-08-29** (post-PR #2 merge).
 
 ---
 
@@ -16,8 +16,8 @@ Short-lived sub-branches (`feat/<phase>/<slice>`) cut off the phase branch and m
 into it, not directly into `main`.
 
 ```
-main   ← Phase 1a merged (2026-07-05)
- └─ feat/template-system-v2           ← Phase 1b (active) — per-platform template keying
+main   ← Phase 1a merged (2026-07-05), Phase 1b merged (2026-08-29 via PR #2)
+ └─ feat/p3-navigation-layout         ← Phase 1c (next) — MAUI P3 tier (tabs, accordion, …)
  └─ feat/avalonia-implementation      ← Phase 2 (planned) — Avalonia templates + reference impl
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
@@ -35,8 +35,8 @@ main   ← Phase 1a merged (2026-07-05)
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a merged | 44 components on .NET 10 + xUnit tests + Avalonia-ready platform model |
-| `feat/template-system-v2` | `main` | **Active** | Phase 1b — per-platform template keying (this branch) |
+| `main` | — | Phase 1a + 1b merged | 44 platform-keyed components, `SupportsPlatform` registry, xUnit 199/199, sizing + token contracts locked |
+| `feat/p3-navigation-layout` | `main` | **Next** | Phase 1c — MAUI P3 (tabs, accordion, collapsible, breadcrumb, scroll-area, skeleton) |
 
 ---
 
@@ -135,10 +135,10 @@ The MAUI-only alpha foundation. Merged to `main` via PR #1.
 
 ---
 
-## Phase 1b — `feat/template-system-v2` (**active — this branch**)
+## Phase 1b — `feat/template-system-v2` (**merged 2026-08-29 via [PR #2](https://github.com/shellui-dev/shellui-native/pull/2)**)
 
-**Prerequisite for any Phase 2 work.** Focused refactor: the template layer becomes platform-keyed
-so adding Avalonia is a per-template dict entry rather than a whole parallel registry.
+Focused refactor: the template layer became platform-keyed so adding Avalonia is a per-template
+dict entry rather than a whole parallel registry. Prerequisite for Phase 2, now unblocked.
 
 ### Problem (context)
 
@@ -239,7 +239,79 @@ public static class ButtonTemplate
 
 ---
 
-## Phase 2 — `feat/avalonia-implementation` (blocked on Phase 1b)
+## Phase 1c — `feat/p3-navigation-layout` (**next**)
+
+Finish MAUI's component vocabulary through P3 before opening the cross-platform front.
+Rationale: Phase 2 (Avalonia) turns every new MAUI component into two components to
+maintain. Locking the P3 tier on MAUI first keeps Phase 2 a mechanical port instead of
+chasing a moving target.
+
+Small, additive branch — no infrastructure changes, no registry surgery. Each new component
+is one template file + one `ComponentRegistry` entry + `TemplateContentTests` parameters
+picking it up automatically.
+
+### Scope — P3 (Navigation & Layout, from [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md))
+
+| # | Component | Sub-components | Notes |
+|---|-----------|----------------|-------|
+| P3.1 | **tabs** | `tabs-list`, `tabs-trigger`, `tabs-content` | Compositional (Trigger/Content pattern). Tab bar + one visible panel at a time. |
+| P3.2 | **accordion** | `accordion-item`, `accordion-trigger`, `accordion-content` | Multiple expandable sections; `Type="single"` vs `"multiple"` behavior. |
+| P3.3 | **collapsible** | `collapsible-trigger`, `collapsible-content` | Single expand/collapse — the primitive `accordion-item` composes on top of. |
+| P3.4 | **breadcrumb** | `breadcrumb-item` | Nav trail. Icon-aware separator between items. |
+| P3.5 | **scroll-area** | — | `ScrollView` wrapper with consistent scrollbar styling. |
+| P3.6 | **skeleton** | — | Loading placeholder — animated grey block, sized by parent. |
+
+### Implementation order
+
+Build the primitive before the composite: **collapsible → accordion → tabs → breadcrumb →
+skeleton → scroll-area**. Collapsible's animation + `IsOpen` state is the accordion-item
+core; accordion-item generalizes it; tabs reuses the same show/hide pattern with mutual
+exclusion. Breadcrumb and skeleton are standalone and can slot in wherever.
+
+### Constraints (locked by Phase 1b)
+
+- Every new template MUST populate `Contents[NativePlatform.MAUI]` (registry lookup contract).
+- Every new form-adjacent control MUST follow the
+  [Form Sizing Contract](./COMPONENTS_ROADMAP.md#form-sizing-contract) — 40px baseline for
+  row-level triggers (`tabs-trigger`, `accordion-trigger`, `breadcrumb-item`).
+- Every new color usage MUST reuse a token from the
+  [Design Token Contract](./COMPONENTS_ROADMAP.md#design-token-contract). New role → add
+  the token to the table first, then use it.
+- Compositional families use `FindParentOfType<T>()` from `element-extensions` (already
+  installed as a dependency by every overlay component — add it as a dependency for the
+  new families too).
+
+### Deliverables
+
+- [ ] 6 new template classes + 3 sub-components (9 files total)
+- [ ] `ComponentRegistry` entries for all 9
+- [ ] `MAUI.Demo` gains a demo section for each family (Tabs / Accordion / Collapsible /
+  Breadcrumb / ScrollArea / Skeleton)
+- [ ] `TemplateContentTests` picks the new components up automatically (parameterized
+  over the whole registry — nothing to add manually)
+- [ ] [COMPONENTS.md](./COMPONENTS.md) updated with usage snippets for each
+
+### Exit criteria to merge → `main`
+
+1. `dotnet build ShellUI.Native.slnx` — 0/0
+2. `dotnet test` — new baseline count reflects 9 new components (should land ~10 tests up)
+3. Every new component has a demo section in `MAUI.Demo` that renders on the Windows head
+4. No token drift: `grep -E '"#[0-9A-Fa-f]{6}"' src/ShellUI.Native.Templates/Templates/` in
+   the diff introduces zero hexes not already in the Design Token Contract table
+
+### What this phase deliberately does NOT do
+
+- No Avalonia work (that's Phase 2, and starting it now would double the maintenance
+  surface while P3 is in flight).
+- No P4+ components (tooltip, toast, alert-dialog, hover-card) — they need overlay
+  primitives that already exist, but they're feedback/overlay rather than nav/layout;
+  scoping them into a separate `feat/p4-feedback` branch keeps PRs reviewable.
+- No refactoring of existing P0/P1/P2 components. Sizing + token contracts are locked;
+  any drift found in review gets a fix-forward in the P4 branch, not here.
+
+---
+
+## Phase 2 — `feat/avalonia-implementation` (unblocked, waiting on Phase 1c)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 

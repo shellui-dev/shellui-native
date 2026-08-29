@@ -2,7 +2,9 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
-Last revised: **2026-08-29** (on `feat/template-system-v2`).
+Last revised: **2026-08-29** (post PR #2 merge — Phase 1b live on `main`).
+
+**Status at a glance:** P0 ✅ done · P1 ✅ done · P2 ✅ done · **P3 ⏭️ next (`feat/p3-navigation-layout`)** · P4–P7 backlog · Avalonia (Phase 2) unblocked, sequenced after P3 to avoid a moving target.
 
 ---
 
@@ -101,42 +103,44 @@ Templates hardcode ARGB strings today (no shared token file until Phase 2 lands 
 
 ---
 
-### P1 — High (Modal / Overlay patterns)
+### P1 — High (Modal / Overlay patterns) ✅ Done
 *Compositional: Parent + Trigger + Content. Needed for most app flows.*
 
-| Component | Priority | Dependencies | ShellUI Ref | Notes |
-|-----------|----------|--------------|-------------|-------|
-| **dialog** | P1.1 | dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close | Dialog | Modal overlay, center screen |
-| **drawer** | P1.2 | drawer-trigger, drawer-content | Drawer | Slide-out from side (Bottom/Left/Right/Top) |
-| **sheet** | P1.3 | sheet-trigger, sheet-content | Sheet | Similar to Drawer, bottom sheet variant |
-| **dropdown** | P1.4 | dropdown-trigger, dropdown-content, dropdown-item | Dropdown | Menu dropdown |
-| **popover** | P1.5 | popover-trigger, popover-content | Popover | Floating content popover |
+| Component | Status | Dependencies | ShellUI Ref | Notes |
+|-----------|--------|--------------|-------------|-------|
+| **dialog** | ✅ Done | dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close | Dialog | Modal overlay, center screen |
+| **drawer** | ✅ Done | drawer-trigger, drawer-content | Drawer | Slide-out from side (Bottom/Left/Right/Top) |
+| **sheet** | ✅ Done | sheet-trigger, sheet-content | Sheet | Similar to Drawer, bottom sheet variant |
+| **dropdown** | ✅ Done | dropdown-trigger, dropdown-content, dropdown-item | Dropdown | Menu dropdown. Item hit target raised to 40px 2026-08-29 |
+| **popover** | ✅ Done | popover-trigger, popover-content | Popover | Floating content popover |
 
 ---
 
-### P2 — High (Form completeness)
+### P2 — High (Form completeness) ✅ Done
 *Essential form controls for full form coverage.*
 
-| Component | Priority | Dependencies | ShellUI Ref | Notes |
-|-----------|----------|--------------|-------------|-------|
-| **textarea** | P2.1 | — | Textarea | Multi-line text input |
-| **select** | P2.2 | select-trigger, select-content, select-item | Select | Native-style picker or custom dropdown |
-| **slider** | P2.3 | — | Slider | Range input |
-| **radio-group** | P2.4 | radio-group-item | RadioGroup | Radio button group |
-| **date-picker** | P2.5 | — | DatePicker | Date selection |
-| **time-picker** | P2.6 | — | TimePicker | Time selection |
+| Component | Status | Dependencies | ShellUI Ref | Notes |
+|-----------|--------|--------------|-------------|-------|
+| **textarea** | ✅ Done | — | Textarea | Multi-line text input |
+| **select** | ✅ Done | — | Select | Native `Picker` wrapper at 40px baseline. Trigger/Content split deferred until custom-dropdown variant is needed |
+| **slider** | ✅ Done | — | Slider | Range input |
+| **radio-group** | ✅ Done | radio-group-item | RadioGroup | Radio button group. Item checked-border fixed 2026-08-29 |
+| **date-picker** | ✅ Done | — | DatePicker | Date selection |
+| **time-picker** | ✅ Done | — | TimePicker | Time selection |
 
 ---
 
-### P3 — Medium (Navigation & Layout)
+### P3 — Medium (Navigation & Layout) ⏭️ Next — `feat/p3-navigation-layout`
+*See [DEVELOPMENT_PLAN.md § Phase 1c](./DEVELOPMENT_PLAN.md) for scope, order, and exit criteria.*
+
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
-| **tabs** | P3.1 | tabs-list, tabs-trigger, tabs-content | Tabs | Tabbed navigation |
-| **accordion** | P3.2 | accordion-item, accordion-trigger, accordion-content | Accordion | Expandable sections |
-| **collapsible** | P3.3 | collapsible-trigger, collapsible-content | Collapsible | Single expand/collapse |
-| **breadcrumb** | P3.4 | breadcrumb-item | Breadcrumb | Breadcrumb nav |
-| **scroll-area** | P3.5 | — | ScrollArea | Scrollable container |
-| **skeleton** | P3.6 | — | Skeleton | Loading placeholder |
+| **collapsible** | P3.1 (build first — primitive) | collapsible-trigger, collapsible-content, element-extensions | Collapsible | Single expand/collapse — the `IsOpen` + animation primitive `accordion-item` composes on top of. |
+| **accordion** | P3.2 | accordion-item, accordion-trigger, accordion-content, element-extensions | Accordion | Multiple sections. `Type=Single` (radio-style) or `Multiple`. |
+| **tabs** | P3.3 | tabs-list, tabs-trigger, tabs-content, element-extensions | Tabs | Tab bar + one visible panel. Trigger MUST render at the 40px baseline (row-level control). |
+| **breadcrumb** | P3.4 | breadcrumb-item | Breadcrumb | Nav trail with separator between items. |
+| **skeleton** | P3.5 | — | Skeleton | Animated grey block, sized by parent — use for perceived-perf on lists. |
+| **scroll-area** | P3.6 | — | ScrollArea | `ScrollView` wrapper. Cross-platform scrollbar styling is thin — consider whether this is worth the wrapper vs documenting native `ScrollView`. |
 
 ---
 
@@ -248,15 +252,30 @@ public static T? FindParentOfType<T>(this Element element) where T : Element
 
 ---
 
-## Order of Implementation (Recommended)
+## Order of Implementation
 
-1. **dialog** + dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-close
-2. **drawer** + drawer-trigger, drawer-content
-3. **tabs** + tabs-list, tabs-trigger, tabs-content
-4. **textarea**
-5. **select** + select-trigger, select-content, select-item
-6. **dropdown** + dropdown-trigger, dropdown-content, dropdown-item
-7. **slider**
-8. **skeleton**
-9. **accordion** + accordion-item, accordion-trigger, accordion-content
-10. **popover** + popover-trigger, popover-content
+**Shipped on `main`** (Phase 1a + 1b — see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md)):
+P0 (15 components) → P1 (14 components across dialog / drawer / sheet / dropdown / popover
+families) → P2 (6 components including textarea, select, slider, radio-group, date-picker,
+time-picker). Total 44 templates, all platform-keyed via Template System v2.
+
+**Up next — `feat/p3-navigation-layout`** (Phase 1c). Build the primitive before the
+composite:
+
+1. **collapsible** + collapsible-trigger, collapsible-content — establishes the `IsOpen` +
+   animation pattern the rest of the tier reuses
+2. **accordion** + accordion-item, accordion-trigger, accordion-content — accordion-item
+   is collapsible with sibling coordination via `FindParentOfType<Accordion>()`
+3. **tabs** + tabs-list, tabs-trigger, tabs-content — same show/hide pattern as accordion
+   but always exactly one visible
+4. **breadcrumb** + breadcrumb-item — standalone, no shared state
+5. **skeleton** — standalone, animation primitive worth locking early so P5 (avatar,
+   table, empty-state) can compose it
+6. **scroll-area** — decide during implementation whether it's worth the wrapper vs
+   documenting native `ScrollView`
+
+**After Phase 1c → Phase 2 (Avalonia).** Do not open Phase 2 until Phase 1c merges — the
+whole point of finishing P3 on MAUI first is to freeze the vocabulary before it doubles.
+
+**Then Phase 1d / P4+ (feedback, data display, advanced).** Sequenced after Avalonia has
+Avalonia-parity on P0/P1 at least, so new MAUI components don't get too far ahead again.
