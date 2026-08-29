@@ -130,7 +130,15 @@ public static class InitService
 
     private static async Task InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath)
     {
-        var content = ComponentRegistry.GetComponentContent("shell");
+        if (!ComponentRegistry.SupportsPlatform("shell", projectInfo.Platform))
+        {
+            AnsiConsole.MarkupLine(
+                $"[yellow]Shell utility has no template for {projectInfo.Platform} yet — skipping.[/] " +
+                $"[dim]Add components once per-platform templates land.[/]");
+            return;
+        }
+
+        var content = ComponentRegistry.GetComponentContent("shell", projectInfo.Platform);
         if (content == null) return;
 
         content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);

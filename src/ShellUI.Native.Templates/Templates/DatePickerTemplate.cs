@@ -15,7 +15,9 @@ public static class DatePickerTemplate
         Tags = new List<string> { "form", "date", "picker" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class DatePicker : ContentView
@@ -86,5 +88,6 @@ public partial class DatePicker : ContentView
             dp._nativePicker.Date = dt;
     }
 }
-";
+"
+    };
 }

@@ -15,7 +15,9 @@ public static class DrawerTriggerTemplate
         Tags = new List<string> { "overlay", "drawer", "trigger" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class DrawerTrigger : ContentView
 {
@@ -26,5 +28,6 @@ public partial class DrawerTrigger : ContentView
         GestureRecognizers.Add(tap);
     }
 }
-";
+"
+    };
 }

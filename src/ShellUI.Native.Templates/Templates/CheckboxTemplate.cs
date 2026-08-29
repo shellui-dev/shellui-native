@@ -17,7 +17,9 @@ public static class CheckboxTemplate
         Tags = new List<string> { "form", "checkbox", "input", "selection" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Checkbox component with label support
@@ -165,6 +167,7 @@ public partial class Checkbox : ContentView
         _checkboxBorder.Opacity = IsEnabled ? 1.0 : 0.5;
     }
 }
-";
+"
+    };
 
 }

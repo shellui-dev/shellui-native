@@ -15,7 +15,9 @@ public static class SelectTemplate
         Tags = new List<string> { "form", "select", "picker", "dropdown" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class Select : ContentView
@@ -83,5 +85,6 @@ public partial class Select : ContentView
             s._picker.SelectedIndex = (int)n;
     }
 }
-";
+"
+    };
 }

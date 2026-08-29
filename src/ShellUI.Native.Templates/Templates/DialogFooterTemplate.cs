@@ -15,7 +15,9 @@ public static class DialogFooterTemplate
         Tags = new List<string> { "overlay", "dialog", "footer" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 [ContentProperty(nameof(Children))]
 public partial class DialogFooter : ContentView
@@ -34,5 +36,6 @@ public partial class DialogFooter : ContentView
         Content = _stack;
     }
 }
-";
+"
+    };
 }

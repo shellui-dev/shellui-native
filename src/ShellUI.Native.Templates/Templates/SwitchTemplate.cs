@@ -17,7 +17,9 @@ public static class SwitchTemplate
         Tags = new List<string> { "form", "switch", "toggle", "input" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Switch/Toggle component
@@ -166,6 +168,7 @@ public partial class Switch : ContentView
         _thumb.TranslationX = thumbX;
     }
 }
-";
+"
+    };
 
 }

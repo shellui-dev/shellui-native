@@ -15,7 +15,9 @@ public static class DropdownContentTemplate
         Tags = new List<string> { "overlay", "dropdown", "content" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 [ContentProperty(nameof(Children))]
 public partial class DropdownContent : ContentView
@@ -30,5 +32,6 @@ public partial class DropdownContent : ContentView
         Content = _stack;
     }
 }
-";
+"
+    };
 }

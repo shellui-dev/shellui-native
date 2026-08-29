@@ -17,7 +17,9 @@ public static class AlertTemplate
         Tags = new List<string> { "feedback", "alert", "notification", "message", "banner" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Alert component for notifications and feedback
@@ -175,6 +177,7 @@ public enum AlertVariant
     Warning,
     Info
 }
-";
+"
+    };
 
 }

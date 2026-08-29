@@ -2,6 +2,51 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
+Last revised: **2026-08-29** (on `feat/template-system-v2`).
+
+---
+
+## Form Sizing Contract
+
+Every single-line form control renders at **40px** high (matches shadcn `h-10` / default `ButtonSize.Default`). Multi-line controls use `MinimumHeightRequest`. Horizontal padding is 12px; vertical padding is 0 when `HeightRequest` is fixed (the fixed height owns the vertical rhythm), 8px when it isn't.
+
+| Component | Height | Padding | Notes |
+|-----------|--------|---------|-------|
+| `Button` (Default) | 40 (from `ButtonStyle.Height`) | `(16, 10)` | Variant-driven: Sm=36, Lg=44, Icon=40×40 |
+| `Input` | 40 | `(12, 0)` | Fixed 2026-08-29 — was unset + `(12, 8)`, rendered inconsistent across platforms |
+| `Select` | 40 | `(12, 0)` | |
+| `DatePicker` | 40 | `(12, 0)` | |
+| `TimePicker` | 40 | `(12, 0)` | |
+| `Textarea` | `MinimumHeightRequest=80` | `(12, 8)` | Multi-line — grows with content |
+| `Checkbox` | 20×20 (box) | — | Icon-shaped, not a field |
+| `RadioGroupItem` | 20×20 (dot) | — | Icon-shaped, not a field |
+
+**Rule for new form controls:** if it visually sits in a form row next to `Input`, it MUST be 40px tall. If it's a compositional container that hosts its own field (e.g. `Combobox`, `InputOTP`), the inner field carries the 40. Don't rely on platform default heights — MAUI's `Entry` / `Picker` defaults vary wildly across Android / iOS / Windows.
+
+**Menu / list rows** (`DropdownItem`, `SelectItem` when added, `ContextMenuOption`) use `MinimumHeightRequest = 40` plus symmetric `Padding = (12, 12)` — they need a real touch target (44px iOS / 48dp Android guidance), not just enough space to draw the text.
+
+**Icon-shaped controls** (`Checkbox` box 20×20, `RadioGroupItem` dot 20×20, `Switch` track 44×24) keep their exact pixel dimensions — those numbers are the design, not a fill. Their outer row inherits its hit area from the surrounding `HorizontalStackLayout`, which currently follows the icon height. If a future accessibility pass needs 44px touch targets for these, expand the container's `MinimumHeightRequest`, not the icon size.
+
+---
+
+## Design Token Contract
+
+Templates hardcode ARGB strings today (no shared token file until Phase 2 lands the Avalonia `ResourceDictionary`). While we're still copy-pasting them, they MUST agree — otherwise "primary" reads as two different blues across the demo.
+
+| Token | Value | Used by |
+|-------|-------|---------|
+| `Primary` | `#2563EB` | Button (Default), Checkbox (fill+border when checked), RadioGroupItem (fill+border when checked, fixed 2026-08-29), Switch (track when on), Progress (Default fill), Input (focus border, fixed 2026-08-29) |
+| `Destructive` | `#EF4444` | Button (Destructive), Badge (Destructive), Progress (Destructive), Input (error border), Alert title (Destructive) |
+| `Border` | `#E5E7EB` | Input (idle), Card (Default/Bordered), Checkbox (unchecked ring), RadioGroupItem (unchecked ring), Separator, Alert (Default) |
+| `Muted background` | `#F3F4F6` | Badge (Secondary bg), Alert (Default bg) |
+| `Foreground` | `#1F2937` | Input text, Label (Default), Checkbox label, Switch label, Alert title (Default) |
+| `Muted foreground` | `#6B7280` | Progress label, Label (Muted variant) |
+| `Placeholder` | `#9CA3AF` | Input placeholder |
+| `Success` | `#22C55E` | Badge/Alert/Progress Success |
+| `Warning` | `#F59E0B` | Badge/Alert/Progress Warning |
+
+**Rule:** never introduce a new hex for a role that already has a token above. If you need a token that isn't listed, add it here first, then use it — that keeps Phase 2's `ResourceDictionary` extraction mechanical (grep the hex, replace with `{DynamicResource ShellUIPrimary}` in Avalonia XAML).
+
 ---
 
 ## Architectural Pattern: Dependencies over ChildComponent
@@ -41,7 +86,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 | shell | ✅ Done | — | Shell |
 | button | ✅ Done | button-variants | Button |
 | button-variants | ✅ Done | — | ButtonVariants |
-| input | ✅ Done | — | Input |
+| input | ✅ Done (height fix 2026-08-29) | — | Input |
 | label | ✅ Done | — | Label |
 | checkbox | ✅ Done | — | Checkbox |
 | switch | ✅ Done | — | Switch |

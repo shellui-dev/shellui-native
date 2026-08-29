@@ -15,7 +15,9 @@ public static class DropdownItemTemplate
         Tags = new List<string> { "overlay", "dropdown", "item", "menu" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class DropdownItem : ContentView
 {
@@ -39,7 +41,8 @@ public partial class DropdownItem : ContentView
         {
             FontSize = 14,
             VerticalOptions = LayoutOptions.Center,
-            Padding = new Thickness(8, 10)
+            Padding = new Thickness(12, 12),
+            MinimumHeightRequest = 40
         };
         Content = _label;
         var tap = new TapGestureRecognizer();
@@ -56,5 +59,6 @@ public partial class DropdownItem : ContentView
 
     private void UpdateContent() => _label.Text = Text ?? string.Empty;
 }
-";
+"
+    };
 }

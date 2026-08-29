@@ -30,12 +30,6 @@ public static class ComponentInstaller
 
         var projectInfo = ProjectDetector.DetectProject();
 
-        if (config.TargetPlatform != NativePlatform.MAUI)
-        {
-            AnsiConsole.MarkupLine($"[yellow]Warning:[/] component templates are currently MAUI-only. " +
-                $"'{config.TargetPlatform}' support is planned but not yet implemented — installed files will contain MAUI code.");
-        }
-
         // Parse comma-separated components
         var componentList = new List<string>();
         foreach (var comp in components)
@@ -163,7 +157,17 @@ public static class ComponentInstaller
             return InstallResult.Skipped;
         }
 
-        var content = ComponentRegistry.GetComponentContent(componentName);
+        if (!ComponentRegistry.SupportsPlatform(componentName, config.TargetPlatform))
+        {
+            var supported = ComponentRegistry.GetSupportedPlatforms(componentName);
+            var supportedList = supported.Count == 0 ? "(none)" : string.Join(", ", supported);
+            AnsiConsole.MarkupLine(
+                $"[red]Component '{componentName}' has no template for {config.TargetPlatform}.[/] " +
+                $"[dim]Supported platforms: {supportedList}. See docs/DEVELOPMENT_PLAN.md for the roadmap.[/]");
+            return InstallResult.Failed;
+        }
+
+        var content = ComponentRegistry.GetComponentContent(componentName, config.TargetPlatform);
         if (content == null)
         {
             AnsiConsole.MarkupLine($"[red]Failed to get content for '{componentName}'[/]");

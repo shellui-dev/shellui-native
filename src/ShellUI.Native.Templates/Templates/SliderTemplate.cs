@@ -15,7 +15,9 @@ public static class SliderTemplate
         Tags = new List<string> { "form", "input", "range", "slider" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class Slider : ContentView
 {
@@ -83,5 +85,6 @@ public partial class Slider : ContentView
             _nativeSlider.Value = Value;
     }
 }
-";
+"
+    };
 }

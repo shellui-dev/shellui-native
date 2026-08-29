@@ -17,7 +17,9 @@ public static class CardFooterTemplate
         Tags = new List<string> { "layout", "card", "footer", "actions" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Card footer section for actions
 public partial class CardFooter : ContentView
@@ -103,5 +105,6 @@ public partial class CardFooter : ContentView
 }
 
 public enum FooterJustify { Start, Center, End, SpaceBetween }
-";
+"
+    };
 }

@@ -17,7 +17,9 @@ public static class ElementExtensionsTemplate
         Tags = new List<string> { "utility", "extensions", "composition" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 /// <summary>Extensions for compositional components (Dialog, Drawer, etc.) - find parent in visual tree.</summary>
 public static class ElementExtensions
@@ -33,5 +35,6 @@ public static class ElementExtensions
         return null;
     }
 }
-";
+"
+    };
 }

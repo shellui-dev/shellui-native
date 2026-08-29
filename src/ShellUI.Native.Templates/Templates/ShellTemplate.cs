@@ -16,7 +16,9 @@ public static class ShellTemplate
         Tags = new List<string> { "utility", "core", "helper" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // ShellUI Native utility class
 public static class Shell
@@ -25,5 +27,6 @@ public static class Shell
     public static string Cn(params string?[] classes)
         => string.Join("" "", classes.Where(c => !string.IsNullOrWhiteSpace(c)));
 }
-";
+"
+    };
 }

@@ -17,7 +17,9 @@ public static class CardContentTemplate
         Tags = new List<string> { "layout", "card", "content" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Card main content section
 public partial class CardContent : ContentView
@@ -68,5 +70,6 @@ public partial class CardContent : ContentView
         }
     }
 }
-";
+"
+    };
 }

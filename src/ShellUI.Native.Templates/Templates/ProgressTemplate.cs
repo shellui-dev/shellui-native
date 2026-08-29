@@ -17,7 +17,9 @@ public static class ProgressTemplate
         Tags = new List<string> { "progress", "loading", "indicator", "bar" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Progress bar component
@@ -202,6 +204,7 @@ public enum ProgressVariant
     Warning,
     Destructive
 }
-";
+"
+    };
 
 }

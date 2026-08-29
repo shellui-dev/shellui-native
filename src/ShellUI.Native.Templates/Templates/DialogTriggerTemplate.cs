@@ -15,7 +15,9 @@ public static class DialogTriggerTemplate
         Tags = new List<string> { "overlay", "dialog", "trigger" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Tap to open dialog. Usage: <DialogTrigger><Button Text=""Open"" /></DialogTrigger>
 public partial class DialogTrigger : ContentView
@@ -35,5 +37,6 @@ public partial class DialogTrigger : ContentView
         dialog?.SetOpen(true);
     }
 }
-";
+"
+    };
 }

@@ -15,7 +15,9 @@ public static class DialogContentTemplate
         Tags = new List<string> { "overlay", "dialog", "content" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Modal content overlay - backdrop + centered box. Usage: <DialogContent><DialogHeader />...</DialogContent>
@@ -66,5 +68,6 @@ public partial class DialogContent : ContentView
     }
 
 }
-";
+"
+    };
 }

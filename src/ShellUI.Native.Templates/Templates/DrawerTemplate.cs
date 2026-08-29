@@ -16,7 +16,9 @@ public static class DrawerTemplate
         Tags = new List<string> { "overlay", "drawer", "panel" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class Drawer : AbsoluteLayout
 {
@@ -86,5 +88,6 @@ public partial class Drawer : AbsoluteLayout
 }
 
 public enum DrawerSide { Left, Right, Top, Bottom }
-";
+"
+    };
 }
