@@ -17,18 +17,28 @@ jobs:
       with:
         dotnet-version: 10.0.x
 
+    # The example projects (examples/MAUI.Demo) need the MAUI workload and are covered
+    # by the separate build-examples job in ci.yml. This validate job stays lightweight —
+    # library projects + tests only, no workload install required.
+
     - name: Check formatting
-      run: dotnet format src/ --verify-no-changes --verbosity diagnostic
+      run: dotnet format src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --verify-no-changes --verbosity diagnostic
       continue-on-error: true
 
     - name: Restore
-      run: dotnet restore src/
+      run: |
+        dotnet restore src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj
+        dotnet restore tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj
 
     - name: Build
-      run: dotnet build src/ --no-restore --configuration Release --warnaserror
+      run: |
+        dotnet build src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-restore --configuration Release --warnaserror
+        dotnet build tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj --no-restore --configuration Release --warnaserror
 
     - name: Check for package vulnerabilities
-      run: dotnet list src/ package --vulnerable --include-transitive
+      run: |
+        dotnet list src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj package --vulnerable --include-transitive
+        dotnet list tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj package --vulnerable --include-transitive
       continue-on-error: true
 
   # Label PR based on files changed
