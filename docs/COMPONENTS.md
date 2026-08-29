@@ -389,7 +389,29 @@ shellui-native add progress
 ---
 
 ### Skeleton
-*(Planned — P3.6, see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md))* — Loading placeholder animation.
+Pulsing grey placeholder for loading states.
+
+```bash
+shellui-native add skeleton
+```
+
+**Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| CornerRadius | double | 4 | Rounded corner radius |
+| HeightRequest / WidthRequest | double | 20 / — | Size — set to match the content it stands in for |
+
+Opacity animates on a 1200ms sin-loop between 1.0 and 0.5. The animation restarts on
+reparenting so it survives navigation between pages.
+
+**Usage:**
+```xml
+<VerticalStackLayout Spacing="8">
+    <ui:Skeleton HeightRequest="20" WidthRequest="200" />
+    <ui:Skeleton HeightRequest="16" />
+    <ui:Skeleton HeightRequest="60" CornerRadius="8" />
+</VerticalStackLayout>
+```
 
 ---
 
@@ -416,6 +438,161 @@ shellui-native add alert
 <ui:Alert Title="Success!" Message="Operation completed successfully" Variant="Success" />
 <ui:Alert Title="Error" Message="Something went wrong" Variant="Destructive" />
 <ui:Alert Message="Info message" Variant="Info" />
+```
+
+---
+
+## Navigation Components
+
+Tabs, accordion, breadcrumb. Also compositional: parent owns state, triggers set it, content reacts.
+
+### Tabs
+Tabbed navigation — one panel visible at a time.
+
+```bash
+shellui-native add tabs
+```
+
+Auto-installs `tabs-list`, `tabs-trigger`, `tabs-content`, and `element-extensions`.
+
+**Properties (Tabs):**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| Value | string | "" | Active tab id (two-way bindable). `SetValue(...)` also works. |
+
+**Properties (TabsTrigger):** `Value` (string, required — id it activates), `Text` (string, its label). Renders active state with Primary underline + bold; MinimumHeightRequest = 40 per the Form Sizing Contract.
+
+**Properties (TabsContent):** `Value` (string, required — panel visible when `Tabs.Value` matches).
+
+**Usage:**
+```xml
+<ui:Tabs Value="overview">
+    <ui:TabsList>
+        <ui:TabsTrigger Value="overview" Text="Overview" />
+        <ui:TabsTrigger Value="details" Text="Details" />
+    </ui:TabsList>
+    <ui:TabsContent Value="overview"><Label Text="Overview body" /></ui:TabsContent>
+    <ui:TabsContent Value="details"><Label Text="Details body" /></ui:TabsContent>
+</ui:Tabs>
+```
+
+Content swaps instantly (no fade) — rapid tab switches would look glitchy under an overlapping animation. Use `Collapsible` or `Accordion` when you want the reveal animation.
+
+---
+
+### Accordion
+Stack of expandable sections.
+
+```bash
+shellui-native add accordion
+```
+
+Auto-installs `accordion-item`, `accordion-trigger`, `accordion-content`, `element-extensions`.
+
+**Properties (Accordion):**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| Type | AccordionType | Single | `Single` (only one item open — radio-style) or `Multiple` (any combination) |
+
+**Events (Accordion):** `ItemToggled(value, isOpen)` — fired for every open + close, so in `Single` mode you'll see a close event for the previously open item followed by an open event for the new one. Enough to persist selection or trigger lazy loading.
+
+**Properties (AccordionItem):** `Value` (string id — required for state tracking).
+
+**Usage:**
+```xml
+<ui:Accordion Type="Single">
+    <ui:AccordionItem Value="a">
+        <ui:AccordionTrigger><Label Text="Section A" FontAttributes="Bold" /></ui:AccordionTrigger>
+        <ui:AccordionContent><Label Text="Body A" /></ui:AccordionContent>
+    </ui:AccordionItem>
+    <ui:Separator />
+    <ui:AccordionItem Value="b">
+        <ui:AccordionTrigger><Label Text="Section B" FontAttributes="Bold" /></ui:AccordionTrigger>
+        <ui:AccordionContent><Label Text="Body B" /></ui:AccordionContent>
+    </ui:AccordionItem>
+</ui:Accordion>
+```
+
+Content fades over 150ms + toggles `IsVisible` (same primitive as `Collapsible`). Height animation is deliberately avoided — MAUI's cross-platform height animation needs measured child height and is unreliable.
+
+---
+
+### Collapsible
+Single expand/collapse — the primitive `AccordionItem` composes on top of.
+
+```bash
+shellui-native add collapsible
+```
+
+Auto-installs `collapsible-trigger`, `collapsible-content`, `element-extensions`.
+
+**Properties (Collapsible):**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| Open | bool | false | Expanded state. `SetOpen(bool)` and `Toggle()` also work. |
+
+**Events (Collapsible):** `OpenChanged(bool)` — fires on every flip.
+
+**Usage:**
+```xml
+<ui:Collapsible Open="{Binding IsExpanded}">
+    <ui:CollapsibleTrigger>
+        <ui:Button Text="Show details" Variant="Outline" />
+    </ui:CollapsibleTrigger>
+    <ui:CollapsibleContent>
+        <Label Text="Hidden until open." />
+    </ui:CollapsibleContent>
+</ui:Collapsible>
+```
+
+`CollapsibleTrigger` wraps whatever visible handle you want — a Label, an icon, a whole row. It only adds the tap gesture + the 40px MinimumHeightRequest (Form Sizing Contract).
+
+---
+
+### Breadcrumb
+Navigation trail with `/` separators.
+
+```bash
+shellui-native add breadcrumb
+```
+
+Auto-installs `breadcrumb-item`.
+
+**Properties (BreadcrumbItem):**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| Text | string | "" | Crumb text |
+| IsCurrent | bool | false | Renders bold + foreground color; suppresses tap |
+
+**Events (BreadcrumbItem):** `Clicked` — fires on tap unless `IsCurrent`.
+
+Each item owns its trailing separator; the parent `Breadcrumb` hides the last one automatically as items are added or removed.
+
+**Usage:**
+```xml
+<ui:Breadcrumb>
+    <ui:BreadcrumbItem Text="Home" Clicked="OnCrumb" />
+    <ui:BreadcrumbItem Text="Library" Clicked="OnCrumb" />
+    <ui:BreadcrumbItem Text="Current Page" IsCurrent="True" />
+</ui:Breadcrumb>
+```
+
+---
+
+### ScrollArea
+Thin `ScrollView` subclass. A named hook for future scrollbar styling — visually identical to MAUI's native `ScrollView` at v1.
+
+```bash
+shellui-native add scroll-area
+```
+
+**Usage:**
+```xml
+<ui:ScrollArea HeightRequest="200">
+    <VerticalStackLayout Spacing="8">
+        <!-- content -->
+    </VerticalStackLayout>
+</ui:ScrollArea>
 ```
 
 ---
@@ -565,16 +742,21 @@ When you add a component, its dependencies are automatically installed:
 | sheet | element-extensions, sheet-trigger, sheet-content |
 | dropdown | element-extensions, dropdown-trigger, dropdown-content, dropdown-item |
 | popover | element-extensions, popover-trigger, popover-content |
+| collapsible | element-extensions, collapsible-trigger, collapsible-content |
+| accordion | element-extensions, accordion-item, accordion-trigger, accordion-content |
+| tabs | element-extensions, tabs-list, tabs-trigger, tabs-content |
+| breadcrumb | breadcrumb-item |
 
 ## Component Categories
 
 Components are organized into the following categories:
 
 - **Form Components**: `button`, `input`, `label`, `checkbox`, `switch`, `textarea`, `slider`, `select`, `radio-group` (+ `radio-group-item`), `date-picker`, `time-picker`
-- **Layout Components**: `card` (+ `card-header`, `card-content`, `card-footer`), `separator`
+- **Layout Components**: `card` (+ `card-header`, `card-content`, `card-footer`), `separator`, `collapsible` (+ trigger, content), `accordion` (+ item, trigger, content), `scroll-area`
+- **Navigation**: `tabs` (+ list, trigger, content), `breadcrumb` (+ item)
 - **Data Display**: `badge`, `progress`
-- **Feedback**: `alert`
+- **Feedback**: `alert`, `skeleton`
 - **Overlay**: `dialog`, `drawer`, `sheet`, `dropdown`, `popover` (+ their trigger/content sub-components)
 - **Utility**: `shell`, `element-extensions` (auto-installed by overlay components)
 
-For P3+ components (Tabs, Accordion, Tooltip, Toast, Skeleton, Table, etc.) see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).
+For P4+ components (Tooltip, Toast, AlertDialog, HoverCard, Table, etc.) see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).

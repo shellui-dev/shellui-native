@@ -256,9 +256,108 @@
                 </ui:PopoverContent>
             </ui:Popover>
 
+            <!-- ================================================================ -->
+            <!-- P3: Navigation / Layout                                        -->
+            <!-- ================================================================ -->
+
+            <Label Text="Collapsible" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Collapsible>
+                <ui:CollapsibleTrigger>
+                    <ui:Button Text="Show details" Variant="Outline" Clicked="OnButtonClicked" />
+                </ui:CollapsibleTrigger>
+                <ui:CollapsibleContent>
+                    <ui:Card Margin="0,8,0,0">
+                        <ui:CardContent>
+                            <Label Text="Hidden content revealed on toggle. Fades in over 150ms." />
+                        </ui:CardContent>
+                    </ui:Card>
+                </ui:CollapsibleContent>
+            </ui:Collapsible>
+
+            <Label Text="Accordion (Single)" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Accordion Type="Single">
+                <ui:AccordionItem Value="a">
+                    <ui:AccordionTrigger>
+                        <Label Text="Section A" FontAttributes="Bold" VerticalOptions="Center" />
+                    </ui:AccordionTrigger>
+                    <ui:AccordionContent>
+                        <Label Text="A's body — opening B will close this in Single mode." Margin="0,4,0,8" />
+                    </ui:AccordionContent>
+                </ui:AccordionItem>
+                <ui:Separator />
+                <ui:AccordionItem Value="b">
+                    <ui:AccordionTrigger>
+                        <Label Text="Section B" FontAttributes="Bold" VerticalOptions="Center" />
+                    </ui:AccordionTrigger>
+                    <ui:AccordionContent>
+                        <Label Text="B's body." Margin="0,4,0,8" />
+                    </ui:AccordionContent>
+                </ui:AccordionItem>
+                <ui:Separator />
+                <ui:AccordionItem Value="c">
+                    <ui:AccordionTrigger>
+                        <Label Text="Section C" FontAttributes="Bold" VerticalOptions="Center" />
+                    </ui:AccordionTrigger>
+                    <ui:AccordionContent>
+                        <Label Text="C's body." Margin="0,4,0,8" />
+                    </ui:AccordionContent>
+                </ui:AccordionItem>
+            </ui:Accordion>
+
+            <Label Text="Tabs" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Tabs Value="overview">
+                <ui:TabsList>
+                    <ui:TabsTrigger Value="overview" Text="Overview" />
+                    <ui:TabsTrigger Value="details" Text="Details" />
+                    <ui:TabsTrigger Value="activity" Text="Activity" />
+                </ui:TabsList>
+                <ui:Separator Margin="0,0,0,12" />
+                <ui:TabsContent Value="overview">
+                    <Label Text="Overview panel — active tab underlines in Primary blue." />
+                </ui:TabsContent>
+                <ui:TabsContent Value="details">
+                    <Label Text="Details panel — instant swap, no fade to avoid glitchy rapid clicks." />
+                </ui:TabsContent>
+                <ui:TabsContent Value="activity">
+                    <Label Text="Activity panel." />
+                </ui:TabsContent>
+            </ui:Tabs>
+
+            <Label Text="Breadcrumb" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:Breadcrumb>
+                <ui:BreadcrumbItem Text="Home" Clicked="OnBreadcrumbClicked" />
+                <ui:BreadcrumbItem Text="Library" Clicked="OnBreadcrumbClicked" />
+                <ui:BreadcrumbItem Text="Data" Clicked="OnBreadcrumbClicked" />
+                <ui:BreadcrumbItem Text="Current Page" IsCurrent="True" />
+            </ui:Breadcrumb>
+
+            <Label Text="Skeleton (loading state)" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <VerticalStackLayout Spacing="8">
+                <ui:Skeleton HeightRequest="20" WidthRequest="200" />
+                <ui:Skeleton HeightRequest="16" />
+                <ui:Skeleton HeightRequest="16" WidthRequest="260" />
+                <ui:Skeleton HeightRequest="60" CornerRadius="8" Margin="0,8,0,0" />
+            </VerticalStackLayout>
+
+            <Label Text="ScrollArea" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
+            <ui:ScrollArea HeightRequest="140">
+                <VerticalStackLayout Spacing="6" Padding="0,0,8,0">
+                    <Label Text="Line 1 — vertical scroll wrapper" />
+                    <Label Text="Line 2" />
+                    <Label Text="Line 3" />
+                    <Label Text="Line 4" />
+                    <Label Text="Line 5" />
+                    <Label Text="Line 6" />
+                    <Label Text="Line 7" />
+                    <Label Text="Line 8" />
+                    <Label Text="Line 9" />
+                    <Label Text="Line 10 — end of list" />
+                </VerticalStackLayout>
+            </ui:ScrollArea>
+
             <!-- Status Label -->
-            <Label x:Name="StatusLabel" 
-                   Text="Click a button to see events!" 
+            <Label x:Name="StatusLabel"
+                   Text="Click a button to see events!"
                    FontSize="14"
                    TextColor="Gray"
                    HorizontalOptions="Center"

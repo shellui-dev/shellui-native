@@ -41,4 +41,10 @@ public partial class MainPage : ContentPage
     private void OnDrawerTriggerClicked(object? sender, EventArgs e) => DemoDrawer.SetOpen(true);
     private void OnSheetTriggerClicked(object? sender, EventArgs e) => DemoSheet.SetOpen(true);
     private void OnDropdownItem(object? sender, EventArgs e) => StatusLabel.Text = "Dropdown item clicked";
+
+    private void OnBreadcrumbClicked(object? sender, EventArgs e)
+    {
+        if (sender is Components.UI.BreadcrumbItem item)
+            StatusLabel.Text = $"Breadcrumb: {item.Text}";
+    }
 }
