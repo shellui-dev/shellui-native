@@ -15,7 +15,9 @@ public static class SheetTriggerTemplate
         Tags = new List<string> { "overlay", "sheet", "trigger" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class SheetTrigger : ContentView
 {
@@ -26,5 +28,6 @@ public partial class SheetTrigger : ContentView
         GestureRecognizers.Add(tap);
     }
 }
-";
+"
+    };
 }

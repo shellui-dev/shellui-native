@@ -15,7 +15,9 @@ public static class DialogDescriptionTemplate
         Tags = new List<string> { "overlay", "dialog", "description" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class DialogDescription : Label
 {
@@ -25,5 +27,6 @@ public partial class DialogDescription : Label
         TextColor = Color.FromArgb(""#6B7280"");
     }
 }
-";
+"
+    };
 }

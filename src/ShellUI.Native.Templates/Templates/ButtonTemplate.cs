@@ -17,7 +17,9 @@ public static class ButtonTemplate
         Tags = new List<string> { "form", "input", "interactive", "button", "action" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 using YourProjectNamespace.Components.UI.Variants;
 
 namespace YourProjectNamespace.Components.UI;
@@ -153,5 +155,6 @@ public partial class Button : ContentView
         Opacity = IsEnabled ? 1.0 : 0.5;
     }
 }
-";
+"
+    };
 }

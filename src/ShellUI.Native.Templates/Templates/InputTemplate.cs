@@ -17,7 +17,9 @@ public static class InputTemplate
         Tags = new List<string> { "form", "input", "text", "field", "entry" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Text input component with validation states
@@ -108,7 +110,8 @@ public partial class Input : ContentView
         _border = new Border
         {
             Content = _entry,
-            Padding = new Thickness(12, 8),
+            Padding = new Thickness(12, 0),
+            HeightRequest = 40,
             StrokeThickness = 1
         };
 
@@ -157,7 +160,7 @@ public partial class Input : ContentView
         // Design tokens matching ShellUI theme
         var backgroundColor = Color.FromArgb(""#FFFFFF"");
         var borderColor = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#E5E7EB"");
-        var focusBorderColor = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#3B82F6"");
+        var focusBorderColor = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#2563EB"");
 
         _border.BackgroundColor = backgroundColor;
         _border.Stroke = borderColor;
@@ -172,5 +175,6 @@ public partial class Input : ContentView
     public void Focus() => _entry.Focus();
     public void Unfocus() => _entry.Unfocus();
 }
-";
+"
+    };
 }

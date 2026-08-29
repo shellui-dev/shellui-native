@@ -17,7 +17,9 @@ public static class LabelTemplate
         Tags = new List<string> { "typography", "text", "label", "heading" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Typography label with variants
 public partial class ShellLabel : ContentView
@@ -125,5 +127,6 @@ public partial class ShellLabel : ContentView
 public enum LabelSize { Xs, Sm, Default, Lg, Xl, Xxl, Xxxl }
 public enum LabelWeight { Light, Normal, Medium, Semibold, Bold }
 public enum LabelVariant { Default, Muted, Destructive, Success, Warning }
-";
+"
+    };
 }

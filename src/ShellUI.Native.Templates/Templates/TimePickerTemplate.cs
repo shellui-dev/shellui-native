@@ -15,7 +15,9 @@ public static class TimePickerTemplate
         Tags = new List<string> { "form", "time", "picker" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class TimePicker : ContentView
@@ -70,5 +72,6 @@ public partial class TimePicker : ContentView
             tp._picker.Time = ts;
     }
 }
-";
+"
+    };
 }

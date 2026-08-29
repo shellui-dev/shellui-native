@@ -16,7 +16,9 @@ public static class SheetTemplate
         Tags = new List<string> { "overlay", "sheet", "panel" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class Sheet : AbsoluteLayout
 {
@@ -86,5 +88,6 @@ public partial class Sheet : AbsoluteLayout
 }
 
 public enum SheetSide { Left, Right, Top, Bottom }
-";
+"
+    };
 }

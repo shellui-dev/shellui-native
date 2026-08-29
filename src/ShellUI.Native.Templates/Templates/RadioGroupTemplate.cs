@@ -15,7 +15,9 @@ public static class RadioGroupTemplate
         Tags = new List<string> { "form", "input", "radio", "choice" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 [ContentProperty(nameof(Children))]
 public partial class RadioGroup : ContentView
@@ -49,5 +51,6 @@ public partial class RadioGroup : ContentView
 
     private static void OnValueChanged(BindableObject b, object o, object n) { }
 }
-";
+"
+    };
 }

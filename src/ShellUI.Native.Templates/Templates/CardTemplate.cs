@@ -17,7 +17,9 @@ public static class CardTemplate
         Tags = new List<string> { "layout", "container", "card", "panel", "surface" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 // Card container - compositional children via Dependencies (CardHeader, CardContent, CardFooter)
@@ -108,5 +110,6 @@ public partial class Card : ContentView
 }
 
 public enum CardVariant { Default, Bordered, Elevated }
-";
+"
+    };
 }

@@ -15,7 +15,9 @@ public static class TextareaTemplate
         Tags = new List<string> { "form", "input", "multiline", "textarea" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class Textarea : ContentView
@@ -109,5 +111,6 @@ public partial class Textarea : ContentView
         _border.Stroke = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#E5E7EB"");
     }
 }
-";
+"
+    };
 }

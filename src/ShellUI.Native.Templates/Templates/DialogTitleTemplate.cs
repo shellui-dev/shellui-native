@@ -15,7 +15,9 @@ public static class DialogTitleTemplate
         Tags = new List<string> { "overlay", "dialog", "title" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class DialogTitle : Label
 {
@@ -25,5 +27,6 @@ public partial class DialogTitle : Label
         FontAttributes = FontAttributes.Bold;
     }
 }
-";
+"
+    };
 }

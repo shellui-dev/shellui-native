@@ -15,7 +15,9 @@ public static class RadioGroupItemTemplate
         Tags = new List<string> { "form", "radio", "option" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class RadioGroupItem : ContentView
@@ -83,9 +85,10 @@ public partial class RadioGroupItem : ContentView
     private void UpdateVisualState()
     {
         var isChecked = FindParentOfType<RadioGroup>()?.Value == Value;
-        _indicator.Stroke = Color.FromArgb(""#E5E7EB"");
-        _indicator.BackgroundColor = isChecked ? Color.FromArgb(""#3B82F6"") : Colors.Transparent;
+        _indicator.Stroke = isChecked ? Color.FromArgb(""#2563EB"") : Color.FromArgb(""#E5E7EB"");
+        _indicator.BackgroundColor = isChecked ? Color.FromArgb(""#2563EB"") : Colors.Transparent;
     }
 }
-";
+"
+    };
 }

@@ -15,7 +15,9 @@ public static class PopoverContentTemplate
         Tags = new List<string> { "overlay", "popover", "content" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 [ContentProperty(nameof(Children))]
 public partial class PopoverContent : ContentView
@@ -30,5 +32,6 @@ public partial class PopoverContent : ContentView
         Content = _stack;
     }
 }
-";
+"
+    };
 }

@@ -15,7 +15,9 @@ public static class DialogTemplate
         Tags = new List<string> { "overlay", "modal", "dialog" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Modal dialog - compositional. Usage: <Dialog><DialogTrigger>...</DialogTrigger><DialogContent>...</DialogContent></Dialog>
 public partial class Dialog : AbsoluteLayout
@@ -75,5 +77,6 @@ public partial class Dialog : AbsoluteLayout
         OpenChanged?.Invoke(this, Open);
     }
 }
-";
+"
+    };
 }

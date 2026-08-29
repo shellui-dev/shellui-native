@@ -15,7 +15,9 @@ public static class DropdownTriggerTemplate
         Tags = new List<string> { "overlay", "dropdown", "trigger" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class DropdownTrigger : ContentView
 {
@@ -26,5 +28,6 @@ public partial class DropdownTrigger : ContentView
         GestureRecognizers.Add(tap);
     }
 }
-";
+"
+    };
 }

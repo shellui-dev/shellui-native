@@ -17,7 +17,9 @@ public static class SeparatorTemplate
         Tags = new List<string> { "layout", "divider", "separator", "line" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 // Separator/divider component
 public partial class Separator : ContentView
@@ -80,6 +82,7 @@ public enum SeparatorOrientation
     Horizontal,
     Vertical
 }
-";
+"
+    };
 
 }

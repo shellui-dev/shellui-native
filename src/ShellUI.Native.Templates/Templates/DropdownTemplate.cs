@@ -15,7 +15,9 @@ public static class DropdownTemplate
         Tags = new List<string> { "overlay", "dropdown", "menu" }
     };
 
-    public static string Content => @"using Microsoft.Maui.Controls.Shapes;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 namespace YourProjectNamespace.Components.UI;
 
 public partial class Dropdown : Grid
@@ -88,5 +90,6 @@ public partial class Dropdown : Grid
         IsOpenChanged?.Invoke(this, IsOpen);
     }
 }
-";
+"
+    };
 }

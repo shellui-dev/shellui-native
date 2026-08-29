@@ -15,7 +15,9 @@ public static class ButtonVariantsTemplate
         IsAvailable = false // Installed as dependency of button
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI.Variants;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI.Variants;
 
 public enum ButtonVariant
 {
@@ -124,5 +126,6 @@ public static class ButtonVariants
         return style;
     }
 }
-";
+"
+    };
 }

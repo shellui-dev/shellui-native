@@ -15,7 +15,9 @@ public static class PopoverTriggerTemplate
         Tags = new List<string> { "overlay", "popover", "trigger" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
 public partial class PopoverTrigger : ContentView
 {
@@ -26,5 +28,6 @@ public partial class PopoverTrigger : ContentView
         GestureRecognizers.Add(tap);
     }
 }
-";
+"
+    };
 }
