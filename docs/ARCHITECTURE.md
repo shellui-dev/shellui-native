@@ -68,17 +68,22 @@ public class ButtonTemplate
         Dependencies = new List<string> { "button-variants" }
     };
 
-    public static string Content => @"namespace YourProjectNamespace.Components.UI;
-// ... component code";
+    // Template System v2: content is keyed by target NativePlatform. Adding Avalonia
+    // support to a component means adding one dict entry here — no registry edit needed.
+    public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
+    {
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
+// ... MAUI component code",
+        // [NativePlatform.Avalonia] = @"..." // added in Phase 2
+    };
 }
 ```
 
-**Gap today (Template System v2 target):** `Content` is a single MAUI-flavored string, and
-`ComponentRegistry.GetComponentContent` has no platform parameter — it can't yet return
-different code for Avalonia vs. MAUI. Adding Avalonia support requires evolving this to
-something like `ButtonTemplate.Content(NativePlatform)` or per-platform static properties
-(`ButtonTemplate.MauiContent` / `ButtonTemplate.AvaloniaContent`) selected by
-`config.TargetPlatform`. See [PLAN.md](./PLAN.md) and [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md).
+**Registry lookup (Template System v2):** `ComponentRegistry.GetComponentContent(name, NativePlatform)`
+returns the source for the target platform, or `null` if the component doesn't exist OR exists
+but has no template for that platform. Callers use `SupportsPlatform(name, platform)` and
+`GetSupportedPlatforms(name)` to distinguish those two failure modes. Landed on
+`feat/template-system-v2` (2026-07-18).
 
 ### 2. Namespace Replacement
 
