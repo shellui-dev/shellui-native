@@ -171,7 +171,14 @@ public static class ComponentManager
                 continue;
             }
 
-            var content = ComponentRegistry.GetComponentContent(componentName);
+            if (!ComponentRegistry.SupportsPlatform(componentName, config.TargetPlatform))
+            {
+                AnsiConsole.MarkupLine(
+                    $"[yellow]Skipped '{componentName}': no template for {config.TargetPlatform}.[/]");
+                continue;
+            }
+
+            var content = ComponentRegistry.GetComponentContent(componentName, config.TargetPlatform);
             if (content == null) continue;
 
             content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
