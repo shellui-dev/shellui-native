@@ -69,7 +69,12 @@ public static class ComponentRegistry
         { "radio-group", (RadioGroupTemplate.Metadata, RadioGroupTemplate.Contents) },
         { "radio-group-item", (RadioGroupItemTemplate.Metadata, RadioGroupItemTemplate.Contents) },
         { "date-picker", (DatePickerTemplate.Metadata, DatePickerTemplate.Contents) },
-        { "time-picker", (TimePickerTemplate.Metadata, TimePickerTemplate.Contents) }
+        { "time-picker", (TimePickerTemplate.Metadata, TimePickerTemplate.Contents) },
+
+        // Navigation / Layout - P3
+        { "collapsible", (CollapsibleTemplate.Metadata, CollapsibleTemplate.Contents) },
+        { "collapsible-trigger", (CollapsibleTriggerTemplate.Metadata, CollapsibleTriggerTemplate.Contents) },
+        { "collapsible-content", (CollapsibleContentTemplate.Metadata, CollapsibleContentTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
