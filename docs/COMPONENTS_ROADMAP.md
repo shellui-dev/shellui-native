@@ -16,9 +16,9 @@ Every single-line form control renders at **40px** high (matches shadcn `h-10` /
 |-----------|--------|---------|-------|
 | `Button` (Default) | 40 (from `ButtonStyle.Height`) | `(16, 10)` | Variant-driven: Sm=36, Lg=44, Icon=40×40 |
 | `Input` | 40 | `(12, 0)` | Fixed 2026-08-29 — was unset + `(12, 8)`, rendered inconsistent across platforms |
-| `Select` | 40 | `(12, 0)` | |
-| `DatePicker` | 40 | `(12, 0)` | |
-| `TimePicker` | 40 | `(12, 0)` | |
+| `Select` | 40 (on native `Picker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 (overflowed on Windows) |
+| `DatePicker` | 40 (on native `DatePicker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 |
+| `TimePicker` | 40 (on native `TimePicker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 |
 | `Textarea` | `MinimumHeightRequest=80` | `(12, 8)` | Multi-line — grows with content |
 | `Checkbox` | 20×20 (box) | — | Icon-shaped, not a field |
 | `RadioGroupItem` | 20×20 (dot) | — | Icon-shaped, not a field |

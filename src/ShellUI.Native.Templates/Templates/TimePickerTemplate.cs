@@ -17,9 +17,11 @@ public static class TimePickerTemplate
 
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
-        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
-namespace YourProjectNamespace.Components.UI;
+        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// v1 hosts the native TimePicker directly — no outer Border. On Windows the native
+// control (WinUI TimePicker with hour/minute/am-pm columns) draws chrome that overflows
+// a wrapping Border. A custom time-popup TimePicker is tracked as a follow-up.
 public partial class TimePicker : ContentView
 {
     public static readonly BindableProperty TimeProperty =
@@ -35,11 +37,13 @@ public partial class TimePicker : ContentView
     public event EventHandler? TimeChanged;
 
     private readonly Microsoft.Maui.Controls.TimePicker _picker;
-    private readonly Border _border;
 
     public TimePicker()
     {
-        _picker = new Microsoft.Maui.Controls.TimePicker();
+        _picker = new Microsoft.Maui.Controls.TimePicker
+        {
+            HeightRequest = 40
+        };
         _picker.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(Microsoft.Maui.Controls.TimePicker.Time))
@@ -48,15 +52,7 @@ public partial class TimePicker : ContentView
                 TimeChanged?.Invoke(this, EventArgs.Empty);
             }
         };
-        _border = new Border
-        {
-            Content = _picker,
-            Padding = new Thickness(12, 0),
-            HeightRequest = 40,
-            StrokeThickness = 1,
-            StrokeShape = new RoundRectangle { CornerRadius = 6 }
-        };
-        Content = _border;
+        Content = _picker;
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)

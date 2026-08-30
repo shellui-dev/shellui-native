@@ -1,7 +1,8 @@
-using Microsoft.Maui.Controls.Shapes;
-
 namespace MAUI.Demo.Components.UI;
 
+// v1 hosts the native DatePicker directly — no outer Border. On Windows the native
+// control (WinUI CalendarDatePicker) draws chrome that overflows a wrapping Border.
+// A custom calendar-popup DatePicker is tracked as a follow-up.
 public partial class DatePicker : ContentView
 {
     public static readonly BindableProperty DateProperty =
@@ -35,26 +36,19 @@ public partial class DatePicker : ContentView
     public event EventHandler<DateChangedEventArgs>? DateChanged;
 
     private readonly Microsoft.Maui.Controls.DatePicker _nativePicker;
-    private readonly Border _border;
 
     public DatePicker()
     {
-        _nativePicker = new Microsoft.Maui.Controls.DatePicker();
+        _nativePicker = new Microsoft.Maui.Controls.DatePicker
+        {
+            HeightRequest = 40
+        };
         _nativePicker.DateSelected += (s, e) =>
         {
-            var newDate = e.NewDate ?? DateTime.Today;
-            Date = newDate;
-            DateChanged?.Invoke(this, new DateChangedEventArgs(e.OldDate, newDate));
+            Date = e.NewDate;
+            DateChanged?.Invoke(this, new DateChangedEventArgs(e.OldDate, e.NewDate));
         };
-        _border = new Border
-        {
-            Content = _nativePicker,
-            Padding = new Thickness(12, 0),
-            HeightRequest = 40,
-            StrokeThickness = 1,
-            StrokeShape = new RoundRectangle { CornerRadius = 6 }
-        };
-        Content = _border;
+        Content = _nativePicker;
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)

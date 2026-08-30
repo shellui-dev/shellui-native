@@ -6,6 +6,10 @@
              x:Class="MAUI.Demo.MainPage"
              Title="ShellUI Native Demo">
 
+    <!-- Page root is a Grid so Dialog / Drawer / Sheet can live as page-root       -->
+    <!-- siblings of the ScrollView, filling the whole window when they open.       -->
+    <!-- Triggers stay inline as regular buttons that call SetOpen on the overlays. -->
+    <Grid>
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
@@ -197,43 +201,18 @@
                 <ui:TimePicker x:Name="TimePickerDemo" />
             </VerticalStackLayout>
 
-            <!-- Overlays: Dialog, Drawer, Sheet, Dropdown, Popover -->
+            <!-- Overlays: triggers only. Dialog/Drawer/Sheet themselves live at page-root -->
+            <!-- below (outside the ScrollView) so their AbsoluteLayout overlay layer can    -->
+            <!-- actually fill the window. Dropdown/Popover are Grid-based and work inline. -->
+
             <Label Text="Dialog" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Dialog x:Name="DemoDialog" OpenChanged="OnDialogOpenChanged">
-                <ui:DialogTrigger>
-                    <ui:Button Text="Open Dialog" Clicked="OnDialogTriggerClicked" />
-                </ui:DialogTrigger>
-                <ui:DialogContent>
-                    <ui:DialogHeader>
-                        <ui:DialogTitle Text="Dialog Title" />
-                        <ui:DialogDescription Text="This is a modal dialog." />
-                    </ui:DialogHeader>
-                    <Label Text="Modal content appears here." />
-                    <ui:DialogFooter>
-                        <ui:Button Text="Close" Clicked="OnDialogClose" />
-                    </ui:DialogFooter>
-                </ui:DialogContent>
-            </ui:Dialog>
+            <ui:Button Text="Open Dialog" Clicked="OnDialogTriggerClicked" />
 
             <Label Text="Drawer" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Drawer x:Name="DemoDrawer" Side="Bottom">
-                <ui:DrawerTrigger>
-                    <ui:Button Text="Open Drawer" Clicked="OnDrawerTriggerClicked" />
-                </ui:DrawerTrigger>
-                <ui:DrawerContent>
-                    <Label Text="Drawer content - slide from bottom" FontAttributes="Bold" />
-                </ui:DrawerContent>
-            </ui:Drawer>
+            <ui:Button Text="Open Drawer" Clicked="OnDrawerTriggerClicked" />
 
             <Label Text="Sheet" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Sheet x:Name="DemoSheet" Side="Right">
-                <ui:SheetTrigger>
-                    <ui:Button Text="Open Sheet" Clicked="OnSheetTriggerClicked" />
-                </ui:SheetTrigger>
-                <ui:SheetContent>
-                    <Label Text="Sheet content" FontAttributes="Bold" />
-                </ui:SheetContent>
-            </ui:Sheet>
+            <ui:Button Text="Open Sheet" Clicked="OnSheetTriggerClicked" />
 
             <Label Text="Dropdown" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
             <ui:Dropdown>
@@ -365,5 +344,36 @@
 
         </VerticalStackLayout>
     </ScrollView>
+
+        <!-- ============ Page-root overlays ============ -->
+        <!-- These live outside the ScrollView so their overlay layer can fill the window. -->
+        <!-- Their triggers above (Buttons that call SetOpen) live inline in the scroll.   -->
+
+        <ui:Dialog x:Name="DemoDialog" OpenChanged="OnDialogOpenChanged">
+            <ui:DialogContent>
+                <ui:DialogHeader>
+                    <ui:DialogTitle Text="Dialog Title" />
+                    <ui:DialogDescription Text="This is a modal dialog." />
+                </ui:DialogHeader>
+                <Label Text="Modal content appears here." />
+                <ui:DialogFooter>
+                    <ui:Button Text="Close" Clicked="OnDialogClose" />
+                </ui:DialogFooter>
+            </ui:DialogContent>
+        </ui:Dialog>
+
+        <ui:Drawer x:Name="DemoDrawer" Side="Bottom">
+            <ui:DrawerContent>
+                <Label Text="Drawer content - slide from bottom" FontAttributes="Bold" />
+            </ui:DrawerContent>
+        </ui:Drawer>
+
+        <ui:Sheet x:Name="DemoSheet" Side="Right">
+            <ui:SheetContent>
+                <Label Text="Sheet content" FontAttributes="Bold" />
+            </ui:SheetContent>
+        </ui:Sheet>
+
+    </Grid>
 
 </ContentPage>
