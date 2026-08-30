@@ -45,8 +45,11 @@ public partial class DatePicker : ContentView
         };
         _nativePicker.DateSelected += (s, e) =>
         {
-            Date = e.NewDate;
-            DateChanged?.Invoke(this, new DateChangedEventArgs(e.OldDate, e.NewDate));
+            // .NET 10 MAUI made DateChangedEventArgs.NewDate nullable
+            var newDate = e.NewDate ?? Date;
+            var oldDate = e.OldDate ?? Date;
+            Date = newDate;
+            DateChanged?.Invoke(this, new DateChangedEventArgs(oldDate, newDate));
         };
         Content = _nativePicker;
     }
@@ -61,7 +64,7 @@ public partial class DatePicker : ContentView
 
     private static void OnDateChanged(BindableObject b, object o, object n)
     {
-        if (b is DatePicker dp && n is DateTime dt && dp._nativePicker.Date != dt)
+        if (b is DatePicker dp && n is DateTime dt && dp._nativePicker.Date.GetValueOrDefault() != dt)
             dp._nativePicker.Date = dt;
     }
 }

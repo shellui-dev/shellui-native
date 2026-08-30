@@ -48,7 +48,8 @@ public partial class TimePicker : ContentView
         {
             if (e.PropertyName == nameof(Microsoft.Maui.Controls.TimePicker.Time))
             {
-                Time = _picker.Time;
+                // .NET 10 MAUI made TimePicker.Time nullable
+                Time = _picker.Time ?? Time;
                 TimeChanged?.Invoke(this, EventArgs.Empty);
             }
         };
@@ -64,7 +65,7 @@ public partial class TimePicker : ContentView
 
     private static void OnTimeChanged(BindableObject b, object o, object n)
     {
-        if (b is TimePicker tp && n is TimeSpan ts && tp._picker.Time != ts)
+        if (b is TimePicker tp && n is TimeSpan ts && tp._picker.Time.GetValueOrDefault() != ts)
             tp._picker.Time = ts;
     }
 }

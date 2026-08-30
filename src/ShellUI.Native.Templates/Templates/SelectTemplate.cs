@@ -71,7 +71,10 @@ public partial class Select : ContentView
     {
         if (b is Select s && n is IList<string> list)
         {
-            s._picker.ItemsSource = list;
+            // Picker.ItemsSource is System.Collections.IList (non-generic). List<string>
+            // implements both, but the IList<string> parameter type doesn't — copy into a
+            // List<string> to cover the case where the caller passed an array or ObservableCollection<T>.
+            s._picker.ItemsSource = list as System.Collections.IList ?? new List<string>(list);
             if (s.SelectedIndex >= 0 && s.SelectedIndex < list.Count)
                 s._picker.SelectedIndex = s.SelectedIndex;
         }
