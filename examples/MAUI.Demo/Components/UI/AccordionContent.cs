@@ -34,11 +34,11 @@ public partial class AccordionContent : ContentView
         if (open)
         {
             IsVisible = true;
-            await this.FadeTo(1, 150, Easing.CubicOut);
+            await this.FadeToAsync(1, 150, Easing.CubicOut);
         }
         else
         {
-            await this.FadeTo(0, 150, Easing.CubicIn);
+            await this.FadeToAsync(0, 150, Easing.CubicIn);
             IsVisible = false;
         }
     }

@@ -689,17 +689,6 @@ shellui-native add popover
 
 ---
 
-## Navigation
-
-### Tabs
-*(Coming Soon)* - Tabbed navigation interface.
-
-```bash
-shellui-native add tabs
-```
-
----
-
 ## Adding Components
 
 ```bash

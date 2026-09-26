@@ -240,7 +240,7 @@ public static class ButtonTemplate
 
 ---
 
-## Phase 1c — `feat/p3-navigation-layout` (**next**)
+## Phase 1c — `feat/p3-navigation-layout` (**in review**)
 
 Finish MAUI's component vocabulary through P3 before opening the cross-platform front.
 Rationale: Phase 2 (Avalonia) turns every new MAUI component into two components to
@@ -284,13 +284,18 @@ exclusion. Breadcrumb and skeleton are standalone and can slot in wherever.
 
 ### Deliverables
 
-- [ ] 6 new template classes + 3 sub-components (9 files total)
-- [ ] `ComponentRegistry` entries for all 9
-- [ ] `MAUI.Demo` gains a demo section for each family (Tabs / Accordion / Collapsible /
+- [x] 6 new template families + their sub-components
+- [x] `ComponentRegistry` entries for all of them
+- [x] `MAUI.Demo` gains a demo section for each family (Tabs / Accordion / Collapsible /
   Breadcrumb / ScrollArea / Skeleton)
-- [ ] `TemplateContentTests` picks the new components up automatically (parameterized
+- [x] `TemplateContentTests` picks the new components up automatically (parameterized
   over the whole registry — nothing to add manually)
-- [ ] [COMPONENTS.md](./COMPONENTS.md) updated with usage snippets for each
+- [x] [COMPONENTS.md](./COMPONENTS.md) updated with usage snippets for each
+
+Fix-forwards that landed here (despite the "no P0–P2 refactoring" rule below) because they
+blocked the demo from rendering at all on Windows: overlays moved to page-root in
+`MAUI.Demo`, outer `Border` removed from Select/DatePicker/TimePicker, and .NET 10 MAUI
+nullable `Date`/`Time` + non-generic `ItemsSource` adaptations. Proper fixes → Phase 1d.
 
 ### Exit criteria to merge → `main`
 
