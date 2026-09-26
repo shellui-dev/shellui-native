@@ -113,3 +113,6 @@ BenchmarkDotNet.Artifacts/
 # Project-specific
 *.DotSettings.user
 launchSettings.json
+
+# VS-generated .sln alongside the canonical ShellUI.Native.slnx
+/shellui-native.sln
