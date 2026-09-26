@@ -39,6 +39,11 @@ public partial class Dialog : AbsoluteLayout
 
     public Dialog()
     {
+        // The host fills its area (page-root overlays fill the whole page). While closed it must
+        // not swallow input meant for content underneath; CascadeInputTransparent = false keeps
+        // an inline trigger inside it clickable. Toggled off while open so the backdrop catches taps.
+        InputTransparent = true;
+        CascadeInputTransparent = false;
         _triggerContainer = new VerticalStackLayout { Spacing = 0 };
         _overlayLayer = new Grid { IsVisible = false, ZIndex = 1000 };
         Children.Add(_triggerContainer);
@@ -74,6 +79,7 @@ public partial class Dialog : AbsoluteLayout
     private void OnOpenChanged()
     {
         _overlayLayer.IsVisible = Open;
+        InputTransparent = !Open;
         OpenChanged?.Invoke(this, Open);
     }
 }
