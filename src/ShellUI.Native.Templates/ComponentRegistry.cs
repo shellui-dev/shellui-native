@@ -15,6 +15,8 @@ public static class ComponentRegistry
     {
         // Core utilities
         { "shell", (ShellTemplate.Metadata, ShellTemplate.Contents) },
+        { "icon", (IconTemplate.Metadata, IconTemplate.Contents) },
+        { "theme-toggle", (ThemeToggleTemplate.Metadata, ThemeToggleTemplate.Contents) },
 
         // Form components
         { "button", (ButtonTemplate.Metadata, ButtonTemplate.Contents) },
@@ -86,7 +88,13 @@ public static class ComponentRegistry
         { "breadcrumb", (BreadcrumbTemplate.Metadata, BreadcrumbTemplate.Contents) },
         { "breadcrumb-item", (BreadcrumbItemTemplate.Metadata, BreadcrumbItemTemplate.Contents) },
         { "skeleton", (SkeletonTemplate.Metadata, SkeletonTemplate.Contents) },
-        { "scroll-area", (ScrollAreaTemplate.Metadata, ScrollAreaTemplate.Contents) }
+        { "scroll-area", (ScrollAreaTemplate.Metadata, ScrollAreaTemplate.Contents) },
+
+        // Feedback & overlays / data display - P4-P5
+        { "alert-dialog", (AlertDialogTemplate.Metadata, AlertDialogTemplate.Contents) },
+        { "toast", (ToastTemplate.Metadata, ToastTemplate.Contents) },
+        { "spinner", (SpinnerTemplate.Metadata, SpinnerTemplate.Contents) },
+        { "avatar", (AvatarTemplate.Metadata, AvatarTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
