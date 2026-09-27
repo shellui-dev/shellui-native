@@ -11,7 +11,7 @@ public static class TabsContentTemplate
         Description = "Body of one tab - shown when parent Tabs.Value matches this Content's Value",
         Category = ComponentCategory.Navigation,
         FilePath = "TabsContent.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string>(),
         Tags = new List<string> { "navigation", "tabs", "content" }
     };
 
@@ -19,12 +19,12 @@ public static class TabsContentTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// Panel shown while its Value is the active tab; fades in on switch.
 [ContentProperty(nameof(Content))]
 public partial class TabsContent : ContentView
 {
     public static readonly BindableProperty ValueProperty =
-        BindableProperty.Create(nameof(Value), typeof(string), typeof(TabsContent), string.Empty,
-            propertyChanged: (b, o, n) => (b as TabsContent)?.RefreshVisibility());
+        BindableProperty.Create(nameof(Value), typeof(string), typeof(TabsContent), string.Empty);
 
     public string Value
     {
@@ -32,33 +32,24 @@ public partial class TabsContent : ContentView
         set => SetValue(ValueProperty, value);
     }
 
-    private Tabs? _parent;
-
     public TabsContent()
     {
         IsVisible = false;
     }
 
-    protected override void OnParentSet()
+    internal void SetActive(bool active, bool animate)
     {
-        base.OnParentSet();
-
-        if (_parent != null)
-            _parent.ValueChanged -= OnParentValueChanged;
-
-        _parent = this.FindParentOfType<Tabs>();
-        if (_parent != null)
+        if (IsVisible == active) return;
+        IsVisible = active;
+        if (active && animate)
         {
-            _parent.ValueChanged += OnParentValueChanged;
-            RefreshVisibility();
+            Opacity = 0;
+            _ = this.FadeToAsync(1, 150, Easing.CubicOut);
         }
-    }
-
-    private void OnParentValueChanged(object? sender, (string Old, string New) e) => RefreshVisibility();
-
-    private void RefreshVisibility()
-    {
-        IsVisible = _parent != null && _parent.Value == Value;
+        else
+        {
+            Opacity = 1;
+        }
     }
 }
 "

@@ -12,7 +12,7 @@ public static class SwitchTemplate
         Description = "Toggle switch component with label support",
         Category = ComponentCategory.Form,
         FilePath = "Switch.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Variants = new List<string> { "default" },
         Tags = new List<string> { "form", "switch", "toggle", "input" }
     };
@@ -20,32 +20,30 @@ public static class SwitchTemplate
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
         [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
+
 namespace YourProjectNamespace.Components.UI;
 
-// Switch/Toggle component
+// Switch — h-6 w-11 rounded-full track (primary when on, input when off),
+// h-5 w-5 thumb in bg-background that slides translate-x-5.
 public partial class Switch : ContentView
 {
     public static readonly BindableProperty IsToggledProperty =
-        BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), 
+        BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch),
             false, BindingMode.TwoWay, propertyChanged: OnIsToggledChanged);
 
     public static readonly BindableProperty LabelProperty =
-        BindableProperty.Create(nameof(Label), typeof(string), typeof(Switch), 
-            string.Empty, propertyChanged: OnLabelChanged);
+        BindableProperty.Create(nameof(Label), typeof(string), typeof(Switch),
+            string.Empty, propertyChanged: (b, o, n) => ((Switch)b).UpdateLabel());
 
-    public static new readonly BindableProperty IsEnabledProperty =
-        BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Switch),
-            true, propertyChanged: OnIsEnabledChanged);
+    private const double TrackWidth = 44;
+    private const double TrackHeight = 24;
+    private const double Inset = 2;
+    private const double ThumbSize = TrackHeight - Inset * 2;          // 20
+    private const double Travel = TrackWidth - Inset * 2 - ThumbSize;  // 20
 
     private readonly Border _track;
     private readonly Border _thumb;
     private readonly Label _label;
-    private readonly TapGestureRecognizer _tapGesture;
-
-    private const double TrackWidth = 44;
-    private const double TrackHeight = 24;
-    private const double ThumbSize = 20;
-    private const double ThumbOffset = 2;
 
     public bool IsToggled
     {
@@ -59,12 +57,6 @@ public partial class Switch : ContentView
         set => SetValue(LabelProperty, value);
     }
 
-    public new bool IsEnabled
-    {
-        get => (bool)GetValue(IsEnabledProperty);
-        set => SetValue(IsEnabledProperty, value);
-    }
-
     public event EventHandler<bool>? Toggled;
 
     public Switch()
@@ -73,99 +65,65 @@ public partial class Switch : ContentView
         {
             WidthRequest = ThumbSize,
             HeightRequest = ThumbSize,
-            BackgroundColor = Colors.White,
             StrokeThickness = 0,
-            StrokeShape = new RoundRectangle { CornerRadius = ThumbSize / 2 }
+            StrokeShape = new RoundRectangle { CornerRadius = ThumbSize / 2 },
+            HorizontalOptions = LayoutOptions.Start,
+            VerticalOptions = LayoutOptions.Center,
+            Shadow = new Shadow { Brush = new SolidColorBrush(Colors.Black), Offset = new Point(0, 1), Radius = 3, Opacity = 0.2f }
         };
+        _thumb.Token(VisualElement.BackgroundColorProperty, ShellToken.Background);
 
         _track = new Border
         {
             Content = _thumb,
             WidthRequest = TrackWidth,
             HeightRequest = TrackHeight,
+            Padding = new Thickness(Inset),
             StrokeThickness = 0,
             StrokeShape = new RoundRectangle { CornerRadius = TrackHeight / 2 },
-            Padding = new Thickness(ThumbOffset, 0, ThumbOffset, 0),
-            HorizontalOptions = LayoutOptions.Start
+            VerticalOptions = LayoutOptions.Center
         };
 
-        _label = new Label
-        {
-            FontSize = 14,
-            VerticalOptions = LayoutOptions.Center,
-            Margin = new Thickness(12, 0, 0, 0)
-        };
+        _label = new Label { FontSize = 14, VerticalOptions = LayoutOptions.Center, VerticalTextAlignment = TextAlignment.Center, IsVisible = false };
+        _label.Token(Microsoft.Maui.Controls.Label.TextColorProperty, ShellToken.Foreground);
 
-        _tapGesture = new TapGestureRecognizer();
-        _tapGesture.Tapped += OnTapped;
+        var row = new HorizontalStackLayout { Spacing = 8, Children = { _track, _label } };
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); IsToggled = !IsToggled; };
+        row.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) IsToggled = !IsToggled; });
 
-        var container = new HorizontalStackLayout
-        {
-            Spacing = 0,
-            Children = { _track, _label }
-        };
-
-        container.GestureRecognizers.Add(_tapGesture);
-        Content = container;
-
-        UpdateVisualState();
-    }
-
-    private void OnTapped(object? sender, EventArgs e)
-    {
-        if (IsEnabled)
-        {
-            IsToggled = !IsToggled;
-            AnimateToggle();
-        }
-    }
-
-    private void AnimateToggle()
-    {
-        var targetX = IsToggled ? TrackWidth - ThumbSize - ThumbOffset : ThumbOffset;
-        _ = _thumb.TranslateToAsync(targetX, 0, 200, Easing.CubicOut);
+        Content = row;
+        HorizontalOptions = LayoutOptions.Start;
+        UpdateVisualState(animate: false);
     }
 
     private static void OnIsToggledChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Switch switchControl)
-        {
-            switchControl.UpdateVisualState();
-            switchControl.AnimateToggle();
-            switchControl.Toggled?.Invoke(switchControl, (bool)newValue);
-        }
+        if (bindable is not Switch control) return;
+        control.UpdateVisualState(animate: true);
+        control.Toggled?.Invoke(control, (bool)newValue);
     }
 
-    private static void OnLabelChanged(BindableObject bindable, object oldValue, object newValue)
+    protected override void OnPropertyChanged(string? propertyName = null)
     {
-        if (bindable is Switch switchControl)
-            switchControl._label.Text = newValue as string ?? string.Empty;
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == IsEnabledProperty.PropertyName)
+            Opacity = IsEnabled ? 1.0 : 0.5;
     }
 
-    private static void OnIsEnabledChanged(BindableObject bindable, object oldValue, object newValue)
+    private void UpdateLabel()
     {
-        if (bindable is Switch switchControl)
-            switchControl.UpdateVisualState();
+        _label.Text = Label ?? string.Empty;
+        _label.IsVisible = !string.IsNullOrEmpty(Label);
     }
 
-    private void UpdateVisualState()
+    private void UpdateVisualState(bool animate)
     {
-        // Design tokens matching ShellUI theme
-        var trackColor = IsToggled 
-            ? Color.FromArgb(""#2563EB"") 
-            : Color.FromArgb(""#D1D5DB"");
-
-        _track.BackgroundColor = trackColor;
-        _thumb.BackgroundColor = Colors.White;
-        _label.TextColor = Color.FromArgb(""#1F2937"");
-        
-        var opacity = IsEnabled ? 1.0 : 0.5;
-        _track.Opacity = opacity;
-        _label.Opacity = opacity;
-
-        // Position thumb
-        var thumbX = IsToggled ? TrackWidth - ThumbSize - ThumbOffset : ThumbOffset;
-        _thumb.TranslationX = thumbX;
+        _track.Token(VisualElement.BackgroundColorProperty, IsToggled ? ShellToken.Primary : ShellToken.Input);
+        var x = IsToggled ? Travel : 0;
+        if (animate) _ = _thumb.TranslateToAsync(x, 0, 150, Easing.CubicOut);
+        else _thumb.TranslationX = x;
     }
 }
 "

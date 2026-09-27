@@ -11,7 +11,7 @@ public static class DialogDescriptionTemplate
         Description = "Description text for dialog",
         Category = ComponentCategory.Overlay,
         FilePath = "DialogDescription.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Tags = new List<string> { "overlay", "dialog", "description" }
     };
 
@@ -19,12 +19,13 @@ public static class DialogDescriptionTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// text-sm text-muted-foreground
 public partial class DialogDescription : Label
 {
     public DialogDescription()
     {
         FontSize = 14;
-        TextColor = Color.FromArgb(""#6B7280"");
+        this.Token(TextColorProperty, ShellToken.MutedForeground);
     }
 }
 "

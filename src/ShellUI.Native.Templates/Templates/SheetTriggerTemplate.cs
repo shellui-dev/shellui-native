@@ -11,7 +11,7 @@ public static class SheetTriggerTemplate
         Description = "Opens sheet on tap",
         Category = ComponentCategory.Overlay,
         FilePath = "SheetTrigger.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string> { "shell", "element-extensions" },
         Tags = new List<string> { "overlay", "sheet", "trigger" }
     };
 
@@ -19,14 +19,10 @@ public static class SheetTriggerTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-public partial class SheetTrigger : ContentView
+// Opens the enclosing Sheet. Usage: <ui:SheetTrigger><ui:Button Text=""Open"" /></ui:SheetTrigger>
+public partial class SheetTrigger : ShellTriggerView
 {
-    public SheetTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => FindParentOfType<Sheet>()?.SetOpen(true);
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Sheet>()?.SetOpen(true);
 }
 "
     };

@@ -12,7 +12,7 @@ public static class AccordionItemTemplate
         Description = "Single row of an Accordion - contains AccordionTrigger + AccordionContent",
         Category = ComponentCategory.Layout,
         FilePath = "AccordionItem.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string> { "shell", "element-extensions" },
         Tags = new List<string> { "layout", "accordion", "item" }
     };
 
@@ -20,7 +20,9 @@ public static class AccordionItemTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-public partial class AccordionItem : VerticalStackLayout
+// One section: trigger + content, with a bottom divider (border-b, none on the last item).
+[ContentProperty(nameof(Children))]
+public partial class AccordionItem : ContentView
 {
     public static readonly BindableProperty ValueProperty =
         BindableProperty.Create(nameof(Value), typeof(string), typeof(AccordionItem), string.Empty);
@@ -31,47 +33,36 @@ public partial class AccordionItem : VerticalStackLayout
         set => SetValue(ValueProperty, value);
     }
 
-    // Item-local view of parent's open set. Trigger/Content subscribe here so they don't
-    // have to know about the Accordion above.
     public bool IsOpen { get; private set; }
     public event EventHandler<bool>? OpenChanged;
 
-    private Accordion? _parent;
+    private readonly VerticalStackLayout _stack;
+    private readonly BoxView _divider;
+
+    public new IList<IView> Children => _stack.Children;
 
     public AccordionItem()
     {
-        Spacing = 0;
+        _stack = new VerticalStackLayout { Spacing = 0 };
+        _divider = new BoxView { HeightRequest = 1 };
+        _divider.Token(BoxView.ColorProperty, ShellToken.Border);
+        Content = new VerticalStackLayout { Spacing = 0, Children = { _stack, _divider } };
     }
 
-    protected override void OnParentSet()
+    public void Toggle() => this.FindParentOfType<Accordion>()?.Toggle(Value);
+
+    internal void SetDividerVisible(bool visible) => _divider.IsVisible = visible;
+
+    internal void ApplyOpen(bool open, bool animate)
     {
-        base.OnParentSet();
-
-        if (_parent != null)
-            _parent.ItemToggled -= OnParentToggled;
-
-        _parent = this.FindParentOfType<Accordion>();
-        if (_parent != null)
-        {
-            _parent.ItemToggled += OnParentToggled;
-            var open = _parent.IsOpen(Value);
-            if (open != IsOpen)
-            {
-                IsOpen = open;
-                OpenChanged?.Invoke(this, IsOpen);
-            }
-        }
+        var changed = IsOpen != open;
+        IsOpen = open;
+        foreach (var trigger in this.FindDescendantsOfType<AccordionTrigger>(e => e is AccordionItem))
+            trigger.SetOpen(open, animate);
+        foreach (var content in this.FindDescendantsOfType<AccordionContent>(e => e is AccordionItem))
+            content.Apply(open, animate);
+        if (changed) OpenChanged?.Invoke(this, open);
     }
-
-    private void OnParentToggled(object? sender, (string Value, bool IsOpen) e)
-    {
-        if (e.Value != Value) return;
-        if (IsOpen == e.IsOpen) return;
-        IsOpen = e.IsOpen;
-        OpenChanged?.Invoke(this, IsOpen);
-    }
-
-    public void Toggle() => _parent?.Toggle(Value);
 }
 "
     };

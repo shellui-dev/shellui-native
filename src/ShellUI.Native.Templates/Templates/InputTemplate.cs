@@ -12,7 +12,7 @@ public static class InputTemplate
         Description = "Text input field with placeholder, validation states, and icon support",
         Category = ComponentCategory.Form,
         FilePath = "Input.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Variants = new List<string> { "default", "error", "success" },
         Tags = new List<string> { "form", "input", "text", "field", "entry" }
     };
@@ -20,37 +20,45 @@ public static class InputTemplate
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
         [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
+
 namespace YourProjectNamespace.Components.UI;
 
-// Text input component with validation states
+// Text input — h-10 rounded-md border border-input px-3 text-sm.
+// Focus: border-ring + soft ring glow. Error: border-destructive.
+// The native Entry's own frame is stripped so this Border is the only chrome.
 public partial class Input : ContentView
 {
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(Input), 
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(Input),
             string.Empty, BindingMode.TwoWay, propertyChanged: OnTextChanged);
 
     public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(Input), 
-            string.Empty, propertyChanged: OnPlaceholderChanged);
+        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(Input),
+            string.Empty, propertyChanged: (b, o, n) => ((Input)b)._entry.Placeholder = n as string ?? string.Empty);
 
     public static readonly BindableProperty IsPasswordProperty =
-        BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(Input), 
-            false, propertyChanged: OnIsPasswordChanged);
+        BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(Input),
+            false, propertyChanged: (b, o, n) => ((Input)b)._entry.IsPassword = (bool)n);
 
     public static readonly BindableProperty HasErrorProperty =
-        BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Input), 
-            false, propertyChanged: OnVisualPropertyChanged);
+        BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Input),
+            false, propertyChanged: (b, o, n) => ((Input)b).UpdateVisualState());
 
     public static readonly BindableProperty IsReadOnlyProperty =
-        BindableProperty.Create(nameof(IsReadOnly), typeof(bool), typeof(Input), 
-            false, propertyChanged: OnIsReadOnlyChanged);
+        BindableProperty.Create(nameof(IsReadOnly), typeof(bool), typeof(Input),
+            false, propertyChanged: (b, o, n) => ((Input)b)._entry.IsReadOnly = (bool)n);
 
     public static readonly BindableProperty MaxLengthProperty =
-        BindableProperty.Create(nameof(MaxLength), typeof(int), typeof(Input), 
-            int.MaxValue, propertyChanged: OnMaxLengthChanged);
+        BindableProperty.Create(nameof(MaxLength), typeof(int), typeof(Input),
+            int.MaxValue, propertyChanged: (b, o, n) => ((Input)b)._entry.MaxLength = (int)n);
+
+    public static readonly BindableProperty KeyboardProperty =
+        BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(Input),
+            Keyboard.Default, propertyChanged: (b, o, n) => ((Input)b)._entry.Keyboard = (Keyboard)n);
 
     private readonly Entry _entry;
     private readonly Border _border;
+    private bool _isFocused;
 
     public string Text
     {
@@ -88,6 +96,12 @@ public partial class Input : ContentView
         set => SetValue(MaxLengthProperty, value);
     }
 
+    public Keyboard Keyboard
+    {
+        get => (Keyboard)GetValue(KeyboardProperty);
+        set => SetValue(KeyboardProperty, value);
+    }
+
     public event EventHandler<TextChangedEventArgs>? TextChanged;
     public event EventHandler? Completed;
 
@@ -95,25 +109,40 @@ public partial class Input : ContentView
     {
         _entry = new Entry
         {
-            BackgroundColor = Colors.Transparent,
             FontSize = 14,
-            VerticalOptions = LayoutOptions.Center
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Fill,
+            ClearButtonVisibility = ClearButtonVisibility.Never
         };
-        
-        _entry.TextChanged += (s, e) => 
+        _entry.Token(Entry.TextColorProperty, ShellToken.Foreground);
+        _entry.Token(Entry.PlaceholderColorProperty, ShellToken.MutedForeground);
+        ShellPlatform.StripNativeChrome(_entry);
+        ShellFocus.Track(_entry);
+
+        _entry.TextChanged += (s, e) =>
         {
             Text = e.NewTextValue;
             TextChanged?.Invoke(this, e);
         };
         _entry.Completed += (s, e) => Completed?.Invoke(this, e);
+        _entry.Focused += (s, e) => { _isFocused = true; UpdateVisualState(); };
+        _entry.Unfocused += (s, e) => { _isFocused = false; UpdateVisualState(); };
 
         _border = new Border
         {
             Content = _entry,
             Padding = new Thickness(12, 0),
             HeightRequest = 40,
-            StrokeThickness = 1
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            BackgroundColor = Colors.Transparent
         };
+
+        // Tapping the padding focuses the entry too.
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => _entry.Focus();
+        _border.GestureRecognizers.Add(tap);
 
         Content = _border;
         UpdateVisualState();
@@ -125,55 +154,35 @@ public partial class Input : ContentView
             input._entry.Text = newValue as string ?? string.Empty;
     }
 
-    private static void OnPlaceholderChanged(BindableObject bindable, object oldValue, object newValue)
+    protected override void OnPropertyChanged(string? propertyName = null)
     {
-        if (bindable is Input input)
-            input._entry.Placeholder = newValue as string ?? string.Empty;
-    }
-
-    private static void OnIsPasswordChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Input input)
-            input._entry.IsPassword = (bool)newValue;
-    }
-
-    private static void OnIsReadOnlyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Input input)
-            input._entry.IsReadOnly = (bool)newValue;
-    }
-
-    private static void OnMaxLengthChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Input input)
-            input._entry.MaxLength = (int)newValue;
-    }
-
-    private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Input input)
-            input.UpdateVisualState();
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == IsEnabledProperty.PropertyName)
+            Opacity = IsEnabled ? 1.0 : 0.5;
     }
 
     private void UpdateVisualState()
     {
-        // Design tokens matching ShellUI theme
-        var backgroundColor = Color.FromArgb(""#FFFFFF"");
-        var borderColor = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#E5E7EB"");
-        var focusBorderColor = HasError ? Color.FromArgb(""#EF4444"") : Color.FromArgb(""#2563EB"");
-
-        _border.BackgroundColor = backgroundColor;
-        _border.Stroke = borderColor;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = 6 };
-
-        _entry.PlaceholderColor = Color.FromArgb(""#9CA3AF"");
-        _entry.TextColor = Color.FromArgb(""#1F2937"");
-
-        Opacity = IsEnabled ? 1.0 : 0.5;
+        var stroke = HasError ? ShellToken.Destructive : _isFocused ? ShellToken.Ring : ShellToken.Input;
+        _border.Token(Border.StrokeProperty, stroke);
+        if (_isFocused || HasError)
+        {
+            _border.Shadow = new Shadow
+            {
+                Brush = new SolidColorBrush(ShellTheme.Get(HasError ? ShellToken.Destructive : ShellToken.Ring)),
+                Offset = new Point(0, 0),
+                Radius = 6,
+                Opacity = 0.35f
+            };
+        }
+        else
+        {
+            _border.ClearValue(VisualElement.ShadowProperty);
+        }
     }
 
-    public void Focus() => _entry.Focus();
-    public void Unfocus() => _entry.Unfocus();
+    public new void Focus() => _entry.Focus();
+    public new void Unfocus() => _entry.Unfocus();
 }
 "
     };

@@ -12,7 +12,7 @@ public static class CardHeaderTemplate
         Description = "Header section for Card component with title and description",
         Category = ComponentCategory.Layout,
         FilePath = "CardHeader.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Variants = new List<string>(),
         Tags = new List<string> { "layout", "card", "header" }
     };
@@ -21,20 +21,19 @@ public static class CardHeaderTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-// Card header section
+// Card header — p-6 space-y-1.5; title font-semibold, description text-sm text-muted-foreground.
 public partial class CardHeader : ContentView
 {
     public static readonly BindableProperty TitleProperty =
-        BindableProperty.Create(nameof(Title), typeof(string), typeof(CardHeader), 
-            string.Empty, propertyChanged: OnTitleChanged);
+        BindableProperty.Create(nameof(Title), typeof(string), typeof(CardHeader), string.Empty,
+            propertyChanged: (b, o, n) => (b as CardHeader)?.UpdateText());
 
     public static readonly BindableProperty DescriptionProperty =
-        BindableProperty.Create(nameof(Description), typeof(string), typeof(CardHeader), 
-            string.Empty, propertyChanged: OnDescriptionChanged);
+        BindableProperty.Create(nameof(Description), typeof(string), typeof(CardHeader), string.Empty,
+            propertyChanged: (b, o, n) => (b as CardHeader)?.UpdateText());
 
-    private readonly Label _titleLabel;
-    private readonly Label _descriptionLabel;
-    private readonly VerticalStackLayout _stack;
+    private readonly Label _title;
+    private readonly Label _description;
 
     public string Title
     {
@@ -50,44 +49,24 @@ public partial class CardHeader : ContentView
 
     public CardHeader()
     {
-        _titleLabel = new Label
-        {
-            FontSize = 18,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Color.FromArgb(""#1F2937"")
-        };
+        _title = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold };
+        _title.Token(Label.TextColorProperty, ShellToken.CardForeground);
+        _description = new Label { FontSize = 14, IsVisible = false };
+        _description.Token(Label.TextColorProperty, ShellToken.MutedForeground);
 
-        _descriptionLabel = new Label
+        Content = new VerticalStackLayout
         {
-            FontSize = 14,
-            TextColor = Color.FromArgb(""#6B7280""),
-            IsVisible = false
+            Spacing = 6,
+            Padding = new Thickness(24, 24, 24, 16),
+            Children = { _title, _description }
         };
-
-        _stack = new VerticalStackLayout
-        {
-            Spacing = 4,
-            Padding = new Thickness(16, 16, 16, 8),
-            Children = { _titleLabel, _descriptionLabel }
-        };
-
-        Content = _stack;
     }
 
-    private static void OnTitleChanged(BindableObject bindable, object oldValue, object newValue)
+    private void UpdateText()
     {
-        if (bindable is CardHeader header)
-            header._titleLabel.Text = newValue as string ?? string.Empty;
-    }
-
-    private static void OnDescriptionChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is CardHeader header)
-        {
-            var text = newValue as string ?? string.Empty;
-            header._descriptionLabel.Text = text;
-            header._descriptionLabel.IsVisible = !string.IsNullOrEmpty(text);
-        }
+        _title.Text = Title ?? string.Empty;
+        _description.Text = Description ?? string.Empty;
+        _description.IsVisible = !string.IsNullOrEmpty(Description);
     }
 }
 "

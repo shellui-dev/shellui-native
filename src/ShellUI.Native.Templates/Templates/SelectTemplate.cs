@@ -11,27 +11,32 @@ public static class SelectTemplate
         Description = "Dropdown select / picker",
         Category = ComponentCategory.Form,
         FilePath = "Select.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell", "icon" },
         Tags = new List<string> { "form", "select", "picker", "dropdown" }
     };
 
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
-        [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
+        [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
 
-// v1 wraps the native Picker directly — no outer Border. The native control (WinUI
-// ComboBox on Windows) draws its own chrome that overflows a wrapping Border on
-// desktop, so we defer styling to the platform. A shadcn-style Popover-based Select
-// with our own visuals is tracked as a follow-up.
-public partial class Select : ContentView
+namespace YourProjectNamespace.Components.UI;
+
+// Select — shadcn-style trigger (h-10 rounded-md border, chevrons icon) and a floating list
+// with a check on the selected item. Custom-drawn, so it looks the same on every platform.
+// Usage: <ui:Select Placeholder=""Pick a country"" /> then set ItemsSource in code or by binding.
+public partial class Select : ContentView, IShellPopup
 {
     public static readonly BindableProperty SelectedIndexProperty =
         BindableProperty.Create(nameof(SelectedIndex), typeof(int), typeof(Select),
-            -1, BindingMode.TwoWay, propertyChanged: OnSelectedChanged);
+            -1, BindingMode.TwoWay, propertyChanged: OnSelectedIndexChanged);
 
     public static readonly BindableProperty ItemsSourceProperty =
         BindableProperty.Create(nameof(ItemsSource), typeof(IList<string>), typeof(Select),
-            null, propertyChanged: OnItemsChanged);
+            null, propertyChanged: (b, o, n) => ((Select)b).RebuildItems());
+
+    public static readonly BindableProperty PlaceholderProperty =
+        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(Select),
+            ""Select..."", propertyChanged: (b, o, n) => ((Select)b).UpdateTrigger());
 
     public int SelectedIndex
     {
@@ -45,45 +50,161 @@ public partial class Select : ContentView
         set => SetValue(ItemsSourceProperty, value);
     }
 
+    public string Placeholder
+    {
+        get => (string)GetValue(PlaceholderProperty);
+        set => SetValue(PlaceholderProperty, value);
+    }
+
     public string? SelectedItem => SelectedIndex >= 0 && ItemsSource != null && SelectedIndex < ItemsSource.Count
         ? ItemsSource[SelectedIndex] : null;
 
+    public bool IsOpen { get; private set; }
+
     public event EventHandler? SelectedIndexChanged;
 
-    private readonly Microsoft.Maui.Controls.Picker _picker;
+    private Action? _restoreZ;
+    private readonly Border _trigger;
+    private readonly Label _value;
+    private readonly Border _panel;
+    private readonly VerticalStackLayout _list;
 
     public Select()
     {
-        _picker = new Microsoft.Maui.Controls.Picker
+        _value = new Label { FontSize = 14, VerticalOptions = LayoutOptions.Center, VerticalTextAlignment = TextAlignment.Center, LineBreakMode = LineBreakMode.TailTruncation };
+        var chevrons = new Icon { Name = IconName.ChevronsUpDown, Size = 16, Token = ShellToken.MutedForeground };
+        var triggerRow = new Grid
         {
-            Title = ""Select..."",
-            HeightRequest = 40
+            ColumnSpacing = 8,
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }
         };
-        _picker.SelectedIndexChanged += (s, e) =>
+        triggerRow.Add(_value, 0, 0);
+        triggerRow.Add(chevrons, 1, 0);
+
+        _trigger = new Border
         {
-            SelectedIndex = _picker.SelectedIndex;
-            SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
+            Content = triggerRow,
+            HeightRequest = 40,
+            Padding = new Thickness(12, 0),
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            BackgroundColor = Colors.Transparent
         };
-        Content = _picker;
+        _trigger.Token(Border.StrokeProperty, ShellToken.Input);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); SetOpen(!IsOpen); };
+        _trigger.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) SetOpen(!IsOpen); });
+
+        _list = new VerticalStackLayout { Spacing = 0 };
+        _panel = new Border
+        {
+            Content = new ScrollView { Content = _list, MaximumHeightRequest = 280 },
+            Padding = new Thickness(4),
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            Shadow = ShellPopups.PanelShadow(),
+            IsVisible = false
+        };
+        _panel.Token(VisualElement.BackgroundColorProperty, ShellToken.Popover);
+        _panel.Token(Border.StrokeProperty, ShellToken.Border);
+
+        Content = new ShellAnchorLayout { MatchAnchorWidth = true, Children = { _trigger, _panel } };
+        UpdateTrigger();
     }
 
-    private static void OnItemsChanged(BindableObject b, object o, object n)
+    public void SetOpen(bool open)
     {
-        if (b is Select s && n is IList<string> list)
+        if (IsOpen == open) return;
+        IsOpen = open;
+        _trigger.Token(Border.StrokeProperty, open ? ShellToken.Ring : ShellToken.Input);
+        if (open)
         {
-            // Picker.ItemsSource is System.Collections.IList (non-generic). List<string>
-            // implements both, but the IList<string> parameter type doesn't — copy into a
-            // List<string> to cover the case where the caller passed an array or ObservableCollection<T>.
-            s._picker.ItemsSource = list as System.Collections.IList ?? new List<string>(list);
-            if (s.SelectedIndex >= 0 && s.SelectedIndex < list.Count)
-                s._picker.SelectedIndex = s.SelectedIndex;
+            _restoreZ?.Invoke();
+            _restoreZ = ShellPopups.RaiseAboveSiblings(this);
+            ShellPopups.Opened(this);
+            _ = ShellPopups.AnimateAsync(_panel, true);
+        }
+        else
+        {
+            ShellPopups.Closed(this);
+            _ = CloseAsync();
         }
     }
 
-    private static void OnSelectedChanged(BindableObject b, object o, object n)
+    public void Close() => SetOpen(false);
+
+    private async Task CloseAsync()
     {
-        if (b is Select s && (int)n != s._picker.SelectedIndex)
-            s._picker.SelectedIndex = (int)n;
+        await ShellPopups.AnimateAsync(_panel, false);
+        if (!IsOpen) { _restoreZ?.Invoke(); _restoreZ = null; }
+    }
+
+    private static void OnSelectedIndexChanged(BindableObject b, object o, object n)
+    {
+        var select = (Select)b;
+        select.UpdateTrigger();
+        select.UpdateItemStates();
+        select.SelectedIndexChanged?.Invoke(select, EventArgs.Empty);
+    }
+
+    private void UpdateTrigger()
+    {
+        var item = SelectedItem;
+        _value.Text = item ?? Placeholder;
+        _value.Token(Label.TextColorProperty, item != null ? ShellToken.Foreground : ShellToken.MutedForeground);
+    }
+
+    private void RebuildItems()
+    {
+        _list.Children.Clear();
+        var items = ItemsSource;
+        if (items == null) return;
+        for (var i = 0; i < items.Count; i++)
+            _list.Children.Add(CreateItem(items[i], i));
+        UpdateTrigger();
+        UpdateItemStates();
+    }
+
+    private View CreateItem(string text, int index)
+    {
+        var label = new Label { Text = text, FontSize = 14, VerticalOptions = LayoutOptions.Center, VerticalTextAlignment = TextAlignment.Center };
+        label.Token(Label.TextColorProperty, ShellToken.PopoverForeground);
+        var check = new Icon { Name = IconName.Check, Size = 16, IsVisible = false };
+        var row = new Grid
+        {
+            ColumnSpacing = 8,
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }
+        };
+        row.Add(label, 0, 0);
+        row.Add(check, 1, 0);
+
+        var item = new Border
+        {
+            Content = row,
+            HeightRequest = 32,
+            Padding = new Thickness(8, 0),
+            StrokeThickness = 0,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusSm },
+            BackgroundColor = Colors.Transparent
+        };
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => item.Token(VisualElement.BackgroundColorProperty, ShellToken.Accent);
+        pointer.PointerExited += (_, _) => { item.ClearValue(VisualElement.BackgroundColorProperty); item.BackgroundColor = Colors.Transparent; };
+        item.GestureRecognizers.Add(pointer);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { SelectedIndex = index; SetOpen(false); };
+        item.GestureRecognizers.Add(tap);
+        return item;
+    }
+
+    private void UpdateItemStates()
+    {
+        for (var i = 0; i < _list.Children.Count; i++)
+        {
+            if (_list.Children[i] is Border { Content: Grid row } && row.Children.Count > 1 && row.Children[1] is Icon check)
+                check.IsVisible = i == SelectedIndex;
+        }
     }
 }
 "

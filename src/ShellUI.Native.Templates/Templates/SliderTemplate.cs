@@ -11,7 +11,7 @@ public static class SliderTemplate
         Description = "Range slider input",
         Category = ComponentCategory.Form,
         FilePath = "Slider.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Tags = new List<string> { "form", "input", "range", "slider" }
     };
 
@@ -19,19 +19,22 @@ public static class SliderTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// Range slider — platform slider tinted with the theme (primary range, secondary track).
 public partial class Slider : ContentView
 {
     public static readonly BindableProperty ValueProperty =
         BindableProperty.Create(nameof(Value), typeof(double), typeof(Slider), 50.0, BindingMode.TwoWay,
-            propertyChanged: (b, o, n) => (b as Slider)?.OnValueChanged());
+            propertyChanged: (b, o, n) => ((Slider)b).SyncValue());
 
     public static readonly BindableProperty MinimumProperty =
-        BindableProperty.Create(nameof(Minimum), typeof(double), typeof(Slider), 0.0);
+        BindableProperty.Create(nameof(Minimum), typeof(double), typeof(Slider), 0.0,
+            propertyChanged: (b, o, n) => ((Slider)b).SyncRange());
 
     public static readonly BindableProperty MaximumProperty =
-        BindableProperty.Create(nameof(Maximum), typeof(double), typeof(Slider), 100.0);
+        BindableProperty.Create(nameof(Maximum), typeof(double), typeof(Slider), 100.0,
+            propertyChanged: (b, o, n) => ((Slider)b).SyncRange());
 
-    private readonly Microsoft.Maui.Controls.Slider _nativeSlider;
+    private readonly Microsoft.Maui.Controls.Slider _native;
 
     public double Value
     {
@@ -55,34 +58,30 @@ public partial class Slider : ContentView
 
     public Slider()
     {
-        _nativeSlider = new Microsoft.Maui.Controls.Slider();
-        _nativeSlider.ValueChanged += (s, e) =>
+        _native = new Microsoft.Maui.Controls.Slider { Minimum = 0, Maximum = 100, Value = 50 };
+        _native.Token(Microsoft.Maui.Controls.Slider.MinimumTrackColorProperty, ShellToken.Primary);
+        _native.Token(Microsoft.Maui.Controls.Slider.MaximumTrackColorProperty, ShellToken.Secondary);
+        _native.Token(Microsoft.Maui.Controls.Slider.ThumbColorProperty, ShellToken.Primary);
+        _native.ValueChanged += (s, e) =>
         {
             Value = e.NewValue;
             ValueChanged?.Invoke(this, e);
         };
-        Content = _nativeSlider;
+        Content = _native;
     }
 
-    protected override void OnBindingContextChanged()
+    private void SyncRange()
     {
-        base.OnBindingContextChanged();
-        _nativeSlider.Minimum = Minimum;
-        _nativeSlider.Maximum = Maximum;
-        _nativeSlider.Value = Value;
+        // Widen before narrowing so Minimum never exceeds Maximum mid-update.
+        if (Maximum > _native.Maximum) { _native.Maximum = Maximum; _native.Minimum = Minimum; }
+        else { _native.Minimum = Minimum; _native.Maximum = Maximum; }
+        SyncValue();
     }
 
-    protected override void OnPropertyChanged(string? propertyName = null)
+    private void SyncValue()
     {
-        base.OnPropertyChanged(propertyName);
-        if (propertyName == MinimumProperty.PropertyName) _nativeSlider.Minimum = Minimum;
-        else if (propertyName == MaximumProperty.PropertyName) _nativeSlider.Maximum = Maximum;
-    }
-
-    private void OnValueChanged()
-    {
-        if (Math.Abs(_nativeSlider.Value - Value) > 0.001)
-            _nativeSlider.Value = Value;
+        if (Math.Abs(_native.Value - Value) > 0.001)
+            _native.Value = Value;
     }
 }
 "

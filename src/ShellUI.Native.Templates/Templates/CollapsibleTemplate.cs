@@ -22,16 +22,16 @@ public static class CollapsibleTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-// Compositional expand/collapse. Usage:
-//   <Collapsible Open=""{Binding IsOpen}"">
-//       <CollapsibleTrigger><Label Text=""Toggle"" /></CollapsibleTrigger>
-//       <CollapsibleContent><Label Text=""Hidden until open"" /></CollapsibleContent>
-//   </Collapsible>
+// Expand/collapse. The trigger can wrap a Button or any view; content animates its height.
+//   <ui:Collapsible Open=""{Binding IsOpen}"">
+//       <ui:CollapsibleTrigger><ui:Button Text=""Toggle"" Variant=""Outline"" /></ui:CollapsibleTrigger>
+//       <ui:CollapsibleContent><Label Text=""Hidden until open"" /></ui:CollapsibleContent>
+//   </ui:Collapsible>
 public partial class Collapsible : VerticalStackLayout
 {
     public static readonly BindableProperty OpenProperty =
         BindableProperty.Create(nameof(Open), typeof(bool), typeof(Collapsible), false,
-            propertyChanged: (b, o, n) => (b as Collapsible)?.OnOpenChanged());
+            BindingMode.TwoWay, propertyChanged: (b, o, n) => ((Collapsible)b).OnOpenChanged());
 
     public bool Open
     {
@@ -39,23 +39,30 @@ public partial class Collapsible : VerticalStackLayout
         set => SetValue(OpenProperty, value);
     }
 
-    // Raised whenever Open flips. CollapsibleContent subscribes to drive its visibility;
-    // consumers may also subscribe for side effects (analytics, lazy loading, etc.).
     public event EventHandler<bool>? OpenChanged;
 
     public Collapsible()
     {
-        Spacing = 0;
+        Spacing = 8;
+        Loaded += (_, _) => Refresh(animate: false);
     }
 
-    public void SetOpen(bool value)
+    public void SetOpen(bool value) => Open = value;
+
+    public void Toggle() => Open = !Open;
+
+    private void OnOpenChanged()
     {
-        if (Open != value) Open = value;
+        Refresh(animate: true);
+        OpenChanged?.Invoke(this, Open);
     }
 
-    public void Toggle() => SetOpen(!Open);
-
-    private void OnOpenChanged() => OpenChanged?.Invoke(this, Open);
+    // The collapsible drives its content, so state never depends on when a child found its parent.
+    private void Refresh(bool animate)
+    {
+        foreach (var content in this.FindDescendantsOfType<CollapsibleContent>(e => e is Collapsible))
+            content.Apply(Open, animate);
+    }
 }
 "
     };

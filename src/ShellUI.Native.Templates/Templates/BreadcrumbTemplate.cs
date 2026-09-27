@@ -22,6 +22,7 @@ public static class BreadcrumbTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// Navigation trail — items separated by chevrons; the last item hides its separator.
 public partial class Breadcrumb : HorizontalStackLayout
 {
     public Breadcrumb()
