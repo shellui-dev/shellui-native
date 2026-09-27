@@ -1,5 +1,9 @@
+using Microsoft.Maui.Controls.Shapes;
+
 namespace MAUI.Demo.Components.UI;
 
+// Tab button — rounded-md px-3 text-sm font-medium; active: bg-background text-foreground
+// shadow-sm; inactive: text-muted-foreground.
 public partial class TabsTrigger : ContentView
 {
     public static readonly BindableProperty ValueProperty =
@@ -7,7 +11,7 @@ public partial class TabsTrigger : ContentView
 
     public static readonly BindableProperty TextProperty =
         BindableProperty.Create(nameof(Text), typeof(string), typeof(TabsTrigger), string.Empty,
-            propertyChanged: (b, o, n) => (b as TabsTrigger)?.UpdateLabel());
+            propertyChanged: (b, o, n) => ((TabsTrigger)b)._label.Text = n as string ?? string.Empty);
 
     public string Value
     {
@@ -21,62 +25,55 @@ public partial class TabsTrigger : ContentView
         set => SetValue(TextProperty, value);
     }
 
+    public bool IsActive { get; private set; }
+
+    private readonly Border _pill;
     private readonly Label _label;
-    private readonly BoxView _underline;
-    private Tabs? _parent;
 
     public TabsTrigger()
     {
-        MinimumHeightRequest = 40;
-
         _label = new Label
         {
             FontSize = 14,
-            HorizontalOptions = LayoutOptions.Center,
+            FontAttributes = FontAttributes.Bold,
             VerticalOptions = LayoutOptions.Center,
-            Padding = new Thickness(12, 8)
+            VerticalTextAlignment = TextAlignment.Center,
+            HorizontalOptions = LayoutOptions.Center
         };
-        _underline = new BoxView
+        _pill = new Border
         {
-            HeightRequest = 2,
-            Color = Colors.Transparent,
-            HorizontalOptions = LayoutOptions.Fill
+            Content = _label,
+            Padding = new Thickness(12, 0),
+            StrokeThickness = 0,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            BackgroundColor = Colors.Transparent
         };
-        Content = new VerticalStackLayout
-        {
-            Spacing = 0,
-            Children = { _label, _underline }
-        };
+        Content = _pill;
 
         var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => _parent?.SetValue(Value);
-        GestureRecognizers.Add(tap);
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); Select(); };
+        _pill.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) Select(); });
+
+        SetActive(false);
     }
 
-    protected override void OnParentSet()
+    private void Select() => this.FindParentOfType<Tabs>()?.SetValue(Value);
+
+    internal void SetActive(bool active)
     {
-        base.OnParentSet();
-
-        if (_parent != null)
-            _parent.ValueChanged -= OnParentValueChanged;
-
-        _parent = this.FindParentOfType<Tabs>();
-        if (_parent != null)
+        IsActive = active;
+        _label.Token(Label.TextColorProperty, active ? ShellToken.Foreground : ShellToken.MutedForeground);
+        if (active)
         {
-            _parent.ValueChanged += OnParentValueChanged;
-            UpdateActiveState(_parent.Value);
+            _pill.Token(VisualElement.BackgroundColorProperty, ShellToken.Background);
+            _pill.Shadow = new Shadow { Brush = new SolidColorBrush(Colors.Black), Offset = new Point(0, 1), Radius = 2, Opacity = 0.1f };
+        }
+        else
+        {
+            _pill.ClearValue(VisualElement.BackgroundColorProperty);
+            _pill.BackgroundColor = Colors.Transparent;
+            _pill.ClearValue(VisualElement.ShadowProperty);
         }
     }
-
-    private void OnParentValueChanged(object? sender, (string Old, string New) e) => UpdateActiveState(e.New);
-
-    private void UpdateActiveState(string activeValue)
-    {
-        var isActive = activeValue == Value;
-        _label.TextColor = isActive ? Color.FromArgb("#2563EB") : Color.FromArgb("#6B7280");
-        _label.FontAttributes = isActive ? FontAttributes.Bold : FontAttributes.None;
-        _underline.Color = isActive ? Color.FromArgb("#2563EB") : Colors.Transparent;
-    }
-
-    private void UpdateLabel() => _label.Text = Text ?? string.Empty;
 }

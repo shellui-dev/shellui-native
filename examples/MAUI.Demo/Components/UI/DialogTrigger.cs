@@ -1,20 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-// Tap to open dialog. Usage: <DialogTrigger><Button Text="Open" /></DialogTrigger>
-public partial class DialogTrigger : ContentView
+// Opens the enclosing Dialog. Usage: <ui:DialogTrigger><ui:Button Text="Open" /></ui:DialogTrigger>
+public partial class DialogTrigger : ShellTriggerView
 {
-    public DialogTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += OnTapped;
-        GestureRecognizers.Add(tap);
-        // Ensure taps pass through to child if Content is interactive
-        InputTransparent = false;
-    }
-
-    private void OnTapped(object? sender, TappedEventArgs e)
-    {
-        var dialog = this.FindParentOfType<Dialog>();
-        dialog?.SetOpen(true);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Dialog>()?.SetOpen(true);
 }

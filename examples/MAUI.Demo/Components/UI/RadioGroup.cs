@@ -1,10 +1,12 @@
 namespace MAUI.Demo.Components.UI;
 
+// Single-choice group. Usage:
+//   <ui:RadioGroup Value="a"><ui:RadioGroupItem Value="a" Text="Option A" />...</ui:RadioGroup>
 [ContentProperty(nameof(Children))]
 public partial class RadioGroup : ContentView
 {
     public static readonly BindableProperty ValueProperty =
-        BindableProperty.Create(nameof(Value), typeof(string), typeof(RadioGroup), 
+        BindableProperty.Create(nameof(Value), typeof(string), typeof(RadioGroup),
             string.Empty, BindingMode.TwoWay, propertyChanged: OnValueChanged);
 
     public string Value
@@ -21,14 +23,24 @@ public partial class RadioGroup : ContentView
 
     public RadioGroup()
     {
-        _stack = new VerticalStackLayout { Spacing = 8 };
+        _stack = new VerticalStackLayout { Spacing = 12 };
         Content = _stack;
+        Loaded += (_, _) => RefreshItems();
     }
 
-    public void SetValue(string value)
+    public void SetValue(string value) => Value = value;
+
+    private static void OnValueChanged(BindableObject b, object o, object n)
     {
-        if (Value != value) { Value = value; ValueChanged?.Invoke(this, value); }
+        if (b is not RadioGroup group) return;
+        group.RefreshItems();
+        group.ValueChanged?.Invoke(group, n as string ?? string.Empty);
     }
 
-    private static void OnValueChanged(BindableObject b, object o, object n) { }
+    // The group drives its items, so item state never depends on when an item found its parent.
+    internal void RefreshItems()
+    {
+        foreach (var item in this.FindDescendantsOfType<RadioGroupItem>(e => e is RadioGroup))
+            item.SetChecked(item.Value == Value);
+    }
 }

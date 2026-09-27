@@ -1,11 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-public partial class DialogClose : ContentView
+// Closes the enclosing Dialog. Wrap a Button: <ui:DialogClose><ui:Button Text="Cancel" /></ui:DialogClose>
+public partial class DialogClose : ShellTriggerView
 {
-    public DialogClose()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => this.FindParentOfType<Dialog>()?.SetOpen(false);
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Dialog>()?.SetOpen(false);
 }

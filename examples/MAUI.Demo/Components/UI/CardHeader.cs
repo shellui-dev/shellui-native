@@ -1,0 +1,50 @@
+namespace MAUI.Demo.Components.UI;
+
+// Card header — p-6 space-y-1.5; title font-semibold, description text-sm text-muted-foreground.
+public partial class CardHeader : ContentView
+{
+    public static readonly BindableProperty TitleProperty =
+        BindableProperty.Create(nameof(Title), typeof(string), typeof(CardHeader), string.Empty,
+            propertyChanged: (b, o, n) => (b as CardHeader)?.UpdateText());
+
+    public static readonly BindableProperty DescriptionProperty =
+        BindableProperty.Create(nameof(Description), typeof(string), typeof(CardHeader), string.Empty,
+            propertyChanged: (b, o, n) => (b as CardHeader)?.UpdateText());
+
+    private readonly Label _title;
+    private readonly Label _description;
+
+    public string Title
+    {
+        get => (string)GetValue(TitleProperty);
+        set => SetValue(TitleProperty, value);
+    }
+
+    public string Description
+    {
+        get => (string)GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
+    public CardHeader()
+    {
+        _title = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold };
+        _title.Token(Label.TextColorProperty, ShellToken.CardForeground);
+        _description = new Label { FontSize = 14, IsVisible = false };
+        _description.Token(Label.TextColorProperty, ShellToken.MutedForeground);
+
+        Content = new VerticalStackLayout
+        {
+            Spacing = 6,
+            Padding = new Thickness(24, 24, 24, 16),
+            Children = { _title, _description }
+        };
+    }
+
+    private void UpdateText()
+    {
+        _title.Text = Title ?? string.Empty;
+        _description.Text = Description ?? string.Empty;
+        _description.IsVisible = !string.IsNullOrEmpty(Description);
+    }
+}

@@ -1,19 +1,22 @@
+using Microsoft.Maui.Controls.Shapes;
+
 namespace MAUI.Demo.Components.UI;
 
-// v1 hosts the native DatePicker directly — no outer Border. On Windows the native
-// control (WinUI CalendarDatePicker) draws chrome that overflows a wrapping Border.
-// A custom calendar-popup DatePicker is tracked as a follow-up.
+// Date field — h-10 rounded-md border border-input around the platform date picker, whose own
+// frame is stripped. A custom calendar popover is tracked as a follow-up.
 public partial class DatePicker : ContentView
 {
     public static readonly BindableProperty DateProperty =
-        BindableProperty.Create(nameof(Date), typeof(DateTime), typeof(DatePicker), 
+        BindableProperty.Create(nameof(Date), typeof(DateTime), typeof(DatePicker),
             DateTime.Today, BindingMode.TwoWay, propertyChanged: OnDateChanged);
 
     public static readonly BindableProperty MinimumDateProperty =
-        BindableProperty.Create(nameof(MinimumDate), typeof(DateTime?), typeof(DatePicker), null);
+        BindableProperty.Create(nameof(MinimumDate), typeof(DateTime?), typeof(DatePicker), null,
+            propertyChanged: (b, o, n) => ((DatePicker)b)._native.MinimumDate = (DateTime?)n ?? DateTime.MinValue);
 
     public static readonly BindableProperty MaximumDateProperty =
-        BindableProperty.Create(nameof(MaximumDate), typeof(DateTime?), typeof(DatePicker), null);
+        BindableProperty.Create(nameof(MaximumDate), typeof(DateTime?), typeof(DatePicker), null,
+            propertyChanged: (b, o, n) => ((DatePicker)b)._native.MaximumDate = (DateTime?)n ?? DateTime.MaxValue);
 
     public DateTime Date
     {
@@ -35,36 +38,44 @@ public partial class DatePicker : ContentView
 
     public event EventHandler<DateChangedEventArgs>? DateChanged;
 
-    private readonly Microsoft.Maui.Controls.DatePicker _nativePicker;
+    private readonly Microsoft.Maui.Controls.DatePicker _native;
 
     public DatePicker()
     {
-        _nativePicker = new Microsoft.Maui.Controls.DatePicker
+        _native = new Microsoft.Maui.Controls.DatePicker
         {
-            HeightRequest = 40
+            FontSize = 14,
+            VerticalOptions = LayoutOptions.Center,
+            BackgroundColor = Colors.Transparent
         };
-        _nativePicker.DateSelected += (s, e) =>
+        _native.Token(Microsoft.Maui.Controls.DatePicker.TextColorProperty, ShellToken.Foreground);
+        ShellPlatform.StripNativeChrome(_native, keepPadding: true);
+        _native.DateSelected += (s, e) =>
         {
-            // .NET 10 MAUI made DateChangedEventArgs.NewDate nullable
+            // .NET 10 MAUI made DateChangedEventArgs.NewDate / OldDate nullable
             var newDate = e.NewDate ?? Date;
             var oldDate = e.OldDate ?? Date;
             Date = newDate;
             DateChanged?.Invoke(this, new DateChangedEventArgs(oldDate, newDate));
         };
-        Content = _nativePicker;
-    }
 
-    protected override void OnPropertyChanged(string? propertyName = null)
-    {
-        base.OnPropertyChanged(propertyName);
-        if (propertyName == DateProperty.PropertyName) _nativePicker.Date = Date;
-        else if (propertyName == MinimumDateProperty.PropertyName) _nativePicker.MinimumDate = MinimumDate ?? DateTime.MinValue;
-        else if (propertyName == MaximumDateProperty.PropertyName) _nativePicker.MaximumDate = MaximumDate ?? DateTime.MaxValue;
+        var border = new Border
+        {
+            Content = _native,
+            HeightRequest = 40,
+            Padding = new Thickness(4, 0),
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            BackgroundColor = Colors.Transparent
+        };
+        border.Token(Border.StrokeProperty, ShellToken.Input);
+        Content = border;
+        HorizontalOptions = LayoutOptions.Start;
     }
 
     private static void OnDateChanged(BindableObject b, object o, object n)
     {
-        if (b is DatePicker dp && n is DateTime dt && dp._nativePicker.Date.GetValueOrDefault() != dt)
-            dp._nativePicker.Date = dt;
+        if (b is DatePicker dp && n is DateTime dt && dp._native.Date.GetValueOrDefault() != dt)
+            dp._native.Date = dt;
     }
 }

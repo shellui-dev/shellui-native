@@ -1,109 +1,87 @@
 using Microsoft.Maui.Controls.Shapes;
-using MauiIcons.Core;
-using MauiIcons.Fluent;
 
 namespace MAUI.Demo.Components.UI;
 
-// Theme toggle switch using MauiIcons Fluent
+// Light/dark mode toggle — a 36x36 outline icon button (shadcn's ModeToggle). The sun and
+// moon cross-fade with a quarter turn. Usage: <ui:ThemeToggle />
 public partial class ThemeToggle : ContentView
 {
-    private readonly Border _track;
-    private readonly Border _thumb;
-    private readonly MauiIcon _icon;
-    private bool _isDark;
+    private const double Box = 36;
+
+    private readonly Border _border;
+    private readonly Icon _sun;
+    private readonly Icon _moon;
 
     public event EventHandler<bool>? ThemeChanged;
 
-    public bool IsDarkMode
-    {
-        get => _isDark;
-        set
-        {
-            if (_isDark != value)
-            {
-                _isDark = value;
-                AnimateToggle();
-                ApplyTheme();
-                ThemeChanged?.Invoke(this, value);
-            }
-        }
-    }
+    public bool IsDarkMode => ShellTheme.IsDarkMode;
 
     public ThemeToggle()
     {
-        _isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+        ShellTheme.EnsureInitialized();
 
-        // Using MauiIcon for cross-platform icons
-        _icon = new MauiIcon
-        {
-            Icon = _isDark ? FluentIcons.WeatherMoon24 : FluentIcons.WeatherSunny24,
-            IconSize = 14,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center
-        };
+        _sun = new Icon { Name = IconName.Sun, Size = 16 };
+        _moon = new Icon { Name = IconName.Moon, Size = 16 };
 
-        _thumb = new Border
+        _border = new Border
         {
-            WidthRequest = 26,
-            HeightRequest = 26,
-            StrokeThickness = 0,
-            Content = _icon,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Start
-        };
-
-        _track = new Border
-        {
-            WidthRequest = 56,
-            HeightRequest = 32,
+            WidthRequest = Box,
+            HeightRequest = Box,
             StrokeThickness = 1,
-            Padding = new Thickness(3),
-            Content = _thumb
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
+            Content = new Grid { Children = { _sun, _moon } }
         };
+        _border.Token(Border.StrokeProperty, ShellToken.Input);
+        _border.Token(VisualElement.BackgroundColorProperty, ShellToken.Background);
+        SemanticProperties.SetDescription(_border, "Toggle theme");
 
-        var tapGesture = new TapGestureRecognizer();
-        tapGesture.Tapped += (s, e) => IsDarkMode = !IsDarkMode;
-        _track.GestureRecognizers.Add(tapGesture);
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => _border.Token(VisualElement.BackgroundColorProperty, ShellToken.Accent);
+        pointer.PointerExited += (_, _) => _border.Token(VisualElement.BackgroundColorProperty, ShellToken.Background);
+        _border.GestureRecognizers.Add(pointer);
 
-        Content = _track;
-        UpdateVisualState();
-    }
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { ShellFocus.FocusPressed(this); Toggle(); };
+        _border.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, Toggle);
 
-    private void ApplyTheme()
-    {
-        if (Application.Current != null)
-            Application.Current.UserAppTheme = _isDark ? AppTheme.Dark : AppTheme.Light;
-    }
+        Content = _border;
+        HorizontalOptions = LayoutOptions.Start;
+        VerticalOptions = LayoutOptions.Center;
 
-    private async void AnimateToggle()
-    {
-        await _thumb.ScaleToAsync(0.85, 60, Easing.CubicOut);
-        _thumb.Margin = _isDark ? new Thickness(24, 0, 0, 0) : new Thickness(0);
-        UpdateVisualState();
-        await _thumb.ScaleToAsync(1.0, 60, Easing.CubicOut);
-    }
-
-    private void UpdateVisualState()
-    {
-        // Track styling
-        _track.BackgroundColor = _isDark ? Color.FromArgb("#1E293B") : Color.FromArgb("#F1F5F9");
-        _track.Stroke = _isDark ? Color.FromArgb("#475569") : Color.FromArgb("#CBD5E1");
-        _track.StrokeShape = new RoundRectangle { CornerRadius = 16 };
-
-        // Thumb styling
-        _thumb.BackgroundColor = _isDark ? Color.FromArgb("#3B82F6") : Colors.White;
-        _thumb.StrokeShape = new RoundRectangle { CornerRadius = 13 };
-        _thumb.Shadow = new Shadow
+        ShowIcons(ShellTheme.IsDarkMode, animate: false);
+        Loaded += (_, _) =>
         {
-            Brush = new SolidColorBrush(Color.FromArgb("#40000000")),
-            Offset = new Point(0, 1),
-            Radius = 3,
-            Opacity = 0.2f
+            ShellTheme.ThemeChanged -= OnThemeChanged;
+            ShellTheme.ThemeChanged += OnThemeChanged;
+            ShowIcons(ShellTheme.IsDarkMode, animate: false);
         };
-        _thumb.Margin = _isDark ? new Thickness(24, 0, 0, 0) : new Thickness(0);
+        Unloaded += (_, _) => ShellTheme.ThemeChanged -= OnThemeChanged;
+    }
 
-        // Icon - using MauiIcons FluentIcons directly
-        _icon.Icon = _isDark ? FluentIcons.WeatherMoon24 : FluentIcons.WeatherSunny24;
-        _icon.IconColor = _isDark ? Colors.White : Color.FromArgb("#F59E0B");
+    public void Toggle()
+    {
+        ShellTheme.ToggleTheme();
+        ThemeChanged?.Invoke(this, ShellTheme.IsDarkMode);
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e) => ShowIcons(ShellTheme.IsDarkMode, animate: true);
+
+    private void ShowIcons(bool dark, bool animate)
+    {
+        var (show, hide) = dark ? (_moon, _sun) : (_sun, _moon);
+        if (!animate)
+        {
+            show.Opacity = 1; show.Rotation = 0; show.Scale = 1;
+            hide.Opacity = 0; hide.Rotation = -90; hide.Scale = 0.5;
+            return;
+        }
+        show.Rotation = 90; show.Scale = 0.5;
+        _ = show.FadeToAsync(1, 200, Easing.CubicOut);
+        _ = show.RotateToAsync(0, 200, Easing.CubicOut);
+        _ = show.ScaleToAsync(1, 200, Easing.CubicOut);
+        _ = hide.FadeToAsync(0, 200, Easing.CubicIn);
+        _ = hide.RotateToAsync(-90, 200, Easing.CubicIn);
+        _ = hide.ScaleToAsync(0.5, 200, Easing.CubicIn);
     }
 }

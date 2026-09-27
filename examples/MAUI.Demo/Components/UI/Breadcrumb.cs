@@ -1,5 +1,6 @@
 namespace MAUI.Demo.Components.UI;
 
+// Navigation trail — items separated by chevrons; the last item hides its separator.
 public partial class Breadcrumb : HorizontalStackLayout
 {
     public Breadcrumb()

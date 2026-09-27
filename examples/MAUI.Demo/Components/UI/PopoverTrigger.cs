@@ -1,11 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-public partial class PopoverTrigger : ContentView
+// Toggles the enclosing Popover. Wrap a Button or any view.
+public partial class PopoverTrigger : ShellTriggerView
 {
-    public PopoverTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => this.FindParentOfType<Popover>()?.ToggleAsync();
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Popover>()?.Toggle();
 }

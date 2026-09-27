@@ -2,29 +2,25 @@ using Microsoft.Maui.Controls.Shapes;
 
 namespace MAUI.Demo.Components.UI;
 
-// Checkbox component with label support
+// Checkbox — h-4 w-4 rounded-sm border border-primary; checked: bg-primary + check icon.
+// The whole row (box + label) is the hit target.
 public partial class Checkbox : ContentView
 {
     public static readonly BindableProperty IsCheckedProperty =
-        BindableProperty.Create(nameof(IsChecked), typeof(bool), typeof(Checkbox), 
+        BindableProperty.Create(nameof(IsChecked), typeof(bool), typeof(Checkbox),
             false, BindingMode.TwoWay, propertyChanged: OnIsCheckedChanged);
 
     public static readonly BindableProperty LabelProperty =
-        BindableProperty.Create(nameof(Label), typeof(string), typeof(Checkbox), 
-            string.Empty, propertyChanged: OnLabelChanged);
+        BindableProperty.Create(nameof(Label), typeof(string), typeof(Checkbox),
+            string.Empty, propertyChanged: (b, o, n) => ((Checkbox)b).UpdateLabel());
 
     public static readonly BindableProperty HasErrorProperty =
-        BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Checkbox), 
-            false, propertyChanged: OnVisualPropertyChanged);
+        BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Checkbox),
+            false, propertyChanged: (b, o, n) => ((Checkbox)b).UpdateVisualState());
 
-    public static new readonly BindableProperty IsEnabledProperty =
-        BindableProperty.Create(nameof(IsEnabled), typeof(bool), typeof(Checkbox), 
-            true, propertyChanged: OnIsEnabledChanged);
-
-    private readonly Border _checkboxBorder;
-    private readonly Label _checkmark;
+    private readonly Border _box;
+    private readonly Icon _check;
     private readonly Label _label;
-    private readonly TapGestureRecognizer _tapGesture;
 
     public bool IsChecked
     {
@@ -44,106 +40,72 @@ public partial class Checkbox : ContentView
         set => SetValue(HasErrorProperty, value);
     }
 
-    public new bool IsEnabled
-    {
-        get => (bool)GetValue(IsEnabledProperty);
-        set => SetValue(IsEnabledProperty, value);
-    }
-
     public event EventHandler<bool>? CheckedChanged;
 
     public Checkbox()
     {
-        _checkmark = new Label
+        _check = new Icon { Name = IconName.Check, Size = 12, StrokeWidth = 3, Token = ShellToken.PrimaryForeground };
+
+        _box = new Border
         {
-            Text = "✓",
-            FontSize = 14,
-            TextColor = Colors.White,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            IsVisible = false
+            Content = _check,
+            WidthRequest = 16,
+            HeightRequest = 16,
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusSm },
+            VerticalOptions = LayoutOptions.Center
         };
 
-        _checkboxBorder = new Border
+        _label = new Label { FontSize = 14, VerticalOptions = LayoutOptions.Center, VerticalTextAlignment = TextAlignment.Center, IsVisible = false };
+        _label.Token(Microsoft.Maui.Controls.Label.TextColorProperty, ShellToken.Foreground);
+
+        var row = new HorizontalStackLayout
         {
-            Content = _checkmark,
-            WidthRequest = 20,
-            HeightRequest = 20,
-            StrokeThickness = 2,
-            StrokeShape = new RoundRectangle { CornerRadius = 4 }
+            Spacing = 8,
+            MinimumHeightRequest = 24,
+            Children = { _box, _label }
         };
 
-        _label = new Label
-        {
-            FontSize = 14,
-            VerticalOptions = LayoutOptions.Center,
-            Margin = new Thickness(8, 0, 0, 0)
-        };
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); IsChecked = !IsChecked; };
+        row.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) IsChecked = !IsChecked; });
 
-        _tapGesture = new TapGestureRecognizer();
-        _tapGesture.Tapped += OnTapped;
-
-        var container = new HorizontalStackLayout
-        {
-            Spacing = 0,
-            Children = { _checkboxBorder, _label }
-        };
-
-        container.GestureRecognizers.Add(_tapGesture);
-        Content = container;
-
+        Content = row;
+        HorizontalOptions = LayoutOptions.Start;
         UpdateVisualState();
-    }
-
-    private void OnTapped(object? sender, EventArgs e)
-    {
-        if (IsEnabled)
-            IsChecked = !IsChecked;
     }
 
     private static void OnIsCheckedChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Checkbox checkbox)
-        {
-            checkbox.UpdateVisualState();
-            checkbox.CheckedChanged?.Invoke(checkbox, (bool)newValue);
-        }
+        if (bindable is not Checkbox checkbox) return;
+        checkbox.UpdateVisualState();
+        checkbox.CheckedChanged?.Invoke(checkbox, (bool)newValue);
     }
 
-    private static void OnLabelChanged(BindableObject bindable, object oldValue, object newValue)
+    protected override void OnPropertyChanged(string? propertyName = null)
     {
-        if (bindable is Checkbox checkbox)
-            checkbox._label.Text = newValue as string ?? string.Empty;
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == IsEnabledProperty.PropertyName)
+            Opacity = IsEnabled ? 1.0 : 0.5;
     }
 
-    private static void OnIsEnabledChanged(BindableObject bindable, object oldValue, object newValue)
+    private void UpdateLabel()
     {
-        if (bindable is Checkbox checkbox)
-            checkbox.UpdateVisualState();
-    }
-
-    private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Checkbox checkbox)
-            checkbox.UpdateVisualState();
+        _label.Text = Label ?? string.Empty;
+        _label.IsVisible = !string.IsNullOrEmpty(Label);
     }
 
     private void UpdateVisualState()
     {
-        // Design tokens matching ShellUI theme
-        var borderColor = HasError 
-            ? Color.FromArgb("#EF4444") 
-            : (IsChecked ? Color.FromArgb("#2563EB") : Color.FromArgb("#E5E7EB"));
-        
-        var backgroundColor = IsChecked 
-            ? Color.FromArgb("#2563EB") 
-            : Colors.Transparent;
-
-        _checkboxBorder.BackgroundColor = backgroundColor;
-        _checkboxBorder.Stroke = borderColor;
-        _checkmark.IsVisible = IsChecked;
-        _label.TextColor = Color.FromArgb("#1F2937");
-        _label.Opacity = IsEnabled ? 1.0 : 0.5;
-        _checkboxBorder.Opacity = IsEnabled ? 1.0 : 0.5;
+        _box.Token(Border.StrokeProperty, HasError ? ShellToken.Destructive : ShellToken.Primary);
+        if (IsChecked)
+            _box.Token(VisualElement.BackgroundColorProperty, ShellToken.Primary);
+        else
+        {
+            _box.ClearValue(VisualElement.BackgroundColorProperty);
+            _box.BackgroundColor = Colors.Transparent;
+        }
+        _check.IsVisible = IsChecked;
     }
 }

@@ -1,45 +1,27 @@
 namespace MAUI.Demo.Components.UI;
 
+// Section body — pb-4 text-sm; expands/collapses its height with the item.
 [ContentProperty(nameof(Content))]
 public partial class AccordionContent : ContentView
 {
-    private AccordionItem? _item;
-
     public AccordionContent()
     {
         IsVisible = false;
         Opacity = 0;
+        IsClippedToBounds = true;
+        Padding = new Thickness(0, 0, 0, 16);
     }
 
-    protected override void OnParentSet()
+    internal void Apply(bool open, bool animate)
     {
-        base.OnParentSet();
-
-        if (_item != null)
-            _item.OpenChanged -= OnItemOpenChanged;
-
-        _item = this.FindParentOfType<AccordionItem>();
-        if (_item != null)
+        if (animate)
         {
-            _item.OpenChanged += OnItemOpenChanged;
-            IsVisible = _item.IsOpen;
-            Opacity = _item.IsOpen ? 1 : 0;
+            _ = this.AnimateExpandAsync(open);
+            return;
         }
-    }
-
-    private void OnItemOpenChanged(object? sender, bool open) => _ = AnimateAsync(open);
-
-    private async Task AnimateAsync(bool open)
-    {
-        if (open)
-        {
-            IsVisible = true;
-            await this.FadeToAsync(1, 150, Easing.CubicOut);
-        }
-        else
-        {
-            await this.FadeToAsync(0, 150, Easing.CubicIn);
-            IsVisible = false;
-        }
+        this.AbortAnimation("ShellExpand");
+        IsVisible = open;
+        Opacity = open ? 1 : 0;
+        HeightRequest = -1;
     }
 }

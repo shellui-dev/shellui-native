@@ -1,5 +1,6 @@
 namespace MAUI.Demo.Components.UI;
 
+// Actions row — flex justify-end gap-2.
 [ContentProperty(nameof(Children))]
 public partial class DialogFooter : ContentView
 {
@@ -12,7 +13,8 @@ public partial class DialogFooter : ContentView
         _stack = new HorizontalStackLayout
         {
             Spacing = 8,
-            HorizontalOptions = LayoutOptions.End
+            HorizontalOptions = LayoutOptions.End,
+            Margin = new Thickness(0, 8, 0, 0)
         };
         Content = _stack;
     }

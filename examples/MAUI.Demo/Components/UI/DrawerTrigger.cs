@@ -1,11 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-public partial class DrawerTrigger : ContentView
+// Opens the enclosing Drawer. Usage: <ui:DrawerTrigger><ui:Button Text="Open" /></ui:DrawerTrigger>
+public partial class DrawerTrigger : ShellTriggerView
 {
-    public DrawerTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => this.FindParentOfType<Drawer>()?.SetOpen(true);
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Drawer>()?.SetOpen(true);
 }

@@ -6,7 +6,8 @@ public enum ButtonVariant
     Destructive,
     Outline,
     Secondary,
-    Ghost
+    Ghost,
+    Link
 }
 
 public enum ButtonSize
@@ -17,103 +18,79 @@ public enum ButtonSize
     Icon
 }
 
-// Style properties for button rendering
+// Token-based style for one variant + size. Null background/border = transparent.
 public class ButtonStyle
 {
-    public Color BackgroundColor { get; set; } = Colors.Transparent;
-    public Color TextColor { get; set; } = Colors.Black;
-    public Color BorderColor { get; set; } = Colors.Transparent;
-    public double BorderThickness { get; set; } = 0;
-    public CornerRadius CornerRadius { get; set; } = new(6);
-    public Thickness Padding { get; set; } = new(16, 10);
+    public ShellToken? Background { get; set; }
+    public ShellToken? HoverBackground { get; set; }
+    public ShellToken Foreground { get; set; } = ShellToken.Foreground;
+    public ShellToken? Border { get; set; }
+    public double HoverOpacity { get; set; } = 1.0;
+    public bool UnderlineOnHover { get; set; }
+    public float CornerRadius { get; set; } = ShellTheme.RadiusMd;
+    public Thickness Padding { get; set; } = new(16, 0);
     public double Height { get; set; } = 40;
-    public double MinWidth { get; set; } = 80;
+    public double Width { get; set; } = -1;
     public double FontSize { get; set; } = 14;
+    public double IconSize { get; set; } = 16;
 }
 
+// Mirrors ShellUI's buttonVariants (cva): variant → colors, size → box.
 public static class ButtonVariants
 {
-    // Theme-aware design tokens
-    private static bool IsDarkMode => Application.Current?.RequestedTheme == AppTheme.Dark;
-
-    private static Color PrimaryColor => Color.FromArgb("#3B82F6"); // blue-500
-    private static Color PrimaryForeground => Colors.White;
-    
-    private static Color DestructiveColor => Color.FromArgb("#EF4444"); // red-500
-    private static Color DestructiveForeground => Colors.White;
-    
-    private static Color SecondaryColor => IsDarkMode 
-        ? Color.FromArgb("#334155")  // slate-700
-        : Color.FromArgb("#F1F5F9"); // slate-100
-    private static Color SecondaryForeground => IsDarkMode 
-        ? Color.FromArgb("#F8FAFC")  // slate-50
-        : Color.FromArgb("#0F172A"); // slate-900
-    
-    private static Color BorderColor => IsDarkMode 
-        ? Color.FromArgb("#475569")  // slate-600
-        : Color.FromArgb("#E2E8F0"); // slate-200
-    
-    private static Color ForegroundColor => IsDarkMode 
-        ? Color.FromArgb("#F8FAFC")  // slate-50
-        : Color.FromArgb("#0F172A"); // slate-900
-
     public static ButtonStyle GetStyle(ButtonVariant variant = ButtonVariant.Default, ButtonSize size = ButtonSize.Default)
     {
         var style = new ButtonStyle();
 
-        // Apply variant styles (theme-aware)
         switch (variant)
         {
-            case ButtonVariant.Default:
-                style.BackgroundColor = PrimaryColor;
-                style.TextColor = PrimaryForeground;
+            case ButtonVariant.Default:      // bg-primary text-primary-foreground hover:bg-primary/90
+                style.Background = ShellToken.Primary;
+                style.Foreground = ShellToken.PrimaryForeground;
+                style.HoverOpacity = 0.9;
                 break;
-            case ButtonVariant.Destructive:
-                style.BackgroundColor = DestructiveColor;
-                style.TextColor = DestructiveForeground;
+            case ButtonVariant.Destructive:  // bg-destructive text-destructive-foreground hover:bg-destructive/90
+                style.Background = ShellToken.Destructive;
+                style.Foreground = ShellToken.DestructiveForeground;
+                style.HoverOpacity = 0.9;
                 break;
-            case ButtonVariant.Outline:
-                style.BackgroundColor = Colors.Transparent;
-                style.TextColor = ForegroundColor;
-                style.BorderColor = BorderColor;
-                style.BorderThickness = 1;
+            case ButtonVariant.Outline:      // border border-input bg-background hover:bg-accent
+                style.Background = ShellToken.Background;
+                style.HoverBackground = ShellToken.Accent;
+                style.Border = ShellToken.Input;
+                style.Foreground = ShellToken.Foreground;
                 break;
-            case ButtonVariant.Secondary:
-                style.BackgroundColor = SecondaryColor;
-                style.TextColor = SecondaryForeground;
+            case ButtonVariant.Secondary:    // bg-secondary text-secondary-foreground hover:bg-secondary/80
+                style.Background = ShellToken.Secondary;
+                style.Foreground = ShellToken.SecondaryForeground;
+                style.HoverOpacity = 0.8;
                 break;
-            case ButtonVariant.Ghost:
-                style.BackgroundColor = Colors.Transparent;
-                style.TextColor = ForegroundColor;
+            case ButtonVariant.Ghost:        // hover:bg-accent hover:text-accent-foreground
+                style.HoverBackground = ShellToken.Accent;
+                style.Foreground = ShellToken.Foreground;
+                break;
+            case ButtonVariant.Link:         // text-primary underline-offset-4 hover:underline
+                style.Foreground = ShellToken.Primary;
+                style.UnderlineOnHover = true;
                 break;
         }
 
-        // Apply size styles (standard sizes)
         switch (size)
         {
-            case ButtonSize.Sm:
+            case ButtonSize.Sm:              // h-9 px-3
                 style.Height = 36;
-                style.Padding = new Thickness(14, 8);
+                style.Padding = new Thickness(12, 0);
                 style.FontSize = 13;
-                style.CornerRadius = new CornerRadius(6);
                 break;
-            case ButtonSize.Default:
+            case ButtonSize.Lg:              // h-11 px-8
+                style.Height = 44;
+                style.Padding = new Thickness(32, 0);
+                style.FontSize = 15;
+                break;
+            case ButtonSize.Icon:            // h-10 w-10
                 style.Height = 40;
-                style.Padding = new Thickness(16, 10);
-                style.FontSize = 14;
-                style.CornerRadius = new CornerRadius(6);
-                break;
-            case ButtonSize.Lg:
-                style.Height = 48;
-                style.Padding = new Thickness(24, 12);
-                style.FontSize = 16;
-                style.CornerRadius = new CornerRadius(8);
-                break;
-            case ButtonSize.Icon:
-                style.Height = 40;
-                style.MinWidth = 40;
-                style.Padding = new Thickness(10);
-                style.CornerRadius = new CornerRadius(6);
+                style.Width = 40;
+                style.Padding = new Thickness(0);
                 break;
         }
 

@@ -1,43 +1,44 @@
 using Microsoft.Maui.Controls.Shapes;
-using MauiIcons.Core;
-using MauiIcons.Fluent;
 using MAUI.Demo.Components.UI.Variants;
 
 namespace MAUI.Demo.Components.UI;
 
-// Interactive button with variant, size, icon support, and click animations
-public partial class Button : ContentView
+// Button with ShellUI variants, sizes, optional icon and loading state.
+// Sizes to its content like an inline-flex button; set HorizontalOptions="Fill" for a block button.
+// Usage: <ui:Button Text="Save" Icon="Check" Variant="Outline" Clicked="OnSave" />
+public partial class Button : ContentView, IShellFocusable
 {
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(ButtonVariant), typeof(Button), 
+        BindableProperty.Create(nameof(Variant), typeof(ButtonVariant), typeof(Button),
             ButtonVariant.Default, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty SizeProperty =
-        BindableProperty.Create(nameof(Size), typeof(ButtonSize), typeof(Button), 
+        BindableProperty.Create(nameof(Size), typeof(ButtonSize), typeof(Button),
             ButtonSize.Default, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty IsLoadingProperty =
-        BindableProperty.Create(nameof(IsLoading), typeof(bool), typeof(Button), 
+        BindableProperty.Create(nameof(IsLoading), typeof(bool), typeof(Button),
             false, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(Button), 
-            string.Empty, propertyChanged: OnTextChanged);
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(Button),
+            string.Empty, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty IconProperty =
-        BindableProperty.Create(nameof(Icon), typeof(FluentIcons?), typeof(Button), 
-            null, propertyChanged: OnIconChanged);
+        BindableProperty.Create(nameof(Icon), typeof(IconName), typeof(Button),
+            IconName.None, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty IconPositionProperty =
-        BindableProperty.Create(nameof(IconPosition), typeof(IconPosition), typeof(Button), 
-            IconPosition.Left, propertyChanged: OnIconChanged);
+        BindableProperty.Create(nameof(IconPosition), typeof(IconPosition), typeof(Button),
+            IconPosition.Left, propertyChanged: OnVisualPropertyChanged);
 
-    private readonly ActivityIndicator _loadingIndicator;
-    private readonly Label _textLabel;
-    private readonly MauiIcon _iconView;
     private readonly Border _border;
-    private readonly HorizontalStackLayout _contentLayout;
-    private ButtonStyle _currentStyle = new();
+    private readonly HorizontalStackLayout _row;
+    private readonly Icon _spinner;
+    private readonly Icon _icon;
+    private readonly Label _label;
+    private ButtonStyle _style = new();
+    private bool _hovered;
 
     public ButtonVariant Variant
     {
@@ -63,9 +64,9 @@ public partial class Button : ContentView
         set => SetValue(TextProperty, value);
     }
 
-    public FluentIcons? Icon
+    public IconName Icon
     {
-        get => (FluentIcons?)GetValue(IconProperty);
+        get => (IconName)GetValue(IconProperty);
         set => SetValue(IconProperty, value);
     }
 
@@ -79,179 +80,126 @@ public partial class Button : ContentView
 
     public Button()
     {
-        _loadingIndicator = new ActivityIndicator
-        {
-            IsRunning = false,
-            IsVisible = false,
-            WidthRequest = 16,
-            HeightRequest = 16,
-            Margin = new Thickness(0, 0, 8, 0)
-        };
-
-        _iconView = new MauiIcon
-        {
-            IconSize = 18,
-            IsVisible = false,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center
-        };
-
-        _textLabel = new Label
+        _spinner = new Icon { Name = IconName.LoaderCircle, IsVisible = false };
+        _icon = new Icon { IsVisible = false };
+        _label = new Label
         {
             VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center,
             VerticalTextAlignment = TextAlignment.Center,
-            HorizontalTextAlignment = TextAlignment.Center
+            LineBreakMode = LineBreakMode.NoWrap,
+            FontAttributes = FontAttributes.Bold
         };
-
-        _contentLayout = new HorizontalStackLayout
+        _row = new HorizontalStackLayout
         {
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
             Spacing = 8,
-            Children = { _loadingIndicator, _iconView, _textLabel }
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center
         };
-
         _border = new Border
         {
-            Content = _contentLayout,
-            StrokeThickness = 0
+            Content = _row,
+            StrokeThickness = 0,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd }
         };
 
-        // Add pointer events for hover/press states
-        var pointerGesture = new PointerGestureRecognizer();
-        pointerGesture.PointerEntered += OnPointerEntered;
-        pointerGesture.PointerExited += OnPointerExited;
-        pointerGesture.PointerPressed += OnPointerPressed;
-        pointerGesture.PointerReleased += OnPointerReleased;
-        _border.GestureRecognizers.Add(pointerGesture);
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => { _hovered = true; ApplyHover(); };
+        pointer.PointerExited += (_, _) => { _hovered = false; ApplyHover(); _border.Scale = 1; };
+        pointer.PointerPressed += (_, _) => { if (CanClick) _ = _border.ScaleToAsync(0.97, 60, Easing.CubicOut); };
+        pointer.PointerReleased += (_, _) => _ = _border.ScaleToAsync(1, 90, Easing.CubicOut);
+        _border.GestureRecognizers.Add(pointer);
 
-        // Add tap gesture for click handling
-        var tapGesture = new TapGestureRecognizer();
-        tapGesture.Tapped += OnTapped;
-        _border.GestureRecognizers.Add(tapGesture);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => { ShellFocus.FocusPressed(this); Press(); };
+        _border.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(this, Press);
 
         Content = _border;
-        
-        // Listen for theme changes
-        if (Application.Current != null)
-        {
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateVisualState();
-        }
-        
+        HorizontalOptions = LayoutOptions.Start;
         UpdateVisualState();
     }
 
-    private void OnPointerEntered(object? sender, PointerEventArgs e)
+    private bool CanClick => IsEnabled && !IsLoading;
+
+    private void Press()
     {
-        if (!IsLoading && IsEnabled)
-        {
-            _border.Opacity = 0.9;
-        }
+        if (!CanClick) return;
+        Clicked?.Invoke(this, EventArgs.Empty);
+        // Inside a DialogTrigger / CollapsibleTrigger / ... the click also activates the trigger.
+        ShellTriggerView.ActivateAncestor(this);
     }
 
-    private void OnPointerExited(object? sender, PointerEventArgs e)
+    protected override void OnPropertyChanged(string? propertyName = null)
     {
-        _border.Opacity = 1.0;
-        _border.Scale = 1.0;
-    }
-
-    private async void OnPointerPressed(object? sender, PointerEventArgs e)
-    {
-        if (!IsLoading && IsEnabled)
-        {
-            await _border.ScaleToAsync(0.96, 50, Easing.CubicOut);
-        }
-    }
-
-    private async void OnPointerReleased(object? sender, PointerEventArgs e)
-    {
-        await _border.ScaleToAsync(1.0, 100, Easing.CubicOut);
-    }
-
-    private async void OnTapped(object? sender, TappedEventArgs e)
-    {
-        if (!IsLoading && IsEnabled)
-        {
-            await _border.ScaleToAsync(0.95, 50, Easing.CubicOut);
-            await _border.ScaleToAsync(1.0, 100, Easing.CubicOut);
-            Clicked?.Invoke(this, EventArgs.Empty);
-        }
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == IsEnabledProperty.PropertyName)
+            Opacity = IsEnabled ? 1.0 : 0.5;
     }
 
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Button button)
-            button.UpdateVisualState();
-    }
-
-    private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Button button)
-            button._textLabel.Text = newValue as string ?? string.Empty;
-    }
-
-    private static void OnIconChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Button button)
-            button.UpdateIconState();
-    }
-
-    private void UpdateIconState()
-    {
-        var hasIcon = Icon.HasValue;
-        _iconView.IsVisible = hasIcon && !IsLoading;
-        
-        if (hasIcon)
-        {
-            _iconView.Icon = Icon!.Value;
-            
-            // Reorder children based on icon position
-            _contentLayout.Children.Clear();
-            _contentLayout.Children.Add(_loadingIndicator);
-            
-            if (IconPosition == IconPosition.Left)
-            {
-                _contentLayout.Children.Add(_iconView);
-                _contentLayout.Children.Add(_textLabel);
-            }
-            else
-            {
-                _contentLayout.Children.Add(_textLabel);
-                _contentLayout.Children.Add(_iconView);
-            }
-        }
-    }
+        => (bindable as Button)?.UpdateVisualState();
 
     private void UpdateVisualState()
     {
-        _currentStyle = ButtonVariants.GetStyle(Variant, Size);
-        
-        _border.BackgroundColor = _currentStyle.BackgroundColor;
-        _border.Stroke = _currentStyle.BorderColor;
-        _border.StrokeThickness = _currentStyle.BorderThickness;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = _currentStyle.CornerRadius };
-        _border.Padding = _currentStyle.Padding;
-        _border.HeightRequest = _currentStyle.Height;
-        _border.MinimumWidthRequest = _currentStyle.MinWidth;
+        _style = ButtonVariants.GetStyle(Variant, Size);
 
-        _textLabel.TextColor = _currentStyle.TextColor;
-        _textLabel.FontSize = _currentStyle.FontSize;
-        _textLabel.FontAttributes = FontAttributes.Bold;
+        _border.HeightRequest = _style.Height;
+        _border.WidthRequest = _style.Width;
+        _border.Padding = _style.Padding;
+        _border.StrokeShape = new RoundRectangle { CornerRadius = _style.CornerRadius };
+        _border.StrokeThickness = _style.Border.HasValue ? 1 : 0;
+        if (_style.Border.HasValue)
+            _border.Token(Border.StrokeProperty, _style.Border.Value);
 
-        // Icon color matches text color
-        _iconView.IconColor = _currentStyle.TextColor;
-        _iconView.IconSize = _currentStyle.FontSize + 2;
-        
-        _loadingIndicator.Color = _currentStyle.TextColor;
-        _loadingIndicator.IsVisible = IsLoading;
-        _loadingIndicator.IsRunning = IsLoading;
-        
-        // Hide icon when loading
-        if (Icon.HasValue)
-            _iconView.IsVisible = !IsLoading;
+        _label.Text = Text ?? string.Empty;
+        _label.IsVisible = !string.IsNullOrEmpty(Text);
+        _label.FontSize = _style.FontSize;
+        _label.Token(Label.TextColorProperty, _style.Foreground);
 
-        Opacity = IsEnabled ? 1.0 : 0.5;
+        _icon.Name = Icon;
+        _icon.Size = _style.IconSize;
+        _icon.Token = _style.Foreground;
+        _icon.IsVisible = Icon != IconName.None && !IsLoading;
+
+        _spinner.Size = _style.IconSize;
+        _spinner.Token = _style.Foreground;
+        _spinner.IsVisible = IsLoading;
+        if (IsLoading) StartSpinner(); else StopSpinner();
+
+        _row.Children.Clear();
+        _row.Children.Add(_spinner);
+        if (IconPosition == IconPosition.Left) { _row.Children.Add(_icon); _row.Children.Add(_label); }
+        else { _row.Children.Add(_label); _row.Children.Add(_icon); }
+
+        ApplyHover();
+    }
+
+    private void ApplyHover()
+    {
+        var hover = _hovered && CanClick;
+        var background = hover && _style.HoverBackground.HasValue ? _style.HoverBackground : _style.Background;
+        if (background.HasValue)
+            _border.Token(VisualElement.BackgroundColorProperty, background.Value);
+        else
+        {
+            _border.ClearValue(VisualElement.BackgroundColorProperty);
+            _border.BackgroundColor = Colors.Transparent;
+        }
+        _border.Opacity = hover ? _style.HoverOpacity : 1.0;
+        _label.TextDecorations = hover && _style.UnderlineOnHover ? TextDecorations.Underline : TextDecorations.None;
+    }
+
+    private void StartSpinner()
+    {
+        if (this.AnimationIsRunning("ButtonSpin")) return;
+        new Animation(v => _spinner.Rotation = v, 0, 360)
+            .Commit(this, "ButtonSpin", 16, 800, Easing.Linear, repeat: () => IsLoading);
+    }
+
+    private void StopSpinner()
+    {
+        this.AbortAnimation("ButtonSpin");
+        _spinner.Rotation = 0;
     }
 }
 
