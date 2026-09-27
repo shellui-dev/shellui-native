@@ -47,6 +47,20 @@ public class TemplateContentTests
         Assert.Contains("YourProjectNamespace", content!);
     }
 
+    // Colors come from the theme tokens published by the `shell` template (ShellTheme), so
+    // light/dark mode and user overrides reach every component. A hardcoded hex in a component
+    // is exactly the bug that left dialogs white-on-white in dark mode.
+    [Theory]
+    [MemberData(nameof(AllRegisteredComponents))]
+    public void MAUI_components_use_theme_tokens_not_hardcoded_colors(string name)
+    {
+        if (name == "shell") return; // defines the palettes
+
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.MAUI);
+        Assert.NotNull(content);
+        Assert.DoesNotContain("Color.FromArgb", content!);
+    }
+
     [Theory]
     [MemberData(nameof(AllRegisteredComponents))]
     public void Every_component_reports_MAUI_as_a_supported_platform(string name)
