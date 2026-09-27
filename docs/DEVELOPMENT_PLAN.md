@@ -351,10 +351,16 @@ hour-minute wheels. Native pickers drop out entirely. Matches shadcn `Select` /
 
 - [ ] Portal helper (`OverlayPortal.AttachTo(Page, View)`) in `element-extensions`
 - [ ] Dialog / Drawer / Sheet templates rewritten as `ContentView` with portal attach
-- [ ] Custom `Select` — trigger button + `Popover` with `SelectItem` list
+- [x] Custom `Select` — trigger + floating list (landed early, 2026-09-27, with the theme-token pass)
 - [ ] Custom `DatePicker` — trigger button + `Popover` with month/year navigation + day grid
 - [ ] Custom `TimePicker` — trigger button + `Popover` with hour/minute wheels
 - [ ] `MAUI.Demo` no longer needs the page-root `Grid` workaround — overlays drop in anywhere
+- [ ] Click-outside closes Dropdown / Popover / Select (needs the portal's page-level layer)
+
+Already in place from the 2026-09-27 pass: theme tokens (`ShellTheme`), overlay open/close
+animations, closed overlays no longer block input, triggers that wrap a Button
+(`ShellTriggerView`), floating Dropdown/Popover/Select via `ShellAnchorLayout`, and
+Date/Time pickers inside a themed border with the native frame stripped.
 
 ### Exit criteria
 

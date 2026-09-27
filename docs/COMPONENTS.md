@@ -1,751 +1,636 @@
 # Component Reference
 
-Complete list of available ShellUI Native components.
+Complete list of available ShellUI Native components. Examples assume
+`xmlns:ui="clr-namespace:YourApp.Components.UI"` on the page.
+
+## Theming
+
+Every component takes its colors from **theme tokens** mirroring ShellUI's CSS variables
+(`--background`, `--primary`, `--border`, …). The `shell` utility (installed by
+`shellui-native init`) defines a light and a dark palette in `ShellTheme` and publishes the
+active one as application resources, so switching theme repaints every component.
+
+| Token | Role |
+|-------|------|
+| `Background` / `Foreground` | Page and dialog surface, body text |
+| `Card` / `CardForeground` | Card surface |
+| `Popover` / `PopoverForeground` | Dropdown, popover and select panels |
+| `Primary` / `PrimaryForeground` | Default button, checked checkbox/switch/radio, progress fill |
+| `Secondary`, `Muted`, `Accent` (+ `*Foreground`) | Secondary button, tab list and skeleton, hover backgrounds |
+| `Destructive`, `Success`, `Warning`, `Info` (+ `*Foreground`) | Status variants (badge, alert, progress, labels) |
+| `Border`, `Input`, `Ring` | Dividers, field borders, focus ring |
+| `Overlay` | Dialog / drawer / sheet backdrop |
+
+**Use the tokens in your own XAML** — each token is published as a Color (`ShellUI<Token>`) and a
+Brush (`ShellUI<Token>Brush`):
+
+```xml
+<ContentPage BackgroundColor="{DynamicResource ShellUIBackground}">
+    <Label Text="Muted text" TextColor="{DynamicResource ShellUIMutedForeground}" />
+    <Border Stroke="{DynamicResource ShellUIBorderBrush}" />
+</ContentPage>
+```
+
+**Initialize early** so page-level `DynamicResource`s resolve on first load (components also do it
+on first use):
+
+```csharp
+public App()
+{
+    InitializeComponent();
+    Components.UI.ShellTheme.EnsureInitialized();
+}
+```
+
+**Switch theme** with `ShellTheme.SetTheme(AppTheme.Dark)`, `ShellTheme.ToggleTheme()`, or the
+`ThemeToggle` component. The theme follows the OS setting until you set one.
+
+**Customize tokens** before the first page loads, then re-publish:
+
+```csharp
+ShellTheme.Light[ShellToken.Primary] = Color.FromArgb("#2563EB");
+ShellTheme.Dark[ShellToken.Primary] = Color.FromArgb("#3B82F6");
+ShellTheme.Apply();
+```
+
+In code, bind any Color/Brush property to a token with the `Token` extension:
+`myBorder.Token(Border.StrokeProperty, ShellToken.Border);`
+
+---
+
+## Icon
+
+Stroke icons from [ShellIcons](../../../icons/shell-icons) (Lucide 0.475.0 — the set ShellUI
+uses), drawn with MAUI shapes: no icon font or package, crisp at any size, theme-aware. The
+template ships a curated set of ~110 icons with exact Lucide names (`trash-2` → `Trash2`).
+To include more, add their names to `ICONS` in `scripts/generate-icons.py`, then run it and
+`scripts/sync-templates.py`.
+
+```bash
+shellui-native add icon
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| Name | IconName | None | Which icon (`Check`, `X`, `Plus`, `ChevronDown`, `Search`, `Settings`, `Trash2`, `Sun`, `Moon`, `Info`, `CircleAlert`, `CircleCheck`, `TriangleAlert`, `User`, `Bell`, … see `IconName`) |
+| Size | double | 16 | Width and height in DIPs; the stroke scales with it |
+| StrokeWidth | double | 2 | Stroke width on Lucide's 24×24 grid |
+| Token | ShellToken | Foreground | Theme color |
+| Color | Color? | null | Explicit color (overrides `Token`) |
+
+```xml
+<ui:Icon Name="Search" Size="16" Token="MutedForeground" />
+```
+
+---
 
 ## Form Components
 
 ### Button
-Interactive button with multiple variants and sizes.
+Interactive button with variants, sizes, an optional icon and a loading state. Sizes to its
+content (set `HorizontalOptions="Fill"` for a full-width button).
 
 ```bash
 shellui-native add button
 ```
 
-**Variants:** Default, Destructive, Outline, Secondary, Ghost
+**Variants:** Default, Secondary, Outline, Destructive, Ghost, Link · **Sizes:** Sm (36), Default (40), Lg (44), Icon (40×40)
 
-**Sizes:** Sm, Default, Lg, Icon
-
-**Properties:**
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| Variant | ButtonVariant | Default | Visual style variant |
-| Size | ButtonSize | Default | Button size |
 | Text | string | "" | Button text |
-| IsLoading | bool | false | Shows loading indicator |
-| IsEnabled | bool | true | Enable/disable button |
+| Variant | ButtonVariant | Default | Visual style |
+| Size | ButtonSize | Default | Height / padding |
+| Icon | IconName | None | Optional icon |
+| IconPosition | IconPosition | Left | `Left` or `Right` of the text |
+| IsLoading | bool | false | Shows a spinner and ignores clicks |
+| IsEnabled | bool | true | Disabled buttons render at 50% opacity |
 
-**Usage:**
 ```xml
-<ui:Button Variant="Primary" Size="Lg" Text="Click me!" Clicked="OnClick" />
+<ui:Button Text="Save" Clicked="OnSave" />
+<ui:Button Text="New item" Icon="Plus" />
+<ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" />
+<ui:Button Icon="Settings" Size="Icon" Variant="Ghost" />
 ```
 
-**Events:** `Clicked`
+**Events:** `Clicked`. On Windows buttons are keyboard tab stops (Enter/Space activate).
 
 ---
 
 ### Input
-Text input field with validation support.
+Single-line text field — 40px, one themed border (the platform control's own frame is removed),
+ring color + soft glow on focus, destructive border on error.
 
 ```bash
 shellui-native add input
 ```
 
-**Properties:**
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| Text | string | "" | Input value (two-way binding) |
+| Text | string | "" | Value (two-way) |
 | Placeholder | string | "" | Placeholder text |
-| IsPassword | bool | false | Mask input as password |
-| HasError | bool | false | Show error state |
+| IsPassword | bool | false | Mask input |
+| HasError | bool | false | Error state |
 | IsReadOnly | bool | false | Prevent editing |
 | MaxLength | int | int.MaxValue | Maximum characters |
+| Keyboard | Keyboard | Default | Soft keyboard type |
 
-**Usage:**
 ```xml
-<ui:Input Placeholder="Enter email" Text="{Binding Email}" />
+<ui:Input Placeholder="you@example.com" Keyboard="Email" Text="{Binding Email}" />
 <ui:Input Placeholder="Password" IsPassword="True" />
-<ui:Input Placeholder="Error state" HasError="True" />
+<ui:Input Text="taken-name" HasError="True" />
 ```
 
 **Events:** `TextChanged`, `Completed`
 
 ---
 
-### Checkbox
-Checkbox input with label and validation states.
-
-```bash
-shellui-native add checkbox
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| IsChecked | bool | false | Checked state (two-way binding) |
-| Label | string | "" | Label text displayed next to checkbox |
-| HasError | bool | false | Show error state |
-| IsEnabled | bool | true | Enable/disable checkbox |
-
-**Usage:**
-```xml
-<ui:Checkbox Label="Accept terms" IsChecked="{Binding Accepted}" />
-<ui:Checkbox Label="Has error" HasError="True" />
-```
-
-**Events:** `CheckedChanged`
-
----
-
-### Switch
-Toggle switch component with label support.
-
-```bash
-shellui-native add switch
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| IsToggled | bool | false | Toggled state (two-way binding) |
-| Label | string | "" | Label text displayed next to switch |
-| IsEnabled | bool | true | Enable/disable switch |
-
-**Usage:**
-```xml
-<ui:Switch Label="Enable notifications" IsToggled="{Binding NotificationsEnabled}" />
-```
-
-**Events:** `Toggled`
-
----
-
-### Label (ShellLabel)
-Typography label with size, weight, and color variants.
-
-```bash
-shellui-native add label
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Text | string | "" | Label text |
-| Size | LabelSize | Default | Font size (Xs, Sm, Default, Lg, Xl, Xxl, Xxxl) |
-| Weight | LabelWeight | Normal | Font weight (Light, Normal, Medium, Semibold, Bold) |
-| Variant | LabelVariant | Default | Color variant (Default, Muted, Destructive, Success, Warning) |
-
-**Usage:**
-```xml
-<ui:ShellLabel Text="Heading" Size="Xl" Weight="Bold" />
-<ui:ShellLabel Text="Subtitle" Size="Sm" Variant="Muted" />
-<ui:ShellLabel Text="Error!" Variant="Destructive" />
-```
-
----
-
 ### Textarea
-Multi-line text input.
+Multi-line text field — min 80px, grows with content.
 
 ```bash
 shellui-native add textarea
 ```
 
-**Properties:** `Text` (two-way), `Placeholder`, `MaxLength`, `IsReadOnly`, `HasError`
+**Properties:** `Text` (two-way), `Placeholder`, `MaxLength`, `HasError` · **Events:** `TextChanged`
 
-**Usage:**
 ```xml
-<ui:Textarea Placeholder="Write a message..." Text="{Binding Body}" />
+<ui:Textarea Placeholder="Type your message here." Text="{Binding Body}" />
 ```
 
 ---
 
-### Slider
-Range slider input.
+### Checkbox
+16×16 box with a check icon; the whole row (box + label) is the hit target.
 
 ```bash
-shellui-native add slider
+shellui-native add checkbox
 ```
 
-**Properties:** `Value` (two-way), `Minimum`, `Maximum`
+**Properties:** `IsChecked` (two-way), `Label`, `HasError`, `IsEnabled` · **Events:** `CheckedChanged`
 
-**Usage:**
 ```xml
-<ui:Slider Value="{Binding Volume}" Minimum="0" Maximum="100" />
+<ui:Checkbox Label="Accept terms and conditions" IsChecked="{Binding Accepted}" />
 ```
 
 ---
 
-### Select
-Dropdown select / picker.
+### Switch
+44×24 track with a 20px thumb that slides inside it.
 
 ```bash
-shellui-native add select
+shellui-native add switch
 ```
 
-**Properties:** `SelectedIndex` (two-way), `Items` (ObservableCollection), `Placeholder`
+**Properties:** `IsToggled` (two-way), `Label`, `IsEnabled` · **Events:** `Toggled`
 
-**Usage:**
 ```xml
-<ui:Select Placeholder="Choose one" SelectedIndex="{Binding Choice}" />
+<ui:Switch Label="Airplane mode" IsToggled="{Binding AirplaneMode}" />
 ```
 
 ---
 
 ### RadioGroup
-Radio button group. Uses compositional pattern.
+Single choice. The group drives its items.
 
 ```bash
 shellui-native add radio-group
 ```
 
-**Auto-installs:** `radio-group-item`
+**Properties (RadioGroup):** `Value` (two-way — the selected item's `Value`) · **Events:** `ValueChanged`
+**Properties (RadioGroupItem):** `Value`, `Text`
 
-**Properties:** `Value` (two-way — matches the `Value` of the selected item)
-
-**Usage:**
 ```xml
-<ui:RadioGroup Value="{Binding SelectedPlan}">
-    <ui:RadioGroupItem Value="basic" Label="Basic" />
-    <ui:RadioGroupItem Value="pro" Label="Pro" />
-    <ui:RadioGroupItem Value="enterprise" Label="Enterprise" />
+<ui:RadioGroup Value="{Binding Density}">
+    <ui:RadioGroupItem Value="default" Text="Default" />
+    <ui:RadioGroupItem Value="comfortable" Text="Comfortable" />
+    <ui:RadioGroupItem Value="compact" Text="Compact" />
 </ui:RadioGroup>
 ```
 
 ---
 
-### DatePicker
-Date selection picker.
+### Select
+Custom-drawn select: a 40px trigger with a chevrons icon and a floating list with a check on the
+selected item. Looks the same on every platform.
+
+```bash
+shellui-native add select
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| ItemsSource | IList&lt;string&gt; | null | Options |
+| SelectedIndex | int | -1 | Selected option (two-way) |
+| SelectedItem | string? | — | Read-only selected option |
+| Placeholder | string | "Select..." | Shown when nothing is selected |
+
+```xml
+<ui:Select Placeholder="Select a country" ItemsSource="{Binding Countries}"
+           SelectedIndex="{Binding CountryIndex}" WidthRequest="280" HorizontalOptions="Start" />
+```
+
+**Events:** `SelectedIndexChanged`
+
+---
+
+### Slider
+Platform slider tinted with the theme (primary range and thumb, secondary track).
+
+```bash
+shellui-native add slider
+```
+
+**Properties:** `Value` (two-way), `Minimum`, `Maximum` · **Events:** `ValueChanged`
+
+---
+
+### DatePicker / TimePicker
+40px themed field around the platform picker (its own frame and dividers are removed). A custom
+calendar popover is planned.
 
 ```bash
 shellui-native add date-picker
+shellui-native add time-picker
 ```
 
-**Properties:** `Date` (two-way, `DateTime`), `MinimumDate`, `MaximumDate`, `Format`
+**DatePicker:** `Date` (two-way), `MinimumDate`, `MaximumDate` · **Events:** `DateChanged`
+**TimePicker:** `Time` (two-way) · **Events:** `TimeChanged`
 
-**Usage:**
+---
+
+### Label (ShellLabel)
+Typography with size, weight and color variants.
+
+```bash
+shellui-native add label
+```
+
+**Properties:** `Text`, `Size` (Xs…Xxxl), `Weight` (Light…Bold), `Variant` (Default, Muted, Destructive, Success, Warning)
+
 ```xml
-<ui:DatePicker Date="{Binding DueDate}" Format="MMM dd, yyyy" />
+<ui:ShellLabel Text="This username is already taken." Size="Sm" Variant="Destructive" />
 ```
 
 ---
 
-### TimePicker
-Time selection picker.
+### ThemeToggle
+36×36 outline icon button that switches light/dark; the sun and moon cross-fade.
 
 ```bash
-shellui-native add time-picker
+shellui-native add theme-toggle
 ```
 
-**Properties:** `Time` (two-way, `TimeSpan`), `Format`
-
-**Usage:**
-```xml
-<ui:TimePicker Time="{Binding Reminder}" Format="h:mm tt" />
-```
+**Events:** `ThemeChanged(bool isDark)` · **Methods:** `Toggle()`
 
 ---
 
 ## Layout Components
 
 ### Card
-Container for grouping related content with header, content, and footer.
+`rounded-xl border bg-card shadow-sm` container.
 
 ```bash
-shellui-native add card
+shellui-native add card   # also installs card-header, card-content, card-footer
 ```
 
-**Variants:** Default, Bordered, Elevated
+**Properties (Card):** `Variant` (Default, Elevated), `IsPressable` · **Events:** `Clicked` (when pressable)
+**CardHeader:** `Title`, `Description` · **CardContent:** any content · **CardFooter:** actions, right-aligned
 
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Variant | CardVariant | Default | Visual style variant |
-| IsPressable | bool | false | Enable tap interactions |
-
-**Usage:**
 ```xml
-<ui:Card Variant="Elevated">
-    <ui:CardHeader Title="Card Title" Description="Optional description" />
-    <ui:CardContent>
-        <Label Text="Card body content goes here" />
-    </ui:CardContent>
+<ui:Card WidthRequest="380" HorizontalOptions="Start">
+    <ui:CardHeader Title="Create project" Description="Deploy your new project in one click." />
+    <ui:CardContent><ui:Input Placeholder="Name of your project" /></ui:CardContent>
     <ui:CardFooter>
-        <ui:Button Text="Action" />
+        <ui:Button Text="Cancel" Variant="Outline" />
+        <ui:Button Text="Deploy" />
     </ui:CardFooter>
 </ui:Card>
 ```
 
-**Events:** `Clicked` (when IsPressable=true)
-
 ---
 
 ### Separator
-Visual divider/separator line for layout.
+1px divider in the `Border` token. **Properties:** `Orientation` (Horizontal, Vertical)
+
+---
+
+### Collapsible
+Expand/collapse with a height animation. The trigger can wrap a Button or any view.
 
 ```bash
-shellui-native add separator
+shellui-native add collapsible
 ```
 
-**Variants:** Horizontal, Vertical
+**Properties:** `Open` (two-way; also `SetOpen(bool)`, `Toggle()`) · **Events:** `OpenChanged`
 
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Orientation | SeparatorOrientation | Horizontal | Direction of separator line |
-
-**Usage:**
 ```xml
-<ui:Separator Orientation="Horizontal" />
-<ui:Separator Orientation="Vertical" />
+<ui:Collapsible>
+    <Grid ColumnDefinitions="*,Auto">
+        <Label Text="@peduarte starred 3 repositories" />
+        <ui:CollapsibleTrigger Grid.Column="1">
+            <ui:Button Icon="ChevronsUpDown" Size="Icon" Variant="Ghost" />
+        </ui:CollapsibleTrigger>
+    </Grid>
+    <ui:CollapsibleContent>
+        <Label Text="Revealed when open." />
+    </ui:CollapsibleContent>
+</ui:Collapsible>
 ```
 
 ---
 
-### CardHeader
-Header section for Card with title and description.
+### Accordion
+Stacked sections with dividers and a chevron that rotates when open; content expands and
+collapses its height.
 
 ```bash
-shellui-native add card-header
+shellui-native add accordion
 ```
 
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Title | string | "" | Header title text |
-| Description | string | "" | Optional subtitle/description |
+**Properties (Accordion):** `Type` (Single, Multiple), `Value` (initially open item; comma-separated for Multiple)
+**Events (Accordion):** `ItemToggled(value, isOpen)`
+**AccordionItem:** `Value` · **AccordionTrigger:** `Text`, or any view as content
 
----
-
-### CardContent
-Main content section for Card.
-
-```bash
-shellui-native add card-content
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| NoPadding | bool | false | Remove default padding |
-
----
-
-### CardFooter
-Footer section for Card, typically used for actions.
-
-```bash
-shellui-native add card-footer
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Orientation | StackOrientation | Horizontal | Layout direction |
-| Justify | FooterJustify | End | Content alignment (Start, Center, End, SpaceBetween) |
-
----
-
-## Data Display
-
-### Badge
-Small status indicator with color variants.
-
-```bash
-shellui-native add badge
-```
-
-**Variants:** Default, Secondary, Destructive, Outline, Success, Warning
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Text | string | "" | Badge text |
-| Variant | BadgeVariant | Default | Color variant |
-
-**Usage:**
 ```xml
-<ui:Badge Text="New" Variant="Success" />
-<ui:Badge Text="Deprecated" Variant="Destructive" />
-<ui:Badge Text="v1.0" Variant="Outline" />
+<ui:Accordion Type="Single" Value="item-1">
+    <ui:AccordionItem Value="item-1">
+        <ui:AccordionTrigger Text="Is it accessible?" />
+        <ui:AccordionContent><Label Text="Yes." /></ui:AccordionContent>
+    </ui:AccordionItem>
+    <ui:AccordionItem Value="item-2">
+        <ui:AccordionTrigger Text="Is it animated?" />
+        <ui:AccordionContent><Label Text="Yes." /></ui:AccordionContent>
+    </ui:AccordionItem>
+</ui:Accordion>
 ```
 
 ---
 
-### Progress
-Progress bar indicator with percentage support.
+### ScrollArea
+`ScrollView` wrapper. Put it in a bordered `Border` for the shadcn look.
 
-```bash
-shellui-native add progress
-```
-
-**Variants:** Default, Success, Warning, Destructive
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Value | double | 0.0 | Current progress value |
-| Maximum | double | 100.0 | Maximum value |
-| Variant | ProgressVariant | Default | Color variant |
-| ShowLabel | bool | false | Display percentage label |
-
-**Usage:**
 ```xml
-<ui:Progress Value="75" Maximum="100" ShowLabel="True" />
-<ui:Progress Value="50" Variant="Success" />
-```
-
-**Computed Properties:** `Percentage` - Calculated percentage (0-100)
-
----
-
-### Skeleton
-Pulsing grey placeholder for loading states.
-
-```bash
-shellui-native add skeleton
-```
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| CornerRadius | double | 4 | Rounded corner radius |
-| HeightRequest / WidthRequest | double | 20 / — | Size — set to match the content it stands in for |
-
-Opacity animates on a 1200ms sin-loop between 1.0 and 0.5. The animation restarts on
-reparenting so it survives navigation between pages.
-
-**Usage:**
-```xml
-<VerticalStackLayout Spacing="8">
-    <ui:Skeleton HeightRequest="20" WidthRequest="200" />
-    <ui:Skeleton HeightRequest="16" />
-    <ui:Skeleton HeightRequest="60" CornerRadius="8" />
-</VerticalStackLayout>
-```
-
----
-
-## Feedback
-
-### Alert
-Contextual feedback messages with variants.
-
-```bash
-shellui-native add alert
-```
-
-**Variants:** Default, Destructive, Success, Warning, Info
-
-**Properties:**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Title | string | "" | Alert title text |
-| Message | string | "" | Alert message/body text |
-| Variant | AlertVariant | Default | Color variant |
-
-**Usage:**
-```xml
-<ui:Alert Title="Success!" Message="Operation completed successfully" Variant="Success" />
-<ui:Alert Title="Error" Message="Something went wrong" Variant="Destructive" />
-<ui:Alert Message="Info message" Variant="Info" />
+<Border Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 6">
+    <ui:ScrollArea HeightRequest="200"><VerticalStackLayout>...</VerticalStackLayout></ui:ScrollArea>
+</Border>
 ```
 
 ---
 
 ## Navigation Components
 
-Tabs, accordion, breadcrumb. Also compositional: parent owns state, triggers set it, content reacts.
-
 ### Tabs
-Tabbed navigation — one panel visible at a time.
+A muted pill-shaped list; the active tab is raised on the background color. Panels fade in on switch.
 
 ```bash
 shellui-native add tabs
 ```
 
-Auto-installs `tabs-list`, `tabs-trigger`, `tabs-content`, and `element-extensions`.
+**Tabs:** `Value` (active tab, two-way) · **Events:** `ValueChanged(old, new)`
+**TabsTrigger:** `Value`, `Text` · **TabsContent:** `Value`
 
-**Properties (Tabs):**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Value | string | "" | Active tab id (two-way bindable). `SetValue(...)` also works. |
-
-**Properties (TabsTrigger):** `Value` (string, required — id it activates), `Text` (string, its label). Renders active state with Primary underline + bold; MinimumHeightRequest = 40 per the Form Sizing Contract.
-
-**Properties (TabsContent):** `Value` (string, required — panel visible when `Tabs.Value` matches).
-
-**Usage:**
 ```xml
-<ui:Tabs Value="overview">
+<ui:Tabs Value="account">
     <ui:TabsList>
-        <ui:TabsTrigger Value="overview" Text="Overview" />
-        <ui:TabsTrigger Value="details" Text="Details" />
+        <ui:TabsTrigger Value="account" Text="Account" />
+        <ui:TabsTrigger Value="password" Text="Password" />
     </ui:TabsList>
-    <ui:TabsContent Value="overview"><Label Text="Overview body" /></ui:TabsContent>
-    <ui:TabsContent Value="details"><Label Text="Details body" /></ui:TabsContent>
+    <ui:TabsContent Value="account">...</ui:TabsContent>
+    <ui:TabsContent Value="password">...</ui:TabsContent>
 </ui:Tabs>
 ```
-
-Content swaps instantly (no fade) — rapid tab switches would look glitchy under an overlapping animation. Use `Collapsible` or `Accordion` when you want the reveal animation.
-
----
-
-### Accordion
-Stack of expandable sections.
-
-```bash
-shellui-native add accordion
-```
-
-Auto-installs `accordion-item`, `accordion-trigger`, `accordion-content`, `element-extensions`.
-
-**Properties (Accordion):**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Type | AccordionType | Single | `Single` (only one item open — radio-style) or `Multiple` (any combination) |
-
-**Events (Accordion):** `ItemToggled(value, isOpen)` — fired for every open + close, so in `Single` mode you'll see a close event for the previously open item followed by an open event for the new one. Enough to persist selection or trigger lazy loading.
-
-**Properties (AccordionItem):** `Value` (string id — required for state tracking).
-
-**Usage:**
-```xml
-<ui:Accordion Type="Single">
-    <ui:AccordionItem Value="a">
-        <ui:AccordionTrigger><Label Text="Section A" FontAttributes="Bold" /></ui:AccordionTrigger>
-        <ui:AccordionContent><Label Text="Body A" /></ui:AccordionContent>
-    </ui:AccordionItem>
-    <ui:Separator />
-    <ui:AccordionItem Value="b">
-        <ui:AccordionTrigger><Label Text="Section B" FontAttributes="Bold" /></ui:AccordionTrigger>
-        <ui:AccordionContent><Label Text="Body B" /></ui:AccordionContent>
-    </ui:AccordionItem>
-</ui:Accordion>
-```
-
-Content fades over 150ms + toggles `IsVisible` (same primitive as `Collapsible`). Height animation is deliberately avoided — MAUI's cross-platform height animation needs measured child height and is unreliable.
-
----
-
-### Collapsible
-Single expand/collapse — the primitive `AccordionItem` composes on top of.
-
-```bash
-shellui-native add collapsible
-```
-
-Auto-installs `collapsible-trigger`, `collapsible-content`, `element-extensions`.
-
-**Properties (Collapsible):**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Open | bool | false | Expanded state. `SetOpen(bool)` and `Toggle()` also work. |
-
-**Events (Collapsible):** `OpenChanged(bool)` — fires on every flip.
-
-**Usage:**
-```xml
-<ui:Collapsible Open="{Binding IsExpanded}">
-    <ui:CollapsibleTrigger>
-        <ui:Button Text="Show details" Variant="Outline" />
-    </ui:CollapsibleTrigger>
-    <ui:CollapsibleContent>
-        <Label Text="Hidden until open." />
-    </ui:CollapsibleContent>
-</ui:Collapsible>
-```
-
-`CollapsibleTrigger` wraps whatever visible handle you want — a Label, an icon, a whole row. It only adds the tap gesture + the 40px MinimumHeightRequest (Form Sizing Contract).
 
 ---
 
 ### Breadcrumb
-Navigation trail with `/` separators.
+Trail with chevron separators; links turn foreground on hover.
 
-```bash
-shellui-native add breadcrumb
-```
+**BreadcrumbItem:** `Text`, `IsCurrent` · **Events:** `Clicked` (not raised for the current item)
 
-Auto-installs `breadcrumb-item`.
-
-**Properties (BreadcrumbItem):**
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| Text | string | "" | Crumb text |
-| IsCurrent | bool | false | Renders bold + foreground color; suppresses tap |
-
-**Events (BreadcrumbItem):** `Clicked` — fires on tap unless `IsCurrent`.
-
-Each item owns its trailing separator; the parent `Breadcrumb` hides the last one automatically as items are added or removed.
-
-**Usage:**
 ```xml
 <ui:Breadcrumb>
     <ui:BreadcrumbItem Text="Home" Clicked="OnCrumb" />
-    <ui:BreadcrumbItem Text="Library" Clicked="OnCrumb" />
-    <ui:BreadcrumbItem Text="Current Page" IsCurrent="True" />
+    <ui:BreadcrumbItem Text="Components" Clicked="OnCrumb" />
+    <ui:BreadcrumbItem Text="Breadcrumb" IsCurrent="True" />
 </ui:Breadcrumb>
 ```
 
 ---
 
-### ScrollArea
-Thin `ScrollView` subclass. A named hook for future scrollbar styling — visually identical to MAUI's native `ScrollView` at v1.
+## Data Display & Feedback
 
-```bash
-shellui-native add scroll-area
+### Badge
+Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, Warning, Info
+
+```xml
+<ui:Badge Text="New" Variant="Success" />
 ```
 
-**Usage:**
+### Progress
+8px bar; the track is the fill color at 20%. Animates to new values.
+**Properties:** `Value`, `Maximum`, `Variant` (Default, Success, Warning, Destructive), `ShowLabel`
+
+### Skeleton
+Pulsing placeholder in the `Muted` token (opacity 1 → 0.5 → 1 every 2s, only while on screen).
+**Properties:** `CornerRadius` (default 6) plus `WidthRequest` / `HeightRequest`
+
+### Avatar
+Circular image over a muted fallback — initials, or a user icon when `Fallback` is empty. The
+fallback shows until the image loads and stays if it fails.
+
+```bash
+shellui-native add avatar
+```
+
+**Properties:** `Source` (ImageSource), `Fallback` (initials), `Size` (Sm 32, Default 40, Lg 48, Xl 64)
+
 ```xml
-<ui:ScrollArea HeightRequest="200">
-    <VerticalStackLayout Spacing="8">
-        <!-- content -->
-    </VerticalStackLayout>
-</ui:ScrollArea>
+<ui:Avatar Source="profile.png" Fallback="CN" />
+<ui:Avatar Fallback="JD" Size="Lg" />
+```
+
+### Spinner
+Rotating loader icon; spins only while on screen. **Properties:** `Size` (Sm 16, Default 24, Lg 32), `Token` (color, default Foreground), `IsRunning`
+
+```xml
+<ui:Spinner />
+<ui:Spinner Size="Lg" Token="MutedForeground" />
+```
+
+### Toast
+Sonner-style notifications that stack in a corner, slide in, pause while hovered and dismiss
+themselves (4s default). Put one `Toaster` where it can fill the page (e.g. last child of the
+page's root Grid), then call the static API from anywhere.
+
+```bash
+shellui-native add toast
+```
+
+```xml
+<ui:Toaster Position="BottomRight" MaxVisible="3" />
+```
+
+```csharp
+Toast.Show("Event has been created", "Sunday, December 03 at 9:00 AM");
+Toast.Success("Profile saved");
+Toast.Error("Upload failed", "The file is larger than 10 MB.");
+Toast.Warning("Storage almost full");
+Toast.Info("New version available");
+var id = Toast.Show("Message archived", actionText: "Undo", action: Undo);
+Toast.Dismiss(id);
+```
+
+**Toaster:** `Position` (BottomRight, BottomCenter, TopRight, TopCenter), `MaxVisible` (default 3)
+
+### Alert
+Bordered callout with an icon. **Properties:** `Title`, `Message`, `Variant` (Default, Destructive, Success, Warning, Info)
+
+```xml
+<ui:Alert Title="Heads up!" Message="You can add components to your app using the CLI." />
+<ui:Alert Title="Error" Message="Your session has expired." Variant="Destructive" />
 ```
 
 ---
 
 ## Overlay Components
 
-Modal dialogs, drawers, sheets, dropdowns, and popovers. Use compositional pattern: parent + trigger + content.
+### Dialog, Drawer, Sheet
+Modal overlays with a dimmed backdrop (tap it to close) and open/close animations: the dialog
+fades and zooms in, the drawer slides up with a grab handle, the sheet slides in from the side.
+Dialog and sheet have a close (X) button.
 
-**Tip:** Place `Dialog`, `Drawer`, or `Sheet` at the page root (e.g. last child of a Grid) with `HorizontalOptions="Fill"` and `VerticalOptions="Fill"` so the overlay covers the full screen.
-
-### Dialog
-Modal dialog overlay.
+**Place them where they can fill the page** — e.g. as the last children of the page's root `Grid`.
+While closed they don't block input to the page underneath.
 
 ```bash
 shellui-native add dialog
-```
-
-**Usage:**
-```xml
-<ui:Dialog x:Name="MyDialog" Open="{Binding IsOpen}" OpenChanged="OnDialogOpenChanged">
-    <ui:DialogTrigger>
-        <ui:Button Text="Open Dialog" />
-    </ui:DialogTrigger>
-    <ui:DialogContent>
-        <ui:DialogHeader>
-            <ui:DialogTitle Text="Title" />
-            <ui:DialogDescription Text="Optional description" />
-            <ui:DialogClose />
-        </ui:DialogHeader>
-        <Label Text="Modal body content" />
-        <ui:DialogFooter>
-            <ui:Button Text="Close" Clicked="OnCloseDialog" />
-        </ui:DialogFooter>
-    </ui:DialogContent>
-</ui:Dialog>
-```
-
-### Drawer
-Slide-out panel (Left, Right, Top, Bottom).
-
-```bash
 shellui-native add drawer
-```
-
-**Properties:** `Open`, `Side` (DrawerSide: Left, Right, Top, Bottom)
-
-### Sheet
-Bottom/top sheet panel.
-
-```bash
 shellui-native add sheet
 ```
 
-**Properties:** `Open`, `Side` (SheetSide: Left, Right, Top, Bottom)
+**Properties:** `Open` (also `SetOpen(bool)`) · **Events:** `OpenChanged` · Drawer/Sheet: `Side` (Left, Right, Top, Bottom)
 
-### Dropdown
-Dropdown menu.
+```xml
+<Grid>
+    <ScrollView>
+        <ui:Button Text="Edit profile" Clicked="OnEdit" />  <!-- OnEdit: EditDialog.SetOpen(true) -->
+    </ScrollView>
+
+    <ui:Dialog x:Name="EditDialog">
+        <ui:DialogContent>
+            <ui:DialogHeader>
+                <ui:DialogTitle Text="Edit profile" />
+                <ui:DialogDescription Text="Make changes to your profile here." />
+            </ui:DialogHeader>
+            <ui:Input Text="Pedro Duarte" />
+            <ui:DialogFooter>
+                <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+                <ui:Button Text="Save changes" Clicked="OnSave" />
+            </ui:DialogFooter>
+        </ui:DialogContent>
+    </ui:Dialog>
+</Grid>
+```
+
+`DialogTrigger` / `DrawerTrigger` / `SheetTrigger` and `DialogClose` wrap a Button or any view.
+
+### Alert Dialog
+A confirmation that requires a choice: no close button, and the backdrop doesn't dismiss it.
+Same placement as Dialog.
+
+```bash
+shellui-native add alert-dialog
+```
+
+**Properties:** `Title`, `Description`, `ConfirmText` ("Continue"), `CancelText` ("Cancel"; empty hides it), `ConfirmVariant` (ButtonVariant), optional extra content inside the tag
+**Events:** `Confirmed`, `Cancelled` · **Methods:** `Task<bool> ShowAsync()`, `SetOpen(bool)`
+
+```xml
+<ui:AlertDialog x:Name="DeleteDialog"
+                Title="Are you absolutely sure?"
+                Description="This action cannot be undone."
+                ConfirmText="Delete account"
+                ConfirmVariant="Destructive" />
+```
+
+```csharp
+if (await DeleteDialog.ShowAsync())
+    await DeleteAccountAsync();
+```
+
+`AlertDialogTrigger` wraps a Button to open it from XAML instead.
+
+### Dropdown, Popover
+Panels that float below their trigger over the following content. Opening one closes any other
+open dropdown, popover or select.
 
 ```bash
 shellui-native add dropdown
-```
-
-**Usage:**
-```xml
-<ui:Dropdown>
-    <ui:DropdownTrigger>
-        <ui:Button Text="Menu" />
-    </ui:DropdownTrigger>
-    <ui:DropdownContent>
-        <ui:DropdownItem Text="Option 1" Clicked="OnOption1" />
-        <ui:DropdownItem Text="Option 2" Clicked="OnOption2" />
-    </ui:DropdownContent>
-</ui:Dropdown>
-```
-
-### Popover
-Floating popover panel.
-
-```bash
 shellui-native add popover
 ```
 
-**Usage:**
+**Properties:** `IsOpen` (also `SetOpen`, `Toggle`, `Close`) · **Events:** `IsOpenChanged`
+**DropdownItem:** `Text`, `Icon` · **Events:** `Clicked` (the menu closes first)
+
 ```xml
+<ui:Dropdown>
+    <ui:DropdownTrigger>
+        <ui:Button Text="Open menu" Variant="Outline" Icon="ChevronDown" IconPosition="Right" />
+    </ui:DropdownTrigger>
+    <ui:DropdownContent>
+        <ui:DropdownItem Text="Profile" Icon="User" Clicked="OnProfile" />
+        <ui:DropdownItem Text="Settings" Icon="Settings" Clicked="OnSettings" />
+    </ui:DropdownContent>
+</ui:Dropdown>
+
 <ui:Popover>
-    <ui:PopoverTrigger>
-        <ui:Button Text="Info" />
-    </ui:PopoverTrigger>
+    <ui:PopoverTrigger><ui:Button Text="Open popover" Variant="Outline" /></ui:PopoverTrigger>
     <ui:PopoverContent>
-        <Label Text="Popover content here" />
+        <Label Text="Dimensions" />
+        <ui:Input Placeholder="Width" />
     </ui:PopoverContent>
 </ui:Popover>
 ```
+
+Known limit: clicking outside an open dropdown/popover doesn't close it yet (use the trigger, pick
+an item, or open another panel). Page-level portals are planned.
 
 ---
 
 ## Adding Components
 
 ```bash
-# Single component
-shellui-native add button
-
-# Multiple components
-shellui-native add button input card
-
-# Card with all sub-components
-shellui-native add card card-header card-content card-footer
-
-# With --force to overwrite existing
-shellui-native add button --force
+shellui-native add button              # single
+shellui-native add button input card   # several
+shellui-native add button --force      # overwrite an installed copy
 ```
 
 ## Listing Components
 
 ```bash
-# All available components
 shellui-native list
-
-# Only installed
 shellui-native list --installed
-
-# Only available (not installed)
 shellui-native list --available
 ```
 
 ## Component Dependencies
 
-When you add a component, its dependencies are automatically installed:
+Dependencies install automatically. Almost every component depends on `shell` (theme tokens and
+core helpers); components that draw icons also depend on `icon`.
 
 | Component | Auto-installs |
 |-----------|---------------|
-| button | button-variants |
-| card | card-header, card-content, card-footer |
-| dialog | element-extensions, dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close |
-| drawer | element-extensions, drawer-trigger, drawer-content |
-| sheet | element-extensions, sheet-trigger, sheet-content |
-| dropdown | element-extensions, dropdown-trigger, dropdown-content, dropdown-item |
-| popover | element-extensions, popover-trigger, popover-content |
-| collapsible | element-extensions, collapsible-trigger, collapsible-content |
-| accordion | element-extensions, accordion-item, accordion-trigger, accordion-content |
-| tabs | element-extensions, tabs-list, tabs-trigger, tabs-content |
+| button | shell, icon, button-variants |
+| card | shell, card-header, card-content, card-footer |
+| select, checkbox, alert, breadcrumb-item, theme-toggle, avatar, spinner | shell, icon |
+| alert-dialog | shell, element-extensions, button |
+| toast | shell, icon, button |
+| dialog | shell, dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close |
+| drawer / sheet | shell, *-trigger, *-content (content also installs icon for the close button) |
+| dropdown / popover | shell, *-trigger, *-content (+ dropdown-item) |
+| collapsible / accordion / tabs | element-extensions + their sub-components |
 | breadcrumb | breadcrumb-item |
 
-## Component Categories
-
-Components are organized into the following categories:
-
-- **Form Components**: `button`, `input`, `label`, `checkbox`, `switch`, `textarea`, `slider`, `select`, `radio-group` (+ `radio-group-item`), `date-picker`, `time-picker`
-- **Layout Components**: `card` (+ `card-header`, `card-content`, `card-footer`), `separator`, `collapsible` (+ trigger, content), `accordion` (+ item, trigger, content), `scroll-area`
-- **Navigation**: `tabs` (+ list, trigger, content), `breadcrumb` (+ item)
-- **Data Display**: `badge`, `progress`
-- **Feedback**: `alert`, `skeleton`
-- **Overlay**: `dialog`, `drawer`, `sheet`, `dropdown`, `popover` (+ their trigger/content sub-components)
-- **Utility**: `shell`, `element-extensions` (auto-installed by overlay components)
-
-For P4+ components (Tooltip, Toast, AlertDialog, HoverCard, Table, etc.) see [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).
+**Upgrading an existing project:** components now require the new `Shell.cs` (theme tokens). If
+your project was initialized earlier, refresh it once with `shellui-native add shell --force`.

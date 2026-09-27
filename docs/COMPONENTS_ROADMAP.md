@@ -2,7 +2,7 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
-Last revised: **2026-08-29** (post PR #2 merge — Phase 1b live on `main`).
+Last revised: **2026-09-27** (theme tokens, icons and component polish on `feat/p3-navigation-layout`).
 
 **Status at a glance:** P0 ✅ done · P1 ✅ done · P2 ✅ done · **P3 ⏭️ next (`feat/p3-navigation-layout`)** · P4–P7 backlog · Avalonia (Phase 2) unblocked, sequenced after P3 to avoid a moving target.
 
@@ -14,40 +14,59 @@ Every single-line form control renders at **40px** high (matches shadcn `h-10` /
 
 | Component | Height | Padding | Notes |
 |-----------|--------|---------|-------|
-| `Button` (Default) | 40 (from `ButtonStyle.Height`) | `(16, 10)` | Variant-driven: Sm=36, Lg=44, Icon=40×40 |
-| `Input` | 40 | `(12, 0)` | Fixed 2026-08-29 — was unset + `(12, 8)`, rendered inconsistent across platforms |
-| `Select` | 40 (on native `Picker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 (overflowed on Windows) |
-| `DatePicker` | 40 (on native `DatePicker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 |
-| `TimePicker` | 40 (on native `TimePicker`) | native | Native chrome — outer `Border` wrap removed 2026-08-30 |
+| `Button` (Default) | 40 (from `ButtonStyle.Height`) | `(16, 0)` | Sm=36 `(12,0)`, Lg=44 `(32,0)`, Icon=40×40. Sizes to content (`HorizontalOptions=Start`) |
+| `Input` | 40 | `(12, 0)` | Native `Entry` frame stripped (`ShellPlatform.StripNativeChrome`) — one border only |
+| `Select` | 40 | `(12, 0)` | Custom-drawn trigger + floating list (rows 32) since 2026-09-27 |
+| `DatePicker` / `TimePicker` | 40 | `(4, 0)` | Themed border around the native picker, native frame/dividers stripped |
 | `Textarea` | `MinimumHeightRequest=80` | `(12, 8)` | Multi-line — grows with content |
-| `Checkbox` | 20×20 (box) | — | Icon-shaped, not a field |
-| `RadioGroupItem` | 20×20 (dot) | — | Icon-shaped, not a field |
+| `TabsList` | 40 | `(4)` | Triggers fill the remaining 32 |
+| `Checkbox` / `RadioGroupItem` | 16×16 | — | Icon-shaped, not a field (shadcn h-4 w-4) |
+| `Switch` | 44×24 track, 20 thumb | inset 2 | Thumb travels exactly `44 - 2*2 - 20 = 20` |
 
-**Rule for new form controls:** if it visually sits in a form row next to `Input`, it MUST be 40px tall. If it's a compositional container that hosts its own field (e.g. `Combobox`, `InputOTP`), the inner field carries the 40. Don't rely on platform default heights — MAUI's `Entry` / `Picker` defaults vary wildly across Android / iOS / Windows.
+**Rule for new form controls:** if it visually sits in a form row next to `Input`, it MUST be 40px tall. If it's a compositional container that hosts its own field (e.g. `Combobox`, `InputOTP`), the inner field carries the 40. Don't rely on platform default heights — MAUI's `Entry` / `Picker` defaults vary wildly across Android / iOS / Windows. When wrapping a platform control in a ShellUI `Border`, call `ShellPlatform.StripNativeChrome` so it doesn't draw a second frame inside ours.
 
-**Menu / list rows** (`DropdownItem`, `SelectItem` when added, `ContextMenuOption`) use `MinimumHeightRequest = 40` plus symmetric `Padding = (12, 12)` — they need a real touch target (44px iOS / 48dp Android guidance), not just enough space to draw the text.
+**Menu / list rows** (`DropdownItem`, `Select` items) are 32 tall with `Padding = (8, 0)` inside a panel with 4px padding — shadcn's `px-2 py-1.5` rows.
 
-**Icon-shaped controls** (`Checkbox` box 20×20, `RadioGroupItem` dot 20×20, `Switch` track 44×24) keep their exact pixel dimensions — those numbers are the design, not a fill. Their outer row inherits its hit area from the surrounding `HorizontalStackLayout`, which currently follows the icon height. If a future accessibility pass needs 44px touch targets for these, expand the container's `MinimumHeightRequest`, not the icon size.
+**Row labels** that sit in a fixed-height row set both `VerticalOptions = Center` and `VerticalTextAlignment = Center`; without the latter a label that gets stretched to the row height draws its text at the top.
+
+**Icon-shaped controls** keep their exact pixel dimensions — those numbers are the design, not a fill. Their outer row is the hit target.
 
 ---
 
 ## Design Token Contract
 
-Templates hardcode ARGB strings today (no shared token file until Phase 2 lands the Avalonia `ResourceDictionary`). While we're still copy-pasting them, they MUST agree — otherwise "primary" reads as two different blues across the demo.
+Since 2026-09-27 colors live in one place: `ShellTheme` in the `shell` template (`Shell.cs`). It
+holds a `Light` and a `Dark` palette keyed by `ShellToken` (ShellUI's CSS variables:
+`Background`, `Foreground`, `Card`, `Popover`, `Primary`, `Secondary`, `Muted`, `Accent`,
+`Destructive`, `Border`, `Input`, `Ring`, plus `Success` / `Warning` / `Info` / `Overlay`), and
+publishes the active palette as app resources (`ShellUIPrimary` Color + `ShellUIPrimaryBrush`
+Brush, …) that it swaps on theme change. Values follow ShellUI's default neutral theme.
 
-| Token | Value | Used by |
-|-------|-------|---------|
-| `Primary` | `#2563EB` | Button (Default), Checkbox (fill+border when checked), RadioGroupItem (fill+border when checked, fixed 2026-08-29), Switch (track when on), Progress (Default fill), Input (focus border, fixed 2026-08-29) |
-| `Destructive` | `#EF4444` | Button (Destructive), Badge (Destructive), Progress (Destructive), Input (error border), Alert title (Destructive) |
-| `Border` | `#E5E7EB` | Input (idle), Card (Default/Bordered), Checkbox (unchecked ring), RadioGroupItem (unchecked ring), Separator, Alert (Default) |
-| `Muted background` | `#F3F4F6` | Badge (Secondary bg), Alert (Default bg) |
-| `Foreground` | `#1F2937` | Input text, Label (Default), Checkbox label, Switch label, Alert title (Default) |
-| `Muted foreground` | `#6B7280` | Progress label, Label (Muted variant) |
-| `Placeholder` | `#9CA3AF` | Input placeholder |
-| `Success` | `#22C55E` | Badge/Alert/Progress Success |
-| `Warning` | `#F59E0B` | Badge/Alert/Progress Warning |
+Components bind with `element.Token(property, ShellToken.X)` (a `SetDynamicResource` wrapper), so a
+theme switch or a runtime override repaints everything. The `init` XAML
+(`StyleTemplates.ThemeResourceDictionary`) mirrors the same palettes for design-time use.
 
-**Rule:** never introduce a new hex for a role that already has a token above. If you need a token that isn't listed, add it here first, then use it — that keeps Phase 2's `ResourceDictionary` extraction mechanical (grep the hex, replace with `{DynamicResource ShellUIPrimary}` in Avalonia XAML).
+**Rules:**
+- Never write a hex color in a component template — `TemplateContentTests.MAUI_components_use_theme_tokens_not_hardcoded_colors` fails the build. Shadows may use `Colors.Black` with an opacity.
+- Need a new role? Add it to `ShellToken`, both palettes and `StyleTemplates` (checked by `StyleTemplatesTests`), then use it.
+- Avalonia (Phase 2) maps the same keys to `{DynamicResource ShellUIPrimary}` in its own dictionaries.
+
+---
+
+## Contributor Workflow: demo first, templates generated
+
+Components are written and run as normal C# in `examples/MAUI.Demo/Components/UI/`, then copied
+into the CLI templates by a script — the demo always tests exactly what `shellui-native add` installs.
+
+1. Edit or add `examples/MAUI.Demo/Components/UI/<Name>.cs` and exercise it in `MainPage.xaml`.
+2. New component? Add it to `NEW` in `scripts/sync-templates.py` (registry key, display name, category, tags).
+3. `python scripts/sync-templates.py` — rewrites each `<Name>Template.cs` content string (namespace
+   placeholder restored, quotes escaped) and recomputes `shell` / `icon` / `element-extensions` / `button`
+   dependencies from the code. Running it twice writes nothing.
+4. Register new templates in `ComponentRegistry`, then `dotnet test`.
+
+Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIcons catalog
+(`../../icons/shell-icons`); edit its `ICONS` list to change the curated set.
 
 ---
 
@@ -148,9 +167,9 @@ Templates hardcode ARGB strings today (no shared token file until Phase 2 lands 
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **tooltip** | P4.1 | — | Tooltip | Hover tooltip (simpler than Popover) |
-| **toast** | P4.2 | — | Toast | Transient notification |
-| **loading** | P4.3 | — | Loading | Loading spinner/state |
-| **alert-dialog** | P4.4 | — | AlertDialog | Confirm/cancel dialog |
+| **toast** ✅ | P4.2 | shell, icon, button | Sonner | Done 2026-09-27 — `Toaster` host + static `Toast.Show/Success/Error/...` |
+| **spinner** ✅ | P4.3 | shell, icon | Loading | Done 2026-09-27 as `spinner` (Loading's spinner variant) |
+| **alert-dialog** ✅ | P4.4 | shell, element-extensions, button | AlertDialog | Done 2026-09-27 — `ShowAsync()` returns the choice |
 | **hover-card** | P4.5 | hover-card-trigger, hover-card-content | HoverCard | Hover-triggered popover |
 
 ---
@@ -158,7 +177,7 @@ Templates hardcode ARGB strings today (no shared token file until Phase 2 lands 
 ### P5 — Lower (Data Display)
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
-| **avatar** | P5.1 | — | Avatar | User avatar image/initials |
+| **avatar** ✅ | P5.1 | shell, icon | Avatar | Done 2026-09-27 |
 | **table** | P5.2 | table-header, table-body, table-row, table-cell, table-head | Table | Data table |
 | **empty-state** | P5.3 | — | EmptyState | Empty list/state message |
 | **callout** | P5.4 | — | Callout | Info/warning callout block |
@@ -227,7 +246,7 @@ public static T? FindParentOfType<T>(this Element element) where T : Element
 ### DRY / SOLID
 - **Single template per component** — one `.cs` file per logical component
 - **Shared enums/variants** — `ButtonVariants`, `AlertVariant`, etc. in `Variants/` folder
-- **Design tokens** — use `ShellTheme` or shared color constants
+- **Design tokens** — bind colors with `.Token(property, ShellToken.X)`; never hardcode a hex (see Design Token Contract)
 - **Composition over configuration** — prefer Trigger+Content over `IsModal`/`RenderMode` flags
 - **Minimal surface** — only expose properties that map to real use cases
 
