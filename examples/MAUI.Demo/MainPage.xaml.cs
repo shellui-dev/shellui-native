@@ -1,50 +1,83 @@
+using MAUI.Demo.Components.UI;
+
 namespace MAUI.Demo;
 
 public partial class MainPage : ContentPage
 {
-    int clickCount = 0;
+    private int _clickCount;
 
     public MainPage()
     {
         InitializeComponent();
-        CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany" };
+        CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany", "Japan" };
+
+        foreach (var tag in Enumerable.Range(1, 30).Reverse().Select(i => $"v1.2.0-beta.{i}"))
+        {
+            TagList.Children.Add(new Separator());
+            TagList.Children.Add(new Label { Text = tag, FontSize = 14 }.Token(Label.TextColorProperty, ShellToken.Foreground));
+        }
     }
+
+    private void Report(string message) => StatusLabel.Text = message;
 
     private void OnButtonClicked(object? sender, EventArgs e)
     {
-        clickCount++;
-        if (sender is Components.UI.Button btn)
-        {
-            StatusLabel.Text = $"Clicked: {btn.Text} (Total: {clickCount})";
-        }
+        _clickCount++;
+        var name = sender is Components.UI.Button { Text.Length: > 0 } btn ? btn.Text : $"{(sender as Components.UI.Button)?.Icon} icon";
+        Report($"Clicked: {name} (total {_clickCount})");
     }
 
     private async void OnLoadingClicked(object? sender, EventArgs e)
     {
-        if (sender is Components.UI.Button btn)
-        {
-            btn.IsLoading = true;
-            btn.Text = "Loading...";
-            StatusLabel.Text = "Loading started...";
+        LoadingBtn.IsLoading = true;
+        LoadingBtn.Text = "Please wait";
+        Report("Loading…");
+        await Task.Delay(2000);
+        LoadingBtn.IsLoading = false;
+        LoadingBtn.Text = "Click to load";
+        Report("Loading complete");
+    }
 
-            await Task.Delay(2000); // Simulate async operation
+    private void OnSelectChanged(object? sender, EventArgs e) => Report($"Select: {CountrySelect.SelectedItem}");
+    private void OnCheckChanged(object? sender, bool isChecked) => Report($"Checkbox: {(isChecked ? "checked" : "unchecked")}");
+    private void OnSwitchToggled(object? sender, bool isOn) => Report($"Switch: {(isOn ? "on" : "off")}");
+    private void OnRadioChanged(object? sender, string value) => Report($"Radio: {value}");
 
-            btn.IsLoading = false;
-            btn.Text = "Click to Load";
-            StatusLabel.Text = "Loading complete!";
-        }
+    private void OnSliderChanged(object? sender, ValueChangedEventArgs e)
+    {
+        ProgressDemo.Value = e.NewValue;
+        Report($"Slider: {e.NewValue:F0}");
     }
 
     private void OnDialogTriggerClicked(object? sender, EventArgs e) => DemoDialog.SetOpen(true);
-    private void OnDialogClose(object? sender, EventArgs e) => DemoDialog.SetOpen(false);
-    private void OnDialogOpenChanged(object? sender, bool e) { }
+    private void OnDialogSave(object? sender, EventArgs e) { DemoDialog.SetOpen(false); Report("Dialog: saved"); }
     private void OnDrawerTriggerClicked(object? sender, EventArgs e) => DemoDrawer.SetOpen(true);
+    private void OnDrawerSubmit(object? sender, EventArgs e) { DemoDrawer.SetOpen(false); Report("Drawer: submitted"); }
     private void OnSheetTriggerClicked(object? sender, EventArgs e) => DemoSheet.SetOpen(true);
-    private void OnDropdownItem(object? sender, EventArgs e) => StatusLabel.Text = "Dropdown item clicked";
+    private void OnSheetSave(object? sender, EventArgs e) { DemoSheet.SetOpen(false); Report("Sheet: saved"); }
+
+    private async void OnAlertDialogClicked(object? sender, EventArgs e)
+    {
+        var confirmed = await DeleteDialog.ShowAsync();
+        Report($"Alert dialog: {(confirmed ? "confirmed" : "cancelled")}");
+        if (confirmed) Toast.Success("Account deleted", "This was only a demo.");
+    }
+
+    private void OnToastDefault(object? sender, EventArgs e) =>
+        Toast.Show("Event has been created", "Sunday, December 03, 2023 at 9:00 AM");
+    private void OnToastSuccess(object? sender, EventArgs e) => Toast.Success("Profile saved");
+    private void OnToastError(object? sender, EventArgs e) => Toast.Error("Upload failed", "The file is larger than 10 MB.");
+    private void OnToastWarning(object? sender, EventArgs e) => Toast.Warning("Storage almost full", "92% of your quota used.");
+    private void OnToastInfo(object? sender, EventArgs e) => Toast.Info("New version available");
+    private void OnToastAction(object? sender, EventArgs e) =>
+        Toast.Show("Message archived", actionText: "Undo", action: () => Report("Toast: undo clicked"));
+
+    private void OnDropdownItem(object? sender, EventArgs e) => Report($"Dropdown: {(sender as DropdownItem)?.Text}");
+    private void OnTabChanged(object? sender, (string Old, string New) e) => Report($"Tab: {e.New}");
 
     private void OnBreadcrumbClicked(object? sender, EventArgs e)
     {
-        if (sender is Components.UI.BreadcrumbItem item)
-            StatusLabel.Text = $"Breadcrumb: {item.Text}";
+        if (sender is BreadcrumbItem item)
+            Report($"Breadcrumb: {item.Text}");
     }
 }

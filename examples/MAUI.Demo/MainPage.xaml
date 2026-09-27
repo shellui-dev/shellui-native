@@ -2,378 +2,385 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:ui="clr-namespace:MAUI.Demo.Components.UI"
-             xmlns:icons="clr-namespace:MauiIcons.Fluent;assembly=MauiIcons.Fluent"
              x:Class="MAUI.Demo.MainPage"
-             Title="ShellUI Native Demo">
+             Shell.NavBarIsVisible="False"
+             Title="ShellUI Native"
+             BackgroundColor="{DynamicResource ShellUIBackground}">
 
-    <!-- Page root is a Grid so Dialog / Drawer / Sheet can live as page-root       -->
-    <!-- siblings of the ScrollView, filling the whole window when they open.       -->
-    <!-- Triggers stay inline as regular buttons that call SetOpen on the overlays. -->
+    <ContentPage.Resources>
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="{DynamicResource ShellUIForeground}" />
+            <Setter Property="Margin" Value="0,16,0,0" />
+        </Style>
+        <Style x:Key="SectionHint" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="{DynamicResource ShellUIMutedForeground}" />
+            <Setter Property="Margin" Value="0,-8,0,0" />
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="{DynamicResource ShellUIForeground}" />
+        </Style>
+        <Style x:Key="Body" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="{DynamicResource ShellUIForeground}" />
+        </Style>
+        <Style x:Key="Muted" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="{DynamicResource ShellUIMutedForeground}" />
+        </Style>
+        <Style TargetType="FlexLayout">
+            <Setter Property="Wrap" Value="Wrap" />
+            <Setter Property="AlignItems" Value="Center" />
+        </Style>
+    </ContentPage.Resources>
+
+    <!-- Dialog / Drawer / Sheet sit at page root (after the ScrollView) so their overlay fills the window. -->
     <Grid>
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <ScrollView>
+            <VerticalStackLayout Padding="24,24,24,48" Spacing="16" MaximumWidthRequest="760">
 
-            <!-- Header with Theme Toggle -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                
-                <VerticalStackLayout Grid.Column="0">
-                    <Label Text="ShellUI Native" 
-                           FontSize="32" 
-                           FontAttributes="Bold" />
-                    <Label Text="Component Demo" 
-                           FontSize="16" 
-                           TextColor="Gray" />
-                </VerticalStackLayout>
-                
-                <ui:ThemeToggle x:Name="ThemeToggleSwitch" 
-                                Grid.Column="1" 
-                                VerticalOptions="Center" />
-            </Grid>
-
-            <!-- Badges Section -->
-            <Label Text="Badges" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <HorizontalStackLayout Spacing="10" HorizontalOptions="Start">
-                <ui:Badge Text="Default" Variant="Default" />
-                <ui:Badge Text="Success" Variant="Success" />
-                <ui:Badge Text="Warning" Variant="Warning" />
-                <ui:Badge Text="Error" Variant="Destructive" />
-            </HorizontalStackLayout>
-
-            <!-- Buttons Section -->
-            <Label Text="Buttons" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:Button Text="Default Button" Variant="Default" Clicked="OnButtonClicked" />
-                <ui:Button Text="Secondary Button" Variant="Secondary" Clicked="OnButtonClicked" />
-                <ui:Button Text="Outline Button" Variant="Outline" Clicked="OnButtonClicked" />
-                <ui:Button Text="Destructive Button" Variant="Destructive" Clicked="OnButtonClicked" />
-                <ui:Button Text="Ghost Button" Variant="Ghost" Clicked="OnButtonClicked" />
-            </VerticalStackLayout>
-
-            <!-- Buttons with Icons -->
-            <Label Text="Buttons with Icons" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:Button Text="Add Item" 
-                           Variant="Default" 
-                           Icon="{x:Static icons:FluentIcons.Add24}" 
-                           Clicked="OnButtonClicked" />
-                <ui:Button Text="Search" 
-                           Variant="Secondary" 
-                           Icon="{x:Static icons:FluentIcons.Search24}" 
-                           Clicked="OnButtonClicked" />
-                <ui:Button Text="Settings" 
-                           Variant="Outline" 
-                           Icon="{x:Static icons:FluentIcons.Settings24}" 
-                           Clicked="OnButtonClicked" />
-                <ui:Button Text="Delete" 
-                           Variant="Destructive" 
-                           Icon="{x:Static icons:FluentIcons.Delete24}" 
-                           Clicked="OnButtonClicked" />
-                <ui:Button Text="Continue" 
-                           Variant="Default" 
-                           Icon="{x:Static icons:FluentIcons.ArrowRight24}" 
-                           IconPosition="Right"
-                           Clicked="OnButtonClicked" />
-            </VerticalStackLayout>
-
-            <!-- Icon-only Buttons -->
-            <Label Text="Icon-only Buttons" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <HorizontalStackLayout Spacing="12" HorizontalOptions="Start">
-                <ui:Button Variant="Outline" 
-                           Icon="{x:Static icons:FluentIcons.Heart24}" 
-                           Size="Sm"
-                           Clicked="OnButtonClicked" />
-                <ui:Button Variant="Outline" 
-                           Icon="{x:Static icons:FluentIcons.Share24}" 
-                           Size="Sm"
-                           Clicked="OnButtonClicked" />
-                <ui:Button Variant="Outline" 
-                           Icon="{x:Static icons:FluentIcons.Bookmark24}" 
-                           Size="Sm"
-                           Clicked="OnButtonClicked" />
-                <ui:Button Variant="Default" 
-                           Icon="{x:Static icons:FluentIcons.Add24}" 
-                           Size="Sm"
-                           Clicked="OnButtonClicked" />
-            </HorizontalStackLayout>
-
-            <!-- Button Sizes -->
-            <Label Text="Button Sizes" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <HorizontalStackLayout Spacing="12" HorizontalOptions="Start">
-                <ui:Button Text="Small" Variant="Default" Size="Sm" Clicked="OnButtonClicked" />
-                <ui:Button Text="Default" Variant="Default" Size="Default" Clicked="OnButtonClicked" />
-                <ui:Button Text="Large" Variant="Default" Size="Lg" Clicked="OnButtonClicked" />
-            </HorizontalStackLayout>
-
-            <!-- Loading Button -->
-            <Label Text="Loading State" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Button x:Name="LoadingBtn" Text="Click to Load" Variant="Default" Clicked="OnLoadingClicked" />
-
-            <!-- Input Section -->
-            <Label Text="Inputs" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:Input x:Name="NameInput" Placeholder="Enter your name..." />
-                <ui:Input Placeholder="Password" IsPassword="True" />
-                <ui:Input Placeholder="Error state" HasError="True" />
-                <ui:Input Placeholder="Read only" Text="Can't edit this" IsReadOnly="True" />
-            </VerticalStackLayout>
-
-            <!-- Labels Section -->
-            <Label Text="ShellLabel Variants" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="8">
-                <ui:ShellLabel Text="Default Label" Variant="Default" />
-                <ui:ShellLabel Text="Muted Label" Variant="Muted" />
-                <ui:ShellLabel Text="Destructive Label" Variant="Destructive" />
-                <ui:ShellLabel Text="Success Label" Variant="Success" />
-                <ui:ShellLabel Text="Warning Label" Variant="Warning" />
-            </VerticalStackLayout>
-
-            <!-- Label Sizes -->
-            <Label Text="Label Sizes" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="4">
-                <ui:ShellLabel Text="Extra Small (Xs)" Size="Xs" />
-                <ui:ShellLabel Text="Small (Sm)" Size="Sm" />
-                <ui:ShellLabel Text="Default" Size="Default" />
-                <ui:ShellLabel Text="Large (Lg)" Size="Lg" />
-                <ui:ShellLabel Text="Extra Large (Xl)" Size="Xl" />
-            </VerticalStackLayout>
-
-            <!-- Card -->
-            <Label Text="Card" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Card Variant="Elevated">
-                <ui:CardHeader Title="Card Title" Description="Optional description" />
-                <ui:CardContent>
-                    <Label Text="Card body content goes here. Use CardHeader, CardContent, CardFooter." />
-                </ui:CardContent>
-                <ui:CardFooter>
-                    <ui:Button Text="Action" Clicked="OnButtonClicked" />
-                </ui:CardFooter>
-            </ui:Card>
-
-            <!-- Separator -->
-            <Label Text="Separator" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Separator Orientation="Horizontal" />
-
-            <!-- Checkbox & Switch -->
-            <Label Text="Checkbox &amp; Switch" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:Checkbox x:Name="CheckDemo" Label="Accept terms" IsChecked="True" />
-                <ui:Switch x:Name="SwitchDemo" Label="Enable notifications" IsToggled="True" />
-            </VerticalStackLayout>
-
-            <!-- Progress -->
-            <Label Text="Progress" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:Progress Value="75" Maximum="100" ShowLabel="True" />
-                <ui:Progress Value="50" Variant="Success" />
-            </VerticalStackLayout>
-
-            <!-- Alert -->
-            <Label Text="Alert" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="8">
-                <ui:Alert Title="Success!" Message="Operation completed" Variant="Success" />
-                <ui:Alert Title="Warning" Message="Please review" Variant="Warning" />
-            </VerticalStackLayout>
-
-            <!-- P2 Form: Textarea, Slider, Select, RadioGroup, DatePicker, TimePicker -->
-            <Label Text="Textarea" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Textarea x:Name="NotesInput" Placeholder="Enter notes..." />
-
-            <Label Text="Slider" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Slider x:Name="VolumeSlider" Value="50" Minimum="0" Maximum="100" />
-
-            <Label Text="Select" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Select x:Name="CountrySelect" SelectedIndex="0" />
-
-            <Label Text="Radio Group" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:RadioGroup x:Name="RadioGroupDemo">
-                <ui:RadioGroupItem Value="a" Text="Option A" />
-                <ui:RadioGroupItem Value="b" Text="Option B" />
-                <ui:RadioGroupItem Value="c" Text="Option C" />
-            </ui:RadioGroup>
-
-            <Label Text="Date &amp; Time Picker" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="12">
-                <ui:DatePicker x:Name="DatePickerDemo" />
-                <ui:TimePicker x:Name="TimePickerDemo" />
-            </VerticalStackLayout>
-
-            <!-- Overlays: triggers only. Dialog/Drawer/Sheet themselves live at page-root -->
-            <!-- below (outside the ScrollView) so their AbsoluteLayout overlay layer can    -->
-            <!-- actually fill the window. Dropdown/Popover are Grid-based and work inline. -->
-
-            <Label Text="Dialog" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Button Text="Open Dialog" Clicked="OnDialogTriggerClicked" />
-
-            <Label Text="Drawer" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Button Text="Open Drawer" Clicked="OnDrawerTriggerClicked" />
-
-            <Label Text="Sheet" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Button Text="Open Sheet" Clicked="OnSheetTriggerClicked" />
-
-            <Label Text="Dropdown" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Dropdown>
-                <ui:DropdownTrigger>
-                    <ui:Button Text="Menu" Clicked="OnButtonClicked" />
-                </ui:DropdownTrigger>
-                <ui:DropdownContent>
-                    <ui:DropdownItem Text="Option 1" Clicked="OnDropdownItem" />
-                    <ui:DropdownItem Text="Option 2" Clicked="OnDropdownItem" />
-                </ui:DropdownContent>
-            </ui:Dropdown>
-
-            <Label Text="Popover" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Popover>
-                <ui:PopoverTrigger>
-                    <ui:Button Text="Show Info" Clicked="OnButtonClicked" />
-                </ui:PopoverTrigger>
-                <ui:PopoverContent>
-                    <Label Text="Popover content - floating panel" />
-                </ui:PopoverContent>
-            </ui:Popover>
-
-            <!-- ================================================================ -->
-            <!-- P3: Navigation / Layout                                        -->
-            <!-- ================================================================ -->
-
-            <Label Text="Collapsible" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Collapsible>
-                <ui:CollapsibleTrigger>
-                    <ui:Button Text="Show details" Variant="Outline" Clicked="OnButtonClicked" />
-                </ui:CollapsibleTrigger>
-                <ui:CollapsibleContent>
-                    <ui:Card Margin="0,8,0,0">
-                        <ui:CardContent>
-                            <Label Text="Hidden content revealed on toggle. Fades in over 150ms." />
-                        </ui:CardContent>
-                    </ui:Card>
-                </ui:CollapsibleContent>
-            </ui:Collapsible>
-
-            <Label Text="Accordion (Single)" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Accordion Type="Single">
-                <ui:AccordionItem Value="a">
-                    <ui:AccordionTrigger>
-                        <Label Text="Section A" FontAttributes="Bold" VerticalOptions="Center" />
-                    </ui:AccordionTrigger>
-                    <ui:AccordionContent>
-                        <Label Text="A's body — opening B will close this in Single mode." Margin="0,4,0,8" />
-                    </ui:AccordionContent>
-                </ui:AccordionItem>
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="ShellUI Native" FontSize="30" FontAttributes="Bold"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                        <Label Text="Beautifully designed components for .NET MAUI" Style="{StaticResource Muted}" />
+                    </VerticalStackLayout>
+                    <ui:ThemeToggle x:Name="ThemeToggleSwitch" Grid.Column="1" VerticalOptions="Start" />
+                </Grid>
+                <Label x:Name="StatusLabel" Text="Interact with a component to see its events here."
+                       Style="{StaticResource Muted}" FontSize="13" />
                 <ui:Separator />
-                <ui:AccordionItem Value="b">
-                    <ui:AccordionTrigger>
-                        <Label Text="Section B" FontAttributes="Bold" VerticalOptions="Center" />
-                    </ui:AccordionTrigger>
-                    <ui:AccordionContent>
-                        <Label Text="B's body." Margin="0,4,0,8" />
-                    </ui:AccordionContent>
-                </ui:AccordionItem>
-                <ui:Separator />
-                <ui:AccordionItem Value="c">
-                    <ui:AccordionTrigger>
-                        <Label Text="Section C" FontAttributes="Bold" VerticalOptions="Center" />
-                    </ui:AccordionTrigger>
-                    <ui:AccordionContent>
-                        <Label Text="C's body." Margin="0,4,0,8" />
-                    </ui:AccordionContent>
-                </ui:AccordionItem>
-            </ui:Accordion>
 
-            <Label Text="Tabs" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Tabs Value="overview">
-                <ui:TabsList>
-                    <ui:TabsTrigger Value="overview" Text="Overview" />
-                    <ui:TabsTrigger Value="details" Text="Details" />
-                    <ui:TabsTrigger Value="activity" Text="Activity" />
-                </ui:TabsList>
-                <ui:Separator Margin="0,0,0,12" />
-                <ui:TabsContent Value="overview">
-                    <Label Text="Overview panel — active tab underlines in Primary blue." />
-                </ui:TabsContent>
-                <ui:TabsContent Value="details">
-                    <Label Text="Details panel — instant swap, no fade to avoid glitchy rapid clicks." />
-                </ui:TabsContent>
-                <ui:TabsContent Value="activity">
-                    <Label Text="Activity panel." />
-                </ui:TabsContent>
-            </ui:Tabs>
+                <!-- Button -->
+                <Label Text="Button" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Button Text="Default" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Secondary" Variant="Secondary" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Outline" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Destructive" Variant="Destructive" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Ghost" Variant="Ghost" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Link" Variant="Link" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                </FlexLayout>
+                <FlexLayout>
+                    <ui:Button Text="Small" Size="Sm" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Default" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Large" Size="Lg" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="New item" Icon="Plus" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Delete" Icon="Trash2" Variant="Destructive" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                </FlexLayout>
+                <FlexLayout>
+                    <ui:Button Icon="Heart" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Icon="Share2" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Icon="Bookmark" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button Icon="Settings" Size="Icon" Variant="Ghost" Margin="0,0,8,8" Clicked="OnButtonClicked" />
+                    <ui:Button x:Name="LoadingBtn" Text="Click to load" Variant="Secondary" Margin="0,0,8,8" Clicked="OnLoadingClicked" />
+                </FlexLayout>
 
-            <Label Text="Breadcrumb" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:Breadcrumb>
-                <ui:BreadcrumbItem Text="Home" Clicked="OnBreadcrumbClicked" />
-                <ui:BreadcrumbItem Text="Library" Clicked="OnBreadcrumbClicked" />
-                <ui:BreadcrumbItem Text="Data" Clicked="OnBreadcrumbClicked" />
-                <ui:BreadcrumbItem Text="Current Page" IsCurrent="True" />
-            </ui:Breadcrumb>
+                <!-- Badge -->
+                <Label Text="Badge" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Badge Text="Default" Margin="0,0,8,8" />
+                    <ui:Badge Text="Secondary" Variant="Secondary" Margin="0,0,8,8" />
+                    <ui:Badge Text="Outline" Variant="Outline" Margin="0,0,8,8" />
+                    <ui:Badge Text="Destructive" Variant="Destructive" Margin="0,0,8,8" />
+                    <ui:Badge Text="Success" Variant="Success" Margin="0,0,8,8" />
+                    <ui:Badge Text="Warning" Variant="Warning" Margin="0,0,8,8" />
+                    <ui:Badge Text="Info" Variant="Info" Margin="0,0,8,8" />
+                </FlexLayout>
 
-            <Label Text="Skeleton (loading state)" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <VerticalStackLayout Spacing="8">
-                <ui:Skeleton HeightRequest="20" WidthRequest="200" />
-                <ui:Skeleton HeightRequest="16" />
-                <ui:Skeleton HeightRequest="16" WidthRequest="260" />
-                <ui:Skeleton HeightRequest="60" CornerRadius="8" Margin="0,8,0,0" />
-            </VerticalStackLayout>
-
-            <Label Text="ScrollArea" FontSize="20" FontAttributes="Bold" Margin="0,20,0,10" />
-            <ui:ScrollArea HeightRequest="140">
-                <VerticalStackLayout Spacing="6" Padding="0,0,8,0">
-                    <Label Text="Line 1 — vertical scroll wrapper" />
-                    <Label Text="Line 2" />
-                    <Label Text="Line 3" />
-                    <Label Text="Line 4" />
-                    <Label Text="Line 5" />
-                    <Label Text="Line 6" />
-                    <Label Text="Line 7" />
-                    <Label Text="Line 8" />
-                    <Label Text="Line 9" />
-                    <Label Text="Line 10 — end of list" />
+                <!-- Input -->
+                <Label Text="Input" Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                    <ui:Input x:Name="NameInput" Placeholder="you@example.com" Keyboard="Email" />
                 </VerticalStackLayout>
-            </ui:ScrollArea>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Password" Style="{StaticResource FieldLabel}" />
+                    <ui:Input Placeholder="••••••••" IsPassword="True" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Username" Style="{StaticResource FieldLabel}" />
+                    <ui:Input Placeholder="Username" Text="taken-name" HasError="True" />
+                    <ui:ShellLabel Text="This username is already taken." Size="Sm" Variant="Destructive" />
+                </VerticalStackLayout>
+                <ui:Input Text="Read-only value" IsReadOnly="True" />
 
-            <!-- Status Label -->
-            <Label x:Name="StatusLabel"
-                   Text="Click a button to see events!"
-                   FontSize="14"
-                   TextColor="Gray"
-                   HorizontalOptions="Center"
-                   Margin="0,20,0,40" />
+                <!-- Textarea -->
+                <Label Text="Textarea" Style="{StaticResource SectionTitle}" />
+                <ui:Textarea x:Name="NotesInput" Placeholder="Type your message here." />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <!-- Select -->
+                <Label Text="Select" Style="{StaticResource SectionTitle}" />
+                <ui:Select x:Name="CountrySelect" Placeholder="Select a country" WidthRequest="280"
+                           HorizontalOptions="Start" SelectedIndexChanged="OnSelectChanged" />
+
+                <!-- Checkbox / Switch / Radio -->
+                <Label Text="Checkbox, Switch, Radio Group" Style="{StaticResource SectionTitle}" />
+                <ui:Checkbox x:Name="CheckDemo" Label="Accept terms and conditions" IsChecked="True" CheckedChanged="OnCheckChanged" />
+                <ui:Switch x:Name="SwitchDemo" Label="Airplane mode" Toggled="OnSwitchToggled" />
+                <ui:RadioGroup x:Name="RadioGroupDemo" Value="comfortable" ValueChanged="OnRadioChanged">
+                    <ui:RadioGroupItem Value="default" Text="Default" />
+                    <ui:RadioGroupItem Value="comfortable" Text="Comfortable" />
+                    <ui:RadioGroupItem Value="compact" Text="Compact" />
+                </ui:RadioGroup>
+
+                <!-- Slider / Progress -->
+                <Label Text="Slider &amp; Progress" Style="{StaticResource SectionTitle}" />
+                <ui:Slider x:Name="VolumeSlider" Value="40" Minimum="0" Maximum="100" ValueChanged="OnSliderChanged" />
+                <ui:Progress x:Name="ProgressDemo" Value="40" ShowLabel="True" />
+                <ui:Progress Value="72" Variant="Success" />
+
+                <!-- Date / Time -->
+                <Label Text="Date &amp; Time" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:DatePicker x:Name="DatePickerDemo" Margin="0,0,8,8" />
+                    <ui:TimePicker x:Name="TimePickerDemo" Margin="0,0,8,8" />
+                </FlexLayout>
+
+                <!-- Card -->
+                <Label Text="Card" Style="{StaticResource SectionTitle}" />
+                <ui:Card WidthRequest="380" HorizontalOptions="Start">
+                    <ui:CardHeader Title="Create project" Description="Deploy your new project in one click." />
+                    <ui:CardContent>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                            <ui:Input Placeholder="Name of your project" />
+                        </VerticalStackLayout>
+                    </ui:CardContent>
+                    <ui:CardFooter>
+                        <ui:Button Text="Cancel" Variant="Outline" Clicked="OnButtonClicked" />
+                        <ui:Button Text="Deploy" Clicked="OnButtonClicked" />
+                    </ui:CardFooter>
+                </ui:Card>
+
+                <!-- Alert -->
+                <Label Text="Alert" Style="{StaticResource SectionTitle}" />
+                <ui:Alert Title="Heads up!" Message="You can add components to your app using the CLI." />
+                <ui:Alert Title="Error" Message="Your session has expired. Please log in again." Variant="Destructive" />
+                <ui:Alert Title="Saved" Message="Your changes were saved." Variant="Success" />
+                <ui:Alert Title="Storage almost full" Message="You have used 92% of your quota." Variant="Warning" />
+
+                <!-- Toast -->
+                <Label Text="Toast" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Button Text="Show toast" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastDefault" />
+                    <ui:Button Text="Success" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastSuccess" />
+                    <ui:Button Text="Error" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastError" />
+                    <ui:Button Text="Warning" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastWarning" />
+                    <ui:Button Text="Info" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastInfo" />
+                    <ui:Button Text="With action" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastAction" />
+                </FlexLayout>
+
+                <!-- Avatar & Spinner -->
+                <Label Text="Avatar" Style="{StaticResource SectionTitle}" />
+                <HorizontalStackLayout Spacing="12">
+                    <ui:Avatar Source="dotnet_bot.png" Fallback="DB" />
+                    <ui:Avatar Fallback="CN" />
+                    <ui:Avatar />
+                    <ui:Avatar Fallback="SM" Size="Sm" />
+                    <ui:Avatar Fallback="LG" Size="Lg" />
+                    <ui:Avatar Source="dotnet_bot.png" Size="Xl" />
+                </HorizontalStackLayout>
+
+                <Label Text="Spinner" Style="{StaticResource SectionTitle}" />
+                <HorizontalStackLayout Spacing="16">
+                    <ui:Spinner Size="Sm" />
+                    <ui:Spinner />
+                    <ui:Spinner Size="Lg" Token="MutedForeground" />
+                    <ui:Button Text="Saving" IsLoading="True" Variant="Secondary" />
+                </HorizontalStackLayout>
+
+                <!-- Overlays -->
+                <Label Text="Alert Dialog" Style="{StaticResource SectionTitle}" />
+                <ui:Button Text="Delete account" Variant="Destructive" Clicked="OnAlertDialogClicked" />
+
+                <Label Text="Dialog, Drawer, Sheet" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Button Text="Open dialog" Variant="Outline" Margin="0,0,8,8" Clicked="OnDialogTriggerClicked" />
+                    <ui:Button Text="Open drawer" Variant="Outline" Margin="0,0,8,8" Clicked="OnDrawerTriggerClicked" />
+                    <ui:Button Text="Open sheet" Variant="Outline" Margin="0,0,8,8" Clicked="OnSheetTriggerClicked" />
+                </FlexLayout>
+
+                <Label Text="Dropdown &amp; Popover" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Dropdown Margin="0,0,8,8">
+                        <ui:DropdownTrigger>
+                            <ui:Button Text="Open menu" Variant="Outline" Icon="ChevronDown" IconPosition="Right" />
+                        </ui:DropdownTrigger>
+                        <ui:DropdownContent>
+                            <ui:DropdownItem Text="Profile" Icon="User" Clicked="OnDropdownItem" />
+                            <ui:DropdownItem Text="Settings" Icon="Settings" Clicked="OnDropdownItem" />
+                            <ui:DropdownItem Text="Notifications" Icon="Bell" Clicked="OnDropdownItem" />
+                        </ui:DropdownContent>
+                    </ui:Dropdown>
+                    <ui:Popover Margin="0,0,8,8">
+                        <ui:PopoverTrigger>
+                            <ui:Button Text="Open popover" Variant="Outline" />
+                        </ui:PopoverTrigger>
+                        <ui:PopoverContent>
+                            <Label Text="Dimensions" Style="{StaticResource FieldLabel}" />
+                            <Label Text="Set the dimensions for the layer." Style="{StaticResource Muted}" />
+                            <ui:Input Placeholder="Width" />
+                        </ui:PopoverContent>
+                    </ui:Popover>
+                </FlexLayout>
+
+                <!-- Collapsible -->
+                <Label Text="Collapsible" Style="{StaticResource SectionTitle}" />
+                <ui:Collapsible>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="@peduarte starred 3 repositories" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                        <ui:CollapsibleTrigger Grid.Column="1">
+                            <ui:Button Icon="ChevronsUpDown" Size="Icon" Variant="Ghost" />
+                        </ui:CollapsibleTrigger>
+                    </Grid>
+                    <ui:Card><Label Text="@radix-ui/primitives" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                    <ui:CollapsibleContent>
+                        <VerticalStackLayout Spacing="8">
+                            <ui:Card><Label Text="@radix-ui/colors" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                            <ui:Card><Label Text="@stitches/react" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                        </VerticalStackLayout>
+                    </ui:CollapsibleContent>
+                </ui:Collapsible>
+
+                <!-- Accordion -->
+                <Label Text="Accordion" Style="{StaticResource SectionTitle}" />
+                <ui:Accordion Type="Single" Value="item-1">
+                    <ui:AccordionItem Value="item-1">
+                        <ui:AccordionTrigger Text="Is it accessible?" />
+                        <ui:AccordionContent>
+                            <Label Text="Yes. It adheres to the WAI-ARIA design pattern." Style="{StaticResource Body}" />
+                        </ui:AccordionContent>
+                    </ui:AccordionItem>
+                    <ui:AccordionItem Value="item-2">
+                        <ui:AccordionTrigger Text="Is it styled?" />
+                        <ui:AccordionContent>
+                            <Label Text="Yes. It comes with default styles that match the other components." Style="{StaticResource Body}" />
+                        </ui:AccordionContent>
+                    </ui:AccordionItem>
+                    <ui:AccordionItem Value="item-3">
+                        <ui:AccordionTrigger Text="Is it animated?" />
+                        <ui:AccordionContent>
+                            <Label Text="Yes. It expands and collapses smoothly." Style="{StaticResource Body}" />
+                        </ui:AccordionContent>
+                    </ui:AccordionItem>
+                </ui:Accordion>
+
+                <!-- Tabs -->
+                <Label Text="Tabs" Style="{StaticResource SectionTitle}" />
+                <ui:Tabs Value="account" ValueChanged="OnTabChanged">
+                    <ui:TabsList>
+                        <ui:TabsTrigger Value="account" Text="Account" />
+                        <ui:TabsTrigger Value="password" Text="Password" />
+                        <ui:TabsTrigger Value="activity" Text="Activity" />
+                    </ui:TabsList>
+                    <ui:TabsContent Value="account">
+                        <ui:Card>
+                            <ui:CardHeader Title="Account" Description="Make changes to your account here." />
+                            <ui:CardContent><ui:Input Text="Pedro Duarte" /></ui:CardContent>
+                        </ui:Card>
+                    </ui:TabsContent>
+                    <ui:TabsContent Value="password">
+                        <ui:Card>
+                            <ui:CardHeader Title="Password" Description="Change your password here." />
+                            <ui:CardContent><ui:Input Placeholder="New password" IsPassword="True" /></ui:CardContent>
+                        </ui:Card>
+                    </ui:TabsContent>
+                    <ui:TabsContent Value="activity">
+                        <Label Text="No recent activity." Style="{StaticResource Muted}" />
+                    </ui:TabsContent>
+                </ui:Tabs>
+
+                <!-- Breadcrumb -->
+                <Label Text="Breadcrumb" Style="{StaticResource SectionTitle}" />
+                <ui:Breadcrumb>
+                    <ui:BreadcrumbItem Text="Home" Clicked="OnBreadcrumbClicked" />
+                    <ui:BreadcrumbItem Text="Components" Clicked="OnBreadcrumbClicked" />
+                    <ui:BreadcrumbItem Text="Breadcrumb" IsCurrent="True" />
+                </ui:Breadcrumb>
+
+                <!-- Skeleton -->
+                <Label Text="Skeleton" Style="{StaticResource SectionTitle}" />
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                    <ui:Skeleton WidthRequest="48" HeightRequest="48" CornerRadius="24" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                        <ui:Skeleton HeightRequest="16" WidthRequest="250" HorizontalOptions="Start" />
+                        <ui:Skeleton HeightRequest="16" WidthRequest="200" HorizontalOptions="Start" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Scroll area -->
+                <Label Text="Scroll Area" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}"
+                        StrokeShape="RoundRectangle 6" WidthRequest="240" HorizontalOptions="Start">
+                    <ui:ScrollArea HeightRequest="180">
+                        <VerticalStackLayout x:Name="TagList" Padding="16" Spacing="8">
+                            <Label Text="Tags" Style="{StaticResource FieldLabel}" />
+                        </VerticalStackLayout>
+                    </ui:ScrollArea>
+                </Border>
+
+                <ui:Separator Margin="0,24,0,0" />
+                <Label Text="Built with ShellUI Native." Style="{StaticResource Muted}" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </ScrollView>
 
         <!-- ============ Page-root overlays ============ -->
-        <!-- These live outside the ScrollView so their overlay layer can fill the window. -->
-        <!-- Their triggers above (Buttons that call SetOpen) live inline in the scroll.   -->
-
-        <ui:Dialog x:Name="DemoDialog" OpenChanged="OnDialogOpenChanged">
+        <ui:Dialog x:Name="DemoDialog">
             <ui:DialogContent>
                 <ui:DialogHeader>
-                    <ui:DialogTitle Text="Dialog Title" />
-                    <ui:DialogDescription Text="This is a modal dialog." />
+                    <ui:DialogTitle Text="Edit profile" />
+                    <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
                 </ui:DialogHeader>
-                <Label Text="Modal content appears here." />
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                    <ui:Input Text="Pedro Duarte" />
+                </VerticalStackLayout>
                 <ui:DialogFooter>
-                    <ui:Button Text="Close" Clicked="OnDialogClose" />
+                    <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+                    <ui:Button Text="Save changes" Clicked="OnDialogSave" />
                 </ui:DialogFooter>
             </ui:DialogContent>
         </ui:Dialog>
 
-        <ui:Drawer x:Name="DemoDrawer" Side="Bottom">
+        <ui:Drawer x:Name="DemoDrawer">
             <ui:DrawerContent>
-                <Label Text="Drawer content - slide from bottom" FontAttributes="Bold" />
+                <Label Text="Move goal" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
+                <Label Text="Set your daily activity goal." Style="{StaticResource Muted}" HorizontalOptions="Center" />
+                <Label Text="350 kcal/day" FontSize="30" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
+                <ui:Button Text="Submit" HorizontalOptions="Fill" Clicked="OnDrawerSubmit" />
             </ui:DrawerContent>
         </ui:Drawer>
 
-        <ui:Sheet x:Name="DemoSheet" Side="Right">
+        <ui:AlertDialog x:Name="DeleteDialog"
+                        Title="Are you absolutely sure?"
+                        Description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                        ConfirmText="Delete account"
+                        ConfirmVariant="Destructive" />
+
+        <ui:Toaster />
+
+        <ui:Sheet x:Name="DemoSheet">
             <ui:SheetContent>
-                <Label Text="Sheet content" FontAttributes="Bold" />
+                <Label Text="Edit profile" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                <Label Text="Make changes to your profile here." Style="{StaticResource Muted}" />
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                    <ui:Input Text="Pedro Duarte" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Username" Style="{StaticResource FieldLabel}" />
+                    <ui:Input Text="@peduarte" />
+                </VerticalStackLayout>
+                <ui:Button Text="Save changes" Clicked="OnSheetSave" />
             </ui:SheetContent>
         </ui:Sheet>
-
     </Grid>
 
 </ContentPage>
