@@ -31,6 +31,33 @@ public class ComponentRegistryTests
         }
     }
 
+    // `shell` is the base layer every component builds on; a cycle (e.g. shell <-> element-extensions)
+    // would make install order ambiguous.
+    [Fact]
+    public void Dependency_graph_has_no_cycles()
+    {
+        var components = ComponentRegistry.Components;
+        var state = new Dictionary<string, int>(); // 1 = visiting, 2 = done
+
+        void Visit(string name, List<string> path)
+        {
+            if (state.TryGetValue(name, out var s))
+            {
+                Assert.True(s == 2, $"Dependency cycle: {string.Join(" -> ", path)} -> {name}");
+                return;
+            }
+            state[name] = 1;
+            path.Add(name);
+            foreach (var dep in components[name].Dependencies)
+                Visit(dep, path);
+            path.RemoveAt(path.Count - 1);
+            state[name] = 2;
+        }
+
+        foreach (var name in components.Keys)
+            Visit(name, new List<string>());
+    }
+
     [Fact]
     public void Exists_is_case_insensitive()
     {

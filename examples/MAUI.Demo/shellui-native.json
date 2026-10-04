@@ -309,6 +309,111 @@
       "Platform": 1,
       "InstalledAt": "2026-02-12T20:26:42.505863Z",
       "IsCustomized": false
+    },
+    {
+      "Name": "collapsible-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "collapsible-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "collapsible",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "accordion-item",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "accordion-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "accordion-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "accordion",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "tabs-list",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "tabs-trigger",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "tabs-content",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "tabs",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "breadcrumb-item",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "breadcrumb",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "skeleton",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
+    },
+    {
+      "Name": "scroll-area",
+      "Version": "0.0.1",
+      "Platform": 1,
+      "InstalledAt": "2026-08-29T00:00:00.0000000Z",
+      "IsCustomized": false
     }
   ]
 }

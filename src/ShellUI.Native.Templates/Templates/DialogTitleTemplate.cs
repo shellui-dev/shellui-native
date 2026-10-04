@@ -11,7 +11,7 @@ public static class DialogTitleTemplate
         Description = "Title text for dialog",
         Category = ComponentCategory.Overlay,
         FilePath = "DialogTitle.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Tags = new List<string> { "overlay", "dialog", "title" }
     };
 
@@ -19,12 +19,14 @@ public static class DialogTitleTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
+// text-lg font-semibold leading-none
 public partial class DialogTitle : Label
 {
     public DialogTitle()
     {
         FontSize = 18;
         FontAttributes = FontAttributes.Bold;
+        this.Token(TextColorProperty, ShellToken.Foreground);
     }
 }
 "

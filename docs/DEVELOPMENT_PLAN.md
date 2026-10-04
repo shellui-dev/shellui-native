@@ -4,7 +4,7 @@ Living document tracking **branches**, **phases**, and **feature implementations
 ShellUI Native. Companion to [PLAN.md](./PLAN.md) (long-term strategy) and
 [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md) (prioritized component backlog).
 
-Last revised: **2026-08-29** (post-PR #2 merge).
+Last revised: **2026-08-30** (Phase 1c in flight, P4 polish scoped).
 
 ---
 
@@ -17,7 +17,8 @@ into it, not directly into `main`.
 
 ```
 main   ← Phase 1a merged (2026-07-05), Phase 1b merged (2026-08-29 via PR #2)
- └─ feat/p3-navigation-layout         ← Phase 1c (next) — MAUI P3 tier (tabs, accordion, …)
+ └─ feat/p3-navigation-layout         ← Phase 1c (active) — MAUI P3 tier (tabs, accordion, …)
+ └─ feat/p4-overlay-portal            ← Phase 1d (queued after 1c) — portal rewrite + shadcn-style controls
  └─ feat/avalonia-implementation      ← Phase 2 (planned) — Avalonia templates + reference impl
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
@@ -239,7 +240,7 @@ public static class ButtonTemplate
 
 ---
 
-## Phase 1c — `feat/p3-navigation-layout` (**next**)
+## Phase 1c — `feat/p3-navigation-layout` (**in review**)
 
 Finish MAUI's component vocabulary through P3 before opening the cross-platform front.
 Rationale: Phase 2 (Avalonia) turns every new MAUI component into two components to
@@ -283,13 +284,18 @@ exclusion. Breadcrumb and skeleton are standalone and can slot in wherever.
 
 ### Deliverables
 
-- [ ] 6 new template classes + 3 sub-components (9 files total)
-- [ ] `ComponentRegistry` entries for all 9
-- [ ] `MAUI.Demo` gains a demo section for each family (Tabs / Accordion / Collapsible /
+- [x] 6 new template families + their sub-components
+- [x] `ComponentRegistry` entries for all of them
+- [x] `MAUI.Demo` gains a demo section for each family (Tabs / Accordion / Collapsible /
   Breadcrumb / ScrollArea / Skeleton)
-- [ ] `TemplateContentTests` picks the new components up automatically (parameterized
+- [x] `TemplateContentTests` picks the new components up automatically (parameterized
   over the whole registry — nothing to add manually)
-- [ ] [COMPONENTS.md](./COMPONENTS.md) updated with usage snippets for each
+- [x] [COMPONENTS.md](./COMPONENTS.md) updated with usage snippets for each
+
+Fix-forwards that landed here (despite the "no P0–P2 refactoring" rule below) because they
+blocked the demo from rendering at all on Windows: overlays moved to page-root in
+`MAUI.Demo`, outer `Border` removed from Select/DatePicker/TimePicker, and .NET 10 MAUI
+nullable `Date`/`Time` + non-generic `ItemsSource` adaptations. Proper fixes → Phase 1d.
 
 ### Exit criteria to merge → `main`
 
@@ -311,7 +317,70 @@ exclusion. Breadcrumb and skeleton are standalone and can slot in wherever.
 
 ---
 
-## Phase 2 — `feat/avalonia-implementation` (unblocked, waiting on Phase 1c)
+## Phase 1d — `feat/p4-overlay-portal` (queued after Phase 1c)
+
+Surface polish pass driven by live testing on Windows 2026-08-30. Two distinct problems
+that both need architectural fixes rather than sizing tweaks.
+
+### Problem 1: Dialog / Drawer / Sheet require a page-root parent
+
+Today these components extend `AbsoluteLayout` with an inner `_overlayLayer` set to
+proportional-fill (0,0,1,1). When placed inside a `VerticalStackLayout` (the natural
+place a consumer would drop them next to a form), the AbsoluteLayout sizes to children
+while the overlay layer wants to fill the parent — circular sizing produces a giant
+empty inline box. The Phase 1c demo pushed them to page-root as a workaround, but that's
+a footgun consumers WILL hit.
+
+**Fix:** rewrite as `ContentView`s that walk up to `ContentPage.Content` on attach, wrap
+it in a `Grid` once (tracked via attached property), inject the overlay layer as the top
+child of that grid. Trigger renders inline; content teleports to page root. Portal-style,
+matches shadcn's `Dialog`/`Sheet` behavior in React.
+
+### Problem 2: Select / DatePicker / TimePicker use native chrome
+
+Same fix as Phase 1c's short-term patch (remove the outer `Border` to stop overflow) —
+functional but not shadcn-quality. Windows' native `Picker`/`CalendarDatePicker`/`TimePicker`
+draw their own chrome that we can't override cleanly cross-platform.
+
+**Fix:** replace each with a `Popover`-based custom control that renders its own trigger
+(bounded, our styling) and opens a `PopoverContent` with the item list / calendar /
+hour-minute wheels. Native pickers drop out entirely. Matches shadcn `Select` /
+`DatePicker` / `TimePicker` — inspiration: `nativewind` + `shadcn/ui`.
+
+### Deliverables
+
+- [x] Portal helper — landed 2026-10-02 as `ShellPortal` in `Shell.cs` (page layer, logical owner, anchored popups with flip + click-outside)
+- [x] Dialog / Drawer / Sheet / AlertDialog show their content in the portal layer — declare them anywhere
+- [x] Custom `Select` — trigger + floating list (landed early, 2026-09-27, with the theme-token pass)
+- [x] Custom `DatePicker` — trigger + floating `calendar` component (month navigation + day grid)
+- [x] Custom `TimePicker` — trigger + floating hour / minute / AM-PM columns (2026-10-04); native picker dropped
+- [x] `MAUI.Demo` no longer needs the page-root `Grid` workaround — its root is a plain `ScrollView` and overlays sit next to their triggers
+- [x] Click-outside closes Dropdown / Popover / Select / DatePicker
+- [x] `tooltip` and `hover-card` (unblocked by the portal)
+- [x] Android pass (2026-10-04, Pixel 7 / API 34 emulator): native underline and padding stripped
+  from text fields; Select list sized and placed from real layout; `BoxView`s no longer pick up
+  the stock dark background; page layer set up as the page appears (first overlay no longer
+  resets the scroll position); overlays edge-to-edge with their content kept inside the safe
+  area; Hover Card opens on tap; opt-in `ShellTheme.SyncSystemBars`
+- [x] `toggle`, `input-otp`, `pagination`, `empty-state`
+- [x] Escape (Windows) and the Android back button close the overlay on top — `ShellDismiss` (2026-10-04; Mac Catalyst still open)
+- [x] `callout`, `combobox`
+
+Already in place from the 2026-09-27 pass: theme tokens (`ShellTheme`), overlay open/close
+animations, closed overlays no longer block input, triggers that wrap a Button
+(`ShellTriggerView`), floating Dropdown/Popover/Select via `ShellAnchorLayout`, and
+Date/Time pickers inside a themed border with the native frame stripped.
+
+### Exit criteria
+
+1. `MAUI.Demo` Dialog / Drawer / Sheet sections can move back into the `ScrollView` and still render + open correctly
+2. Select / DatePicker / TimePicker render with our own border + rounded corners on Windows (no native chrome bleed)
+3. `dotnet test` still green (visual tests remain manual until we automate them)
+4. Every color still reuses the [Design Token Contract](./COMPONENTS_ROADMAP.md#design-token-contract)
+
+---
+
+## Phase 2 — `feat/avalonia-implementation` (queued after Phase 1d)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 

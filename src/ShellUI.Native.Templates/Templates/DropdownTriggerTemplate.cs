@@ -11,7 +11,7 @@ public static class DropdownTriggerTemplate
         Description = "Opens dropdown on tap",
         Category = ComponentCategory.Overlay,
         FilePath = "DropdownTrigger.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string> { "shell", "element-extensions" },
         Tags = new List<string> { "overlay", "dropdown", "trigger" }
     };
 
@@ -19,14 +19,10 @@ public static class DropdownTriggerTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-public partial class DropdownTrigger : ContentView
+// Toggles the enclosing Dropdown. Wrap a Button or any view.
+public partial class DropdownTrigger : ShellTriggerView
 {
-    public DropdownTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => FindParentOfType<Dropdown>()?.ToggleAsync();
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Dropdown>()?.Toggle();
 }
 "
     };

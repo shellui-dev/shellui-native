@@ -2,8 +2,8 @@ using Microsoft.Maui.Controls.Shapes;
 
 namespace MAUI.Demo.Components.UI;
 
-// Card - A container component with header, content, footer slots
-// Usage: <Card><CardHeader /><CardContent /><CardFooter /></Card>
+// Card container — rounded-lg border bg-card shadow-sm.
+// Usage: <ui:Card><ui:CardHeader Title="..." /><ui:CardContent>...</ui:CardContent><ui:CardFooter>...</ui:CardFooter></ui:Card>
 [ContentProperty(nameof(CardContent))]
 public partial class Card : ContentView
 {
@@ -40,18 +40,18 @@ public partial class Card : ContentView
         _border = new Border
         {
             Content = _container,
-            Padding = 0
+            Padding = 0,
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusLg + 4 }
         };
+        _border.Token(VisualElement.BackgroundColorProperty, ShellToken.Card);
+        _border.Token(Border.StrokeProperty, ShellToken.Border);
 
         var tap = new TapGestureRecognizer();
         tap.Tapped += (s, e) => { if (IsPressable) Clicked?.Invoke(this, EventArgs.Empty); };
         _border.GestureRecognizers.Add(tap);
 
         Content = _border;
-
-        if (Application.Current != null)
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateVisuals();
-
         UpdateVisuals();
     }
 
@@ -59,120 +59,14 @@ public partial class Card : ContentView
 
     private void UpdateVisuals()
     {
-        _border.BackgroundColor = ShellTheme.BackgroundCard;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = 8 };
-
-        switch (Variant)
+        _border.Shadow = new Shadow
         {
-            case CardVariant.Default:
-                _border.Stroke = ShellTheme.Border;
-                _border.StrokeThickness = 1;
-                _border.Shadow = new Shadow { Opacity = 0 };
-                break;
-            case CardVariant.Elevated:
-                _border.Stroke = Colors.Transparent;
-                _border.StrokeThickness = 0;
-                _border.Shadow = new Shadow
-                {
-                    Brush = new SolidColorBrush(Color.FromArgb("#30000000")),
-                    Offset = new Point(0, 4),
-                    Radius = 12,
-                    Opacity = ShellTheme.IsDarkMode ? 0.4f : 0.15f
-                };
-                break;
-        }
-    }
-}
-
-// Standalone CardHeader - use ui:CardHeader to avoid XAML parsing "Card.Header" as property
-public class CardHeader : ContentView
-{
-    public static readonly BindableProperty TitleProperty =
-        BindableProperty.Create(nameof(Title), typeof(string), typeof(CardHeader), "", propertyChanged: OnTextChanged);
-
-    public static readonly BindableProperty DescriptionProperty =
-        BindableProperty.Create(nameof(Description), typeof(string), typeof(CardHeader), "", propertyChanged: OnTextChanged);
-
-    private readonly Label _title;
-    private readonly Label _description;
-
-    public string Title { get => (string)GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
-    public string Description { get => (string)GetValue(DescriptionProperty); set => SetValue(DescriptionProperty, value); }
-
-    public CardHeader()
-    {
-        _title = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold };
-        _description = new Label { FontSize = 14, IsVisible = false };
-
-        Content = new VerticalStackLayout
-        {
-            Spacing = 4,
-            Padding = new Thickness(16, 16, 16, 8),
-            Children = { _title, _description }
+            Brush = new SolidColorBrush(Colors.Black),
+            Offset = Variant == CardVariant.Elevated ? new Point(0, 4) : new Point(0, 1),
+            Radius = Variant == CardVariant.Elevated ? 12 : 2,
+            Opacity = Variant == CardVariant.Elevated ? 0.10f : 0.05f
         };
-
-        if (Application.Current != null)
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
-        UpdateColors();
     }
-
-    private static void OnTextChanged(BindableObject b, object o, object n)
-    {
-        if (b is CardHeader h)
-        {
-            h._title.Text = h.Title;
-            h._description.Text = h.Description;
-            h._description.IsVisible = !string.IsNullOrEmpty(h.Description);
-        }
-    }
-
-    private void UpdateColors()
-    {
-        _title.TextColor = ShellTheme.Foreground;
-        _description.TextColor = ShellTheme.ForegroundMuted;
-    }
-}
-
-// Standalone CardContent - body area (inherits ContentProperty from ContentView)
-public class CardContent : ContentView
-{
-    public CardContent()
-    {
-        Padding = new Thickness(16, 8);
-    }
-}
-
-// Standalone CardFooter - footer area with action buttons
-[ContentProperty(nameof(FooterContent))]
-public class CardFooter : ContentView
-{
-    private readonly BoxView _separator;
-    private readonly HorizontalStackLayout _content;
-
-    public IList<IView> FooterContent => _content.Children;
-
-    public CardFooter()
-    {
-        _separator = new BoxView { HeightRequest = 1, HorizontalOptions = LayoutOptions.Fill };
-        _content = new HorizontalStackLayout
-        {
-            Spacing = 8,
-            Padding = new Thickness(16, 12),
-            HorizontalOptions = LayoutOptions.End
-        };
-
-        Content = new VerticalStackLayout
-        {
-            Spacing = 0,
-            Children = { _separator, _content }
-        };
-
-        if (Application.Current != null)
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateColors();
-        UpdateColors();
-    }
-
-    private void UpdateColors() => _separator.BackgroundColor = ShellTheme.Border;
 }
 
 public enum CardVariant { Default, Elevated }

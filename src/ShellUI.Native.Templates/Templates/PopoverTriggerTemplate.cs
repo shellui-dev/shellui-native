@@ -11,7 +11,7 @@ public static class PopoverTriggerTemplate
         Description = "Opens popover on tap",
         Category = ComponentCategory.Overlay,
         FilePath = "PopoverTrigger.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string> { "shell", "element-extensions" },
         Tags = new List<string> { "overlay", "popover", "trigger" }
     };
 
@@ -19,14 +19,10 @@ public static class PopoverTriggerTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-public partial class PopoverTrigger : ContentView
+// Toggles the enclosing Popover. Wrap a Button or any view.
+public partial class PopoverTrigger : ShellTriggerView
 {
-    public PopoverTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => FindParentOfType<Popover>()?.ToggleAsync();
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Popover>()?.Toggle();
 }
 "
     };

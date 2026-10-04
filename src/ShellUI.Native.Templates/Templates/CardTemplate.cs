@@ -12,7 +12,7 @@ public static class CardTemplate
         Description = "Container component for grouping related content with optional header and footer",
         Category = ComponentCategory.Layout,
         FilePath = "Card.cs",
-        Dependencies = new List<string> { "card-header", "card-content", "card-footer" },
+        Dependencies = new List<string> { "shell", "card-header", "card-content", "card-footer" },
         Variants = new List<string> { "default", "bordered", "elevated" },
         Tags = new List<string> { "layout", "container", "card", "panel", "surface" }
     };
@@ -20,23 +20,23 @@ public static class CardTemplate
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
         [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
+
 namespace YourProjectNamespace.Components.UI;
 
-// Card container - compositional children via Dependencies (CardHeader, CardContent, CardFooter)
-// Usage: <Card><CardHeader /><CardContent /><CardFooter /></Card>
-[ContentProperty(nameof(Children))]
+// Card container — rounded-lg border bg-card shadow-sm.
+// Usage: <ui:Card><ui:CardHeader Title=""..."" /><ui:CardContent>...</ui:CardContent><ui:CardFooter>...</ui:CardFooter></ui:Card>
+[ContentProperty(nameof(CardContent))]
 public partial class Card : ContentView
 {
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(CardVariant), typeof(Card), 
-            CardVariant.Default, propertyChanged: OnVisualPropertyChanged);
+        BindableProperty.Create(nameof(Variant), typeof(CardVariant), typeof(Card),
+            CardVariant.Default, propertyChanged: OnVisualChanged);
 
     public static readonly BindableProperty IsPressableProperty =
-        BindableProperty.Create(nameof(IsPressable), typeof(bool), typeof(Card), 
-            false, propertyChanged: OnVisualPropertyChanged);
+        BindableProperty.Create(nameof(IsPressable), typeof(bool), typeof(Card), false);
 
     private readonly Border _border;
-    private readonly VerticalStackLayout _contentStack;
+    private readonly VerticalStackLayout _container;
 
     public CardVariant Variant
     {
@@ -50,66 +50,47 @@ public partial class Card : ContentView
         set => SetValue(IsPressableProperty, value);
     }
 
-    /// <summary>Children collection for CardHeader, CardContent, CardFooter (compositional pattern)</summary>
-    public new IList<IView> Children => _contentStack.Children;
-
     public event EventHandler? Clicked;
+
+    public IList<IView> CardContent => _container.Children;
 
     public Card()
     {
-        _contentStack = new VerticalStackLayout { Spacing = 0 };
-        _border = new Border { Content = _contentStack, Padding = 0 };
+        _container = new VerticalStackLayout { Spacing = 0 };
 
-        var tapGesture = new TapGestureRecognizer();
-        tapGesture.Tapped += (s, e) =>
+        _border = new Border
         {
-            if (IsPressable) Clicked?.Invoke(this, EventArgs.Empty);
+            Content = _container,
+            Padding = 0,
+            StrokeThickness = 1,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusLg + 4 }
         };
-        _border.GestureRecognizers.Add(tapGesture);
+        _border.Token(VisualElement.BackgroundColorProperty, ShellToken.Card);
+        _border.Token(Border.StrokeProperty, ShellToken.Border);
+
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (s, e) => { if (IsPressable) Clicked?.Invoke(this, EventArgs.Empty); };
+        _border.GestureRecognizers.Add(tap);
+
         Content = _border;
-        UpdateVisualState();
+        UpdateVisuals();
     }
 
-    private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Card card) card.UpdateVisualState();
-    }
+    private static void OnVisualChanged(BindableObject b, object o, object n) => (b as Card)?.UpdateVisuals();
 
-    private void UpdateVisualState()
+    private void UpdateVisuals()
     {
-        var backgroundColor = Color.FromArgb(""#FFFFFF"");
-        var borderColor = Color.FromArgb(""#E5E7EB"");
-        _border.BackgroundColor = backgroundColor;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = 8 };
-
-        switch (Variant)
+        _border.Shadow = new Shadow
         {
-            case CardVariant.Default:
-                _border.Stroke = borderColor;
-                _border.StrokeThickness = 1;
-                _border.Shadow = null;
-                break;
-            case CardVariant.Bordered:
-                _border.Stroke = borderColor;
-                _border.StrokeThickness = 2;
-                _border.Shadow = null;
-                break;
-            case CardVariant.Elevated:
-                _border.Stroke = Colors.Transparent;
-                _border.StrokeThickness = 0;
-                _border.Shadow = new Shadow
-                {
-                    Brush = new SolidColorBrush(Color.FromArgb(""#20000000"")),
-                    Offset = new Point(0, 4),
-                    Radius = 8,
-                    Opacity = 0.15f
-                };
-                break;
-        }
+            Brush = new SolidColorBrush(Colors.Black),
+            Offset = Variant == CardVariant.Elevated ? new Point(0, 4) : new Point(0, 1),
+            Radius = Variant == CardVariant.Elevated ? 12 : 2,
+            Opacity = Variant == CardVariant.Elevated ? 0.10f : 0.05f
+        };
     }
 }
 
-public enum CardVariant { Default, Bordered, Elevated }
+public enum CardVariant { Default, Elevated }
 "
     };
 }

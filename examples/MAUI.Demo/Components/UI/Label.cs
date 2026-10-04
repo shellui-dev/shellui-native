@@ -1,22 +1,22 @@
 namespace MAUI.Demo.Components.UI;
 
-// Typography label with variants - theme-aware
+// Typography label with size / weight / variant — theme-aware.
 public partial class ShellLabel : ContentView
 {
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(ShellLabel), 
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(ShellLabel),
             string.Empty, propertyChanged: OnTextChanged);
 
     public static readonly BindableProperty SizeProperty =
-        BindableProperty.Create(nameof(Size), typeof(LabelSize), typeof(ShellLabel), 
+        BindableProperty.Create(nameof(Size), typeof(LabelSize), typeof(ShellLabel),
             LabelSize.Default, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty WeightProperty =
-        BindableProperty.Create(nameof(Weight), typeof(LabelWeight), typeof(ShellLabel), 
+        BindableProperty.Create(nameof(Weight), typeof(LabelWeight), typeof(ShellLabel),
             LabelWeight.Normal, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(LabelVariant), typeof(ShellLabel), 
+        BindableProperty.Create(nameof(Variant), typeof(LabelVariant), typeof(ShellLabel),
             LabelVariant.Default, propertyChanged: OnVisualPropertyChanged);
 
     private readonly Label _label;
@@ -49,13 +49,6 @@ public partial class ShellLabel : ContentView
     {
         _label = new Label();
         Content = _label;
-        
-        // Listen for theme changes
-        if (Application.Current != null)
-        {
-            Application.Current.RequestedThemeChanged += (s, e) => UpdateVisualState();
-        }
-        
         UpdateVisualState();
     }
 
@@ -66,19 +59,14 @@ public partial class ShellLabel : ContentView
     }
 
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is ShellLabel label)
-            label.UpdateVisualState();
-    }
+        => (bindable as ShellLabel)?.UpdateVisualState();
 
     private void UpdateVisualState()
     {
-        // Font size based on Size enum
         _label.FontSize = Size switch
         {
             LabelSize.Xs => 12,
             LabelSize.Sm => 14,
-            LabelSize.Default => 16,
             LabelSize.Lg => 18,
             LabelSize.Xl => 20,
             LabelSize.Xxl => 24,
@@ -86,27 +74,19 @@ public partial class ShellLabel : ContentView
             _ => 16
         };
 
-        // Font weight
-        _label.FontAttributes = Weight switch
-        {
-            LabelWeight.Light => FontAttributes.None,
-            LabelWeight.Normal => FontAttributes.None,
-            LabelWeight.Medium => FontAttributes.None,
-            LabelWeight.Semibold => FontAttributes.Bold,
-            LabelWeight.Bold => FontAttributes.Bold,
-            _ => FontAttributes.None
-        };
+        // MAUI exposes only regular/bold without a custom font family.
+        _label.FontAttributes = Weight is LabelWeight.Semibold or LabelWeight.Bold
+            ? FontAttributes.Bold
+            : FontAttributes.None;
 
-        // Theme-aware text color based on variant
-        _label.TextColor = Variant switch
+        _label.Token(Label.TextColorProperty, Variant switch
         {
-            LabelVariant.Default => ShellTheme.Foreground,
-            LabelVariant.Muted => ShellTheme.ForegroundMuted,
-            LabelVariant.Destructive => ShellTheme.Destructive,
-            LabelVariant.Success => ShellTheme.Success,
-            LabelVariant.Warning => ShellTheme.Warning,
-            _ => ShellTheme.Foreground
-        };
+            LabelVariant.Muted => ShellToken.MutedForeground,
+            LabelVariant.Destructive => ShellToken.Destructive,
+            LabelVariant.Success => ShellToken.Success,
+            LabelVariant.Warning => ShellToken.Warning,
+            _ => ShellToken.Foreground
+        });
     }
 }
 

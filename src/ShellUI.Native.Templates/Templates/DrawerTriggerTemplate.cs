@@ -11,7 +11,7 @@ public static class DrawerTriggerTemplate
         Description = "Opens drawer on tap",
         Category = ComponentCategory.Overlay,
         FilePath = "DrawerTrigger.cs",
-        Dependencies = new List<string> { "element-extensions" },
+        Dependencies = new List<string> { "shell", "element-extensions" },
         Tags = new List<string> { "overlay", "drawer", "trigger" }
     };
 
@@ -19,14 +19,10 @@ public static class DrawerTriggerTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-public partial class DrawerTrigger : ContentView
+// Opens the enclosing Drawer. Usage: <ui:DrawerTrigger><ui:Button Text=""Open"" /></ui:DrawerTrigger>
+public partial class DrawerTrigger : ShellTriggerView
 {
-    public DrawerTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => FindParentOfType<Drawer>()?.SetOpen(true);
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Drawer>()?.SetOpen(true);
 }
 "
     };

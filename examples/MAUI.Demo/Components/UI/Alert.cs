@@ -2,25 +2,25 @@ using Microsoft.Maui.Controls.Shapes;
 
 namespace MAUI.Demo.Components.UI;
 
-// Alert component for notifications and feedback
+// Callout with icon, title and message — rounded-lg border p-4, icon + text tinted per variant.
 public partial class Alert : ContentView
 {
     public static readonly BindableProperty TitleProperty =
-        BindableProperty.Create(nameof(Title), typeof(string), typeof(Alert), 
-            string.Empty, propertyChanged: OnTitleChanged);
+        BindableProperty.Create(nameof(Title), typeof(string), typeof(Alert),
+            string.Empty, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty MessageProperty =
-        BindableProperty.Create(nameof(Message), typeof(string), typeof(Alert), 
-            string.Empty, propertyChanged: OnMessageChanged);
+        BindableProperty.Create(nameof(Message), typeof(string), typeof(Alert),
+            string.Empty, propertyChanged: OnVisualPropertyChanged);
 
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(AlertVariant), typeof(Alert), 
+        BindableProperty.Create(nameof(Variant), typeof(AlertVariant), typeof(Alert),
             AlertVariant.Default, propertyChanged: OnVisualPropertyChanged);
 
     private readonly Border _container;
+    private readonly Icon _icon;
     private readonly Label _titleLabel;
     private readonly Label _messageLabel;
-    private readonly VerticalStackLayout _contentStack;
 
     public string Title
     {
@@ -42,110 +42,58 @@ public partial class Alert : ContentView
 
     public Alert()
     {
-        _titleLabel = new Label
-        {
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
-            Margin = new Thickness(0, 0, 0, 4)
-        };
+        _icon = new Icon { Size = 16, VerticalOptions = LayoutOptions.Start, Margin = new Thickness(0, 2, 0, 0) };
+        _titleLabel = new Label { FontSize = 14, FontAttributes = FontAttributes.Bold };
+        _messageLabel = new Label { FontSize = 14 };
 
-        _messageLabel = new Label
+        var text = new VerticalStackLayout { Spacing = 4, Children = { _titleLabel, _messageLabel } };
+        var row = new Grid
         {
-            FontSize = 14
+            ColumnSpacing = 12,
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star) }
         };
-
-        _contentStack = new VerticalStackLayout
-        {
-            Spacing = 0,
-            Padding = new Thickness(16),
-            Children = { _titleLabel, _messageLabel }
-        };
+        row.Add(_icon, 0, 0);
+        row.Add(text, 1, 0);
 
         _container = new Border
         {
-            Content = _contentStack,
-            Padding = new Thickness(0),
+            Content = row,
+            Padding = new Thickness(16, 12),
             StrokeThickness = 1,
-            StrokeShape = new RoundRectangle { CornerRadius = 6 }
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusLg }
         };
+        _container.Token(VisualElement.BackgroundColorProperty, ShellToken.Card);
 
         Content = _container;
         UpdateVisualState();
     }
 
-    private static void OnTitleChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Alert alert)
-        {
-            var text = newValue as string ?? string.Empty;
-            alert._titleLabel.Text = text;
-            alert._titleLabel.IsVisible = !string.IsNullOrEmpty(text);
-        }
-    }
-
-    private static void OnMessageChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Alert alert)
-        {
-            var text = newValue as string ?? string.Empty;
-            alert._messageLabel.Text = text;
-            alert._messageLabel.IsVisible = !string.IsNullOrEmpty(text);
-        }
-    }
-
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Alert alert)
-            alert.UpdateVisualState();
-    }
+        => (bindable as Alert)?.UpdateVisualState();
 
     private void UpdateVisualState()
     {
-        // Design tokens matching ShellUI theme - variant color schemes
-        var (bg, fg, border, titleColor) = Variant switch
+        var (icon, accent) = Variant switch
         {
-            AlertVariant.Default => (
-                Color.FromArgb("#F3F4F6"),
-                Color.FromArgb("#374151"),
-                Color.FromArgb("#E5E7EB"),
-                Color.FromArgb("#1F2937")
-            ),
-            AlertVariant.Destructive => (
-                Color.FromArgb("#FEF2F2"),
-                Color.FromArgb("#991B1B"),
-                Color.FromArgb("#FECACA"),
-                Color.FromArgb("#DC2626")
-            ),
-            AlertVariant.Success => (
-                Color.FromArgb("#F0FDF4"),
-                Color.FromArgb("#166534"),
-                Color.FromArgb("#BBF7D0"),
-                Color.FromArgb("#22C55E")
-            ),
-            AlertVariant.Warning => (
-                Color.FromArgb("#FFFBEB"),
-                Color.FromArgb("#92400E"),
-                Color.FromArgb("#FDE68A"),
-                Color.FromArgb("#F59E0B")
-            ),
-            AlertVariant.Info => (
-                Color.FromArgb("#EFF6FF"),
-                Color.FromArgb("#1E40AF"),
-                Color.FromArgb("#BFDBFE"),
-                Color.FromArgb("#3B82F6")
-            ),
-            _ => (
-                Color.FromArgb("#F3F4F6"),
-                Color.FromArgb("#374151"),
-                Color.FromArgb("#E5E7EB"),
-                Color.FromArgb("#1F2937")
-            )
+            AlertVariant.Destructive => (IconName.CircleAlert, ShellToken.Destructive),
+            AlertVariant.Success => (IconName.CircleCheck, ShellToken.Success),
+            AlertVariant.Warning => (IconName.TriangleAlert, ShellToken.Warning),
+            AlertVariant.Info => (IconName.Info, ShellToken.Info),
+            _ => (IconName.Info, ShellToken.Foreground)
         };
 
-        _container.BackgroundColor = bg;
-        _container.Stroke = border;
-        _titleLabel.TextColor = titleColor;
-        _messageLabel.TextColor = fg;
+        _icon.Name = icon;
+        _icon.Token = accent;
+        _titleLabel.Text = Title ?? string.Empty;
+        _titleLabel.IsVisible = !string.IsNullOrEmpty(Title);
+        _messageLabel.Text = Message ?? string.Empty;
+        _messageLabel.IsVisible = !string.IsNullOrEmpty(Message);
+
+        // Tinted variants color the title; the message stays readable in the muted foreground.
+        _titleLabel.Token(Label.TextColorProperty, accent);
+        _messageLabel.Token(Label.TextColorProperty,
+            Variant == AlertVariant.Default ? ShellToken.MutedForeground : ShellToken.Foreground);
+        _container.Token(Border.StrokeProperty, Variant == AlertVariant.Default ? ShellToken.Border : accent);
     }
 }
 

@@ -1,11 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-public partial class SheetTrigger : ContentView
+// Opens the enclosing Sheet. Usage: <ui:SheetTrigger><ui:Button Text="Open" /></ui:SheetTrigger>
+public partial class SheetTrigger : ShellTriggerView
 {
-    public SheetTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => this.FindParentOfType<Sheet>()?.SetOpen(true);
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Sheet>()?.SetOpen(true);
 }

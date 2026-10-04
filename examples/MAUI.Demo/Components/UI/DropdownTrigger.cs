@@ -1,11 +1,7 @@
 namespace MAUI.Demo.Components.UI;
 
-public partial class DropdownTrigger : ContentView
+// Toggles the enclosing Dropdown. Wrap a Button or any view.
+public partial class DropdownTrigger : ShellTriggerView
 {
-    public DropdownTrigger()
-    {
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += (s, e) => this.FindParentOfType<Dropdown>()?.ToggleAsync();
-        GestureRecognizers.Add(tap);
-    }
+    protected override void OnActivated() => this.FindParentOfType<Dropdown>()?.Toggle();
 }

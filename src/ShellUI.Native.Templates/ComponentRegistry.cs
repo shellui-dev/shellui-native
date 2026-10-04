@@ -15,6 +15,8 @@ public static class ComponentRegistry
     {
         // Core utilities
         { "shell", (ShellTemplate.Metadata, ShellTemplate.Contents) },
+        { "icon", (IconTemplate.Metadata, IconTemplate.Contents) },
+        { "theme-toggle", (ThemeToggleTemplate.Metadata, ThemeToggleTemplate.Contents) },
 
         // Form components
         { "button", (ButtonTemplate.Metadata, ButtonTemplate.Contents) },
@@ -69,7 +71,41 @@ public static class ComponentRegistry
         { "radio-group", (RadioGroupTemplate.Metadata, RadioGroupTemplate.Contents) },
         { "radio-group-item", (RadioGroupItemTemplate.Metadata, RadioGroupItemTemplate.Contents) },
         { "date-picker", (DatePickerTemplate.Metadata, DatePickerTemplate.Contents) },
-        { "time-picker", (TimePickerTemplate.Metadata, TimePickerTemplate.Contents) }
+        { "time-picker", (TimePickerTemplate.Metadata, TimePickerTemplate.Contents) },
+
+        // Navigation / Layout - P3
+        { "collapsible", (CollapsibleTemplate.Metadata, CollapsibleTemplate.Contents) },
+        { "collapsible-trigger", (CollapsibleTriggerTemplate.Metadata, CollapsibleTriggerTemplate.Contents) },
+        { "collapsible-content", (CollapsibleContentTemplate.Metadata, CollapsibleContentTemplate.Contents) },
+        { "accordion", (AccordionTemplate.Metadata, AccordionTemplate.Contents) },
+        { "accordion-item", (AccordionItemTemplate.Metadata, AccordionItemTemplate.Contents) },
+        { "accordion-trigger", (AccordionTriggerTemplate.Metadata, AccordionTriggerTemplate.Contents) },
+        { "accordion-content", (AccordionContentTemplate.Metadata, AccordionContentTemplate.Contents) },
+        { "tabs", (TabsTemplate.Metadata, TabsTemplate.Contents) },
+        { "tabs-list", (TabsListTemplate.Metadata, TabsListTemplate.Contents) },
+        { "tabs-trigger", (TabsTriggerTemplate.Metadata, TabsTriggerTemplate.Contents) },
+        { "tabs-content", (TabsContentTemplate.Metadata, TabsContentTemplate.Contents) },
+        { "breadcrumb", (BreadcrumbTemplate.Metadata, BreadcrumbTemplate.Contents) },
+        { "breadcrumb-item", (BreadcrumbItemTemplate.Metadata, BreadcrumbItemTemplate.Contents) },
+        { "skeleton", (SkeletonTemplate.Metadata, SkeletonTemplate.Contents) },
+        { "scroll-area", (ScrollAreaTemplate.Metadata, ScrollAreaTemplate.Contents) },
+
+        // Feedback & overlays / data display - P4-P5
+        { "alert-dialog", (AlertDialogTemplate.Metadata, AlertDialogTemplate.Contents) },
+        { "toast", (ToastTemplate.Metadata, ToastTemplate.Contents) },
+        { "spinner", (SpinnerTemplate.Metadata, SpinnerTemplate.Contents) },
+        { "avatar", (AvatarTemplate.Metadata, AvatarTemplate.Contents) },
+        { "tooltip", (TooltipTemplate.Metadata, TooltipTemplate.Contents) },
+        { "hover-card", (HoverCardTemplate.Metadata, HoverCardTemplate.Contents) },
+        { "hover-card-trigger", (HoverCardTriggerTemplate.Metadata, HoverCardTriggerTemplate.Contents) },
+        { "hover-card-content", (HoverCardContentTemplate.Metadata, HoverCardContentTemplate.Contents) },
+        { "calendar", (CalendarTemplate.Metadata, CalendarTemplate.Contents) },
+        { "toggle", (ToggleTemplate.Metadata, ToggleTemplate.Contents) },
+        { "input-otp", (InputOtpTemplate.Metadata, InputOtpTemplate.Contents) },
+        { "pagination", (PaginationTemplate.Metadata, PaginationTemplate.Contents) },
+        { "empty-state", (EmptyStateTemplate.Metadata, EmptyStateTemplate.Contents) },
+        { "callout", (CalloutTemplate.Metadata, CalloutTemplate.Contents) },
+        { "combobox", (ComboboxTemplate.Metadata, ComboboxTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

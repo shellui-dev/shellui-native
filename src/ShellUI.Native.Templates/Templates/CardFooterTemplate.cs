@@ -21,90 +21,25 @@ public static class CardFooterTemplate
     {
         [NativePlatform.MAUI] = @"namespace YourProjectNamespace.Components.UI;
 
-// Card footer section for actions
+// Card footer — flex items-center p-6 pt-0; actions right-aligned.
+[ContentProperty(nameof(FooterContent))]
 public partial class CardFooter : ContentView
 {
-    public static readonly BindableProperty OrientationProperty =
-        BindableProperty.Create(nameof(Orientation), typeof(StackOrientation), typeof(CardFooter), 
-            StackOrientation.Horizontal, propertyChanged: OnOrientationChanged);
+    private readonly HorizontalStackLayout _content;
 
-    public static readonly BindableProperty JustifyProperty =
-        BindableProperty.Create(nameof(Justify), typeof(FooterJustify), typeof(CardFooter), 
-            FooterJustify.End, propertyChanged: OnJustifyChanged);
-
-    private readonly FlexLayout _flexLayout;
-
-    public StackOrientation Orientation
-    {
-        get => (StackOrientation)GetValue(OrientationProperty);
-        set => SetValue(OrientationProperty, value);
-    }
-
-    public FooterJustify Justify
-    {
-        get => (FooterJustify)GetValue(JustifyProperty);
-        set => SetValue(JustifyProperty, value);
-    }
+    public IList<IView> FooterContent => _content.Children;
 
     public CardFooter()
     {
-        _flexLayout = new FlexLayout
+        _content = new HorizontalStackLayout
         {
-            Direction = FlexDirection.Row,
-            JustifyContent = FlexJustify.End,
-            AlignItems = FlexAlignItems.Center,
-            Padding = new Thickness(16, 8, 16, 16)
+            Spacing = 8,
+            HorizontalOptions = LayoutOptions.End
         };
-
-        // Add separator line at top
-        var separator = new BoxView
-        {
-            HeightRequest = 1,
-            BackgroundColor = Color.FromArgb(""#E5E7EB""),
-            HorizontalOptions = LayoutOptions.Fill
-        };
-
-        var stack = new VerticalStackLayout
-        {
-            Spacing = 0,
-            Children = { separator, _flexLayout }
-        };
-
-        Content = stack;
-    }
-
-    /*
-     * Allow children to be added to the flex layout
-     */
-    public new IList<IView> Children => _flexLayout.Children;
-
-    private static void OnOrientationChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is CardFooter footer)
-        {
-            footer._flexLayout.Direction = (StackOrientation)newValue == StackOrientation.Horizontal 
-                ? FlexDirection.Row 
-                : FlexDirection.Column;
-        }
-    }
-
-    private static void OnJustifyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is CardFooter footer)
-        {
-            footer._flexLayout.JustifyContent = (FooterJustify)newValue switch
-            {
-                FooterJustify.Start => FlexJustify.Start,
-                FooterJustify.Center => FlexJustify.Center,
-                FooterJustify.End => FlexJustify.End,
-                FooterJustify.SpaceBetween => FlexJustify.SpaceBetween,
-                _ => FlexJustify.End
-            };
-        }
+        Padding = new Thickness(24, 0, 24, 24);
+        Content = _content;
     }
 }
-
-public enum FooterJustify { Start, Center, End, SpaceBetween }
 "
     };
 }

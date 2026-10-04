@@ -12,7 +12,7 @@ public static class BadgeTemplate
         Description = "Small status indicator with variant colors",
         Category = ComponentCategory.DataDisplay,
         FilePath = "Badge.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         Variants = new List<string> { "default", "secondary", "destructive", "outline", "success", "warning" },
         Tags = new List<string> { "status", "indicator", "badge", "tag", "chip" }
     };
@@ -20,17 +20,18 @@ public static class BadgeTemplate
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
     {
         [NativePlatform.MAUI] = @"using Microsoft.Maui.Controls.Shapes;
+
 namespace YourProjectNamespace.Components.UI;
 
-// Badge status indicator component
+// Status pill — rounded-full border px-2.5 py-0.5 text-xs font-semibold.
 public partial class Badge : ContentView
 {
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(Badge), 
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(Badge),
             string.Empty, propertyChanged: OnTextChanged);
 
     public static readonly BindableProperty VariantProperty =
-        BindableProperty.Create(nameof(Variant), typeof(BadgeVariant), typeof(Badge), 
+        BindableProperty.Create(nameof(Variant), typeof(BadgeVariant), typeof(Badge),
             BadgeVariant.Default, propertyChanged: OnVisualPropertyChanged);
 
     private readonly Border _border;
@@ -54,8 +55,8 @@ public partial class Badge : ContentView
         {
             FontSize = 12,
             FontAttributes = FontAttributes.Bold,
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center
+            VerticalTextAlignment = TextAlignment.Center,
+            HorizontalTextAlignment = TextAlignment.Center
         };
 
         _border = new Border
@@ -63,10 +64,12 @@ public partial class Badge : ContentView
             Content = _label,
             Padding = new Thickness(10, 2),
             StrokeThickness = 1,
-            HeightRequest = 22
+            StrokeShape = new RoundRectangle { CornerRadius = 999 }
         };
 
         Content = _border;
+        HorizontalOptions = LayoutOptions.Start;
+        VerticalOptions = LayoutOptions.Center;
         UpdateVisualState();
     }
 
@@ -77,61 +80,35 @@ public partial class Badge : ContentView
     }
 
     private static void OnVisualPropertyChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is Badge badge)
-            badge.UpdateVisualState();
-    }
+        => (bindable as Badge)?.UpdateVisualState();
 
     private void UpdateVisualState()
     {
-        // Define color schemes for each variant
+        // (background, foreground, border); null background = transparent.
         var (bg, fg, border) = Variant switch
         {
-            BadgeVariant.Default => (
-                Color.FromArgb(""#1F2937""),
-                Color.FromArgb(""#FFFFFF""),
-                Color.FromArgb(""#1F2937"")
-            ),
-            BadgeVariant.Secondary => (
-                Color.FromArgb(""#F3F4F6""),
-                Color.FromArgb(""#374151""),
-                Color.FromArgb(""#F3F4F6"")
-            ),
-            BadgeVariant.Destructive => (
-                Color.FromArgb(""#EF4444""),
-                Color.FromArgb(""#FFFFFF""),
-                Color.FromArgb(""#EF4444"")
-            ),
-            BadgeVariant.Outline => (
-                Colors.Transparent,
-                Color.FromArgb(""#374151""),
-                Color.FromArgb(""#E5E7EB"")
-            ),
-            BadgeVariant.Success => (
-                Color.FromArgb(""#22C55E""),
-                Color.FromArgb(""#FFFFFF""),
-                Color.FromArgb(""#22C55E"")
-            ),
-            BadgeVariant.Warning => (
-                Color.FromArgb(""#F59E0B""),
-                Color.FromArgb(""#FFFFFF""),
-                Color.FromArgb(""#F59E0B"")
-            ),
-            _ => (
-                Color.FromArgb(""#1F2937""),
-                Color.FromArgb(""#FFFFFF""),
-                Color.FromArgb(""#1F2937"")
-            )
+            BadgeVariant.Secondary => ((ShellToken?)ShellToken.Secondary, ShellToken.SecondaryForeground, ShellToken.Secondary),
+            BadgeVariant.Destructive => (ShellToken.Destructive, ShellToken.DestructiveForeground, ShellToken.Destructive),
+            BadgeVariant.Outline => (null, ShellToken.Foreground, ShellToken.Border),
+            BadgeVariant.Success => (ShellToken.Success, ShellToken.SuccessForeground, ShellToken.Success),
+            BadgeVariant.Warning => (ShellToken.Warning, ShellToken.WarningForeground, ShellToken.Warning),
+            BadgeVariant.Info => (ShellToken.Info, ShellToken.InfoForeground, ShellToken.Info),
+            _ => (ShellToken.Primary, ShellToken.PrimaryForeground, ShellToken.Primary)
         };
 
-        _border.BackgroundColor = bg;
-        _border.Stroke = border;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = 9999 }; // Full rounded
-        _label.TextColor = fg;
+        if (bg.HasValue)
+            _border.Token(VisualElement.BackgroundColorProperty, bg.Value);
+        else
+        {
+            _border.ClearValue(VisualElement.BackgroundColorProperty);
+            _border.BackgroundColor = Colors.Transparent;
+        }
+        _border.Token(Border.StrokeProperty, border);
+        _label.Token(Label.TextColorProperty, fg);
     }
 }
 
-public enum BadgeVariant { Default, Secondary, Destructive, Outline, Success, Warning }
+public enum BadgeVariant { Default, Secondary, Destructive, Outline, Success, Warning, Info }
 "
     };
 }
