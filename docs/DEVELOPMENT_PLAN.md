@@ -353,7 +353,7 @@ hour-minute wheels. Native pickers drop out entirely. Matches shadcn `Select` /
 - [x] Dialog / Drawer / Sheet / AlertDialog show their content in the portal layer — declare them anywhere
 - [x] Custom `Select` — trigger + floating list (landed early, 2026-09-27, with the theme-token pass)
 - [x] Custom `DatePicker` — trigger + floating `calendar` component (month navigation + day grid)
-- [ ] Custom `TimePicker` — trigger button + `Popover` with hour/minute wheels
+- [x] Custom `TimePicker` — trigger + floating hour / minute / AM-PM columns (2026-10-04); native picker dropped
 - [x] `MAUI.Demo` no longer needs the page-root `Grid` workaround — its root is a plain `ScrollView` and overlays sit next to their triggers
 - [x] Click-outside closes Dropdown / Popover / Select / DatePicker
 - [x] `tooltip` and `hover-card` (unblocked by the portal)
@@ -363,7 +363,8 @@ hour-minute wheels. Native pickers drop out entirely. Matches shadcn `Select` /
   resets the scroll position); overlays edge-to-edge with their content kept inside the safe
   area; Hover Card opens on tap; opt-in `ShellTheme.SyncSystemBars`
 - [x] `toggle`, `input-otp`, `pagination`, `empty-state`
-- [ ] Escape closes the open overlay (Windows / Mac Catalyst)
+- [x] Escape (Windows) and the Android back button close the overlay on top — `ShellDismiss` (2026-10-04; Mac Catalyst still open)
+- [x] `callout`, `combobox`
 
 Already in place from the 2026-09-27 pass: theme tokens (`ShellTheme`), overlay open/close
 animations, closed overlays no longer block input, triggers that wrap a Button

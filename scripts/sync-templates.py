@@ -45,6 +45,10 @@ NEW = {
                  ["otp", "code", "verification", "input"]),
     "Pagination": ("pagination", "Pagination", "Page navigation with previous/next and ellipsis", "Navigation",
                    ["pagination", "pages", "navigation"]),
+    "Callout": ("callout", "Callout", "Highlighted note tinted by variant (info, warning, danger, tip)", "Feedback",
+                ["callout", "note", "admonition", "info"]),
+    "Combobox": ("combobox", "Combobox", "Searchable select with a filter field", "Form",
+                 ["combobox", "select", "search", "autocomplete"]),
     "EmptyState": ("empty-state", "Empty State", "Placeholder for an empty list or screen", "DataDisplay",
                    ["empty", "placeholder", "state"]),
 }

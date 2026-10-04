@@ -275,6 +275,32 @@ shellui-native add select
 
 ---
 
+### Combobox
+A Select with a search field: the floating panel has a filter input above the option list, a check
+on the selected option and a "no results" message. On desktop the search field takes focus when
+the panel opens, and Enter picks the first match.
+
+```bash
+shellui-native add combobox
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| ItemsSource | IList&lt;string&gt; | null | Options |
+| Value | string | "" | Selected option (two-way) |
+| Placeholder | string | "Select..." | Shown when nothing is selected |
+| SearchPlaceholder | string | "Search..." | Placeholder of the filter field |
+| EmptyText | string | "No results found." | Shown when nothing matches |
+
+```xml
+<ui:Combobox Placeholder="Select framework..." ItemsSource="{Binding Frameworks}"
+             Value="{Binding Framework}" WidthRequest="280" HorizontalOptions="Start" />
+```
+
+**Events:** `ValueChanged`
+
+---
+
 ### Slider
 Platform slider tinted with the theme (primary range and thumb, secondary track).
 
@@ -315,13 +341,20 @@ shellui-native add date-picker   # also installs calendar
 ```
 
 ### TimePicker
-40px themed field around the platform time picker (its own frame and dividers are removed).
+Custom-drawn: a 40px trigger (clock icon + formatted time) that opens scrollable hour and minute
+columns — plus AM/PM on a 12-hour clock — floating over the page. Picking a value updates `Time`
+straight away; click outside or press Escape to close. Looks the same on every platform.
 
 ```bash
 shellui-native add time-picker
 ```
 
-**Properties:** `Time` (two-way) · **Events:** `TimeChanged`
+**Properties:** `Time` (two-way), `MinuteStep` (default 5), `Is24Hour` (defaults to the current
+culture's clock), `Format` (.NET time format; default `HH:mm` or `h:mm tt`) · **Events:** `TimeChanged`
+
+```xml
+<ui:TimePicker Time="{Binding StartsAt}" MinuteStep="15" />
+```
 
 ---
 
@@ -583,6 +616,23 @@ Toast.Dismiss(id);
 
 **Toaster:** `Position` (BottomRight, BottomCenter, TopRight, TopCenter), `MaxVisible` (default 3)
 
+### Callout
+Highlighted note on a faint tint of the variant color, with an icon, an optional title, text
+and/or any child content. **Variants:** Info, Warning, Danger, Tip, Default
+
+```bash
+shellui-native add callout
+```
+
+**Properties:** `Variant`, `Title`, `Text`, `Icon` (overrides the variant's icon) · child view becomes the body
+
+```xml
+<ui:Callout Variant="Tip" Title="Tip" Text="Press Escape to close the overlay on top." />
+<ui:Callout Variant="Warning" Title="Heads up">
+    <Label Text="Any content can go here." />
+</ui:Callout>
+```
+
 ### Alert
 Bordered callout with an icon. **Properties:** `Title`, `Message`, `Variant` (Default, Destructive, Success, Warning, Info)
 
@@ -725,6 +775,12 @@ closes it.
 </ui:HoverCard>
 ```
 
+### Closing overlays from the keyboard
+Open dialogs, drawers, sheets and popups (select, combobox, dropdown, popover, date and time
+pickers) are tracked newest-last in `ShellDismiss`. **Escape** on Windows and the **back button**
+on Android close the one on top; an Alert Dialog treats that as Cancel. With nothing open the key
+keeps its normal behavior. Call `ShellDismiss.DismissTop()` to do the same from your own code.
+
 ### How overlays float
 `ShellPortal` (in `Shell.cs`) keeps one layer above each page's content — set up as the page
 appears, as the last child of the page's root `Grid`; a page whose root isn't a Grid gets wrapped
@@ -764,7 +820,7 @@ core helpers); components that draw icons also depend on `icon`.
 |-----------|---------------|
 | button | shell, icon, button-variants |
 | card | shell, card-header, card-content, card-footer |
-| select, checkbox, alert, breadcrumb-item, theme-toggle, avatar, spinner, toggle, pagination, empty-state | shell, icon |
+| select, combobox, time-picker, checkbox, alert, callout, breadcrumb-item, theme-toggle, avatar, spinner, toggle, pagination, empty-state | shell, icon |
 | input-otp | shell |
 | alert-dialog | shell, element-extensions, button |
 | toast | shell, icon, button |

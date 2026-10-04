@@ -88,6 +88,9 @@ public partial class AlertDialog : ShellOverlayHost
 
     protected override bool IsTrigger(Element child) => child is AlertDialogTrigger;
 
+    // Escape / back counts as Cancel.
+    protected override void Dismiss() => Resolve(false);
+
     // Opens the dialog and completes with true (confirm) or false (cancel).
     public Task<bool> ShowAsync()
     {

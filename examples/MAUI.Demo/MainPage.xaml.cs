@@ -10,6 +10,10 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany", "Japan" };
+        FrameworkCombobox.ItemsSource = new List<string>
+        {
+            ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native", "SwiftUI", "Jetpack Compose"
+        };
 
         foreach (var tag in Enumerable.Range(1, 30).Reverse().Select(i => $"v1.2.0-beta.{i}"))
         {
@@ -71,6 +75,12 @@ public partial class MainPage : ContentPage
 
     private void OnDateChanged(object? sender, DateChangedEventArgs e) => Report($"Date: {e.NewDate:d}");
     private void OnCalendarSelected(object? sender, DateTime date) => Report($"Calendar: {date:d}");
+    private void OnTimeChanged(object? sender, EventArgs e)
+    {
+        if (sender is Components.UI.TimePicker picker)
+            Report($"Time: {picker.Time.Hours:00}:{picker.Time.Minutes:00}");
+    }
+    private void OnComboboxChanged(object? sender, string value) => Report($"Combobox: {value}");
 
     private void OnTogglePressed(object? sender, bool pressed) => Report($"Toggle: {(pressed ? "on" : "off")}");
     private void OnOtpCompleted(object? sender, string code) => Report($"OTP complete: {code}");

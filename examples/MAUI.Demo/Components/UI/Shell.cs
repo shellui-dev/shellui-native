@@ -602,6 +602,7 @@ public static class ShellPortal
             surface.GestureRecognizers.Add(tap);
             catcher = surface;
             layer.Children.Add(surface);
+            if (options.OnDismiss != null) ShellDismiss.Push(handle, options.OnDismiss);
         }
 
         Detach(panel);
@@ -694,12 +695,96 @@ public sealed class ShellPopupHandle
     {
         if (_closed) return;
         _closed = true;
+        ShellDismiss.Remove(this);
         if (_catcher() is { } catcher) ShellPortal.Detach(catcher);
         _panel.AbortAnimation("FadeTo");
         _panel.AbortAnimation("ScaleTo");
         await Task.WhenAll(_panel.FadeToAsync(0, 90, Easing.CubicIn), _panel.ScaleToAsync(0.95, 90, Easing.CubicIn));
         ShellPortal.Detach(_panel);
     }
+}
+
+// Open overlays and popups, newest last. Escape (Windows) and the Android back button close the
+// top one; with nothing open the key keeps its normal behavior.
+public static class ShellDismiss
+{
+    private static readonly List<(object Key, Action Close)> _open = new();
+
+    public static void Push(object key, Action close)
+    {
+        _open.RemoveAll(entry => ReferenceEquals(entry.Key, key));
+        _open.Add((key, close));
+        Hook();
+    }
+
+    public static void Remove(object key)
+    {
+        _open.RemoveAll(entry => ReferenceEquals(entry.Key, key));
+        Sync();
+    }
+
+    // Closes the most recently opened overlay. False when nothing is open.
+    public static bool DismissTop()
+    {
+        if (_open.Count == 0) return false;
+        var top = _open[^1];
+        _open.RemoveAt(_open.Count - 1);
+        Sync();
+        top.Close();
+        return true;
+    }
+
+#if WINDOWS
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Microsoft.UI.Xaml.UIElement, object> _hooked = new();
+
+    private static void Hook()
+    {
+        if (Application.Current is not { } app) return;
+        foreach (var window in app.Windows)
+        {
+            if (window.Handler?.PlatformView is not Microsoft.UI.Xaml.Window { Content: { } root }) continue;
+            if (_hooked.TryGetValue(root, out _)) continue;
+            _hooked.Add(root, new object());
+            root.PreviewKeyDown += (_, e) =>
+            {
+                if (e.Key == Windows.System.VirtualKey.Escape && DismissTop()) e.Handled = true;
+            };
+        }
+    }
+
+    private static void Sync() { }
+#elif ANDROID
+    // Enabled only while something is open, so back still navigates otherwise.
+    private sealed class BackCallback : AndroidX.Activity.OnBackPressedCallback
+    {
+        public BackCallback() : base(false) { }
+        public override void HandleOnBackPressed() => DismissTop();
+    }
+
+    private static BackCallback? _back;
+    private static WeakReference<Android.App.Activity>? _backActivity;
+
+    private static void Hook()
+    {
+        if (Platform.CurrentActivity is AndroidX.Activity.ComponentActivity activity &&
+            (_back is null || _backActivity is null || !_backActivity.TryGetTarget(out var hooked) || hooked != activity))
+        {
+            _back?.Remove();
+            _back = new BackCallback();
+            _backActivity = new WeakReference<Android.App.Activity>(activity);
+            activity.OnBackPressedDispatcher.AddCallback(_back);
+        }
+        Sync();
+    }
+
+    private static void Sync()
+    {
+        if (_back != null) _back.Enabled = _open.Count > 0;
+    }
+#else
+    private static void Hook() { }
+    private static void Sync() { }
+#endif
 }
 
 // Floating panels with a click-outside catcher (Dropdown, Popover, Select). Only one is open at
@@ -861,9 +946,14 @@ public abstract class ShellOverlayHost : Grid
 
     public void SetOpen(bool value) => Open = value;
 
+    // What Escape / the Android back button does while this overlay is on top.
+    protected virtual void Dismiss() => Open = false;
+
     private async void OnOpenChanged()
     {
         var version = ++_version;
+        if (Open) ShellDismiss.Push(this, Dismiss);
+        else ShellDismiss.Remove(this);
         OpenChanged?.Invoke(this, Open);
         if (_content is null) return;
         var animated = _content as IShellOverlayContent;

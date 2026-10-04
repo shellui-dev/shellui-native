@@ -18,7 +18,7 @@ Every single-line form control renders at **40px** high (matches shadcn `h-10` /
 | `Input` | 40 | `(12, 0)` | Native `Entry` frame stripped (`ShellPlatform.StripNativeChrome`) — one border only |
 | `Select` | 40 | `(12, 0)` | Custom-drawn trigger + floating list (rows 32) since 2026-09-27 |
 | `DatePicker` | 40 | `(12, 0)` | Custom-drawn trigger + floating `Calendar` (32px day cells) since 2026-10-02 |
-| `TimePicker` | 40 | `(4, 0)` | Themed border around the native picker, native frame/dividers stripped |
+| `TimePicker` | 40 | `(12, 0)` | Custom-drawn trigger + floating hour / minute / AM-PM columns (32px cells) since 2026-10-04 |
 | `Textarea` | `MinimumHeightRequest=80` | `(12, 8)` | Multi-line — grows with content |
 | `TabsList` | 40 | `(4)` | Triggers fill the remaining 32 |
 | `Checkbox` / `RadioGroupItem` | 16×16 | — | Icon-shaped, not a field (shadcn h-4 w-4) |
@@ -181,7 +181,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | **avatar** ✅ | P5.1 | shell, icon | Avatar | Done 2026-09-27 |
 | **table** | P5.2 | table-header, table-body, table-row, table-cell, table-head | Table | Data table |
 | **empty-state** ✅ | P5.3 | shell, icon | EmptyState | Done 2026-10-04 — icon tile, title, description, action row, optional dashed border |
-| **callout** | P5.4 | — | Callout | Info/warning callout block |
+| **callout** ✅ | P5.4 | shell, icon | Callout | Done 2026-10-04 — Info / Warning / Danger / Tip / Default, tinted background |
 | **pagination** ✅ | P5.5 | shell, icon | Pagination | Done 2026-10-04 — previous/next, sibling window, ellipses |
 | **toggle** ✅ | — | shell, icon | Toggle | Done 2026-10-04 — pressed-state button (Default / Outline) |
 
@@ -203,7 +203,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | Component | Priority | Notes |
 |-----------|----------|-------|
 | chart (line, bar, pie, area) | P7 | Consider external chart lib integration |
-| combobox | P7 | Searchable select |
+| combobox ✅ | P7 | Done 2026-10-04 — Select with a filter field, Enter picks the first match |
 | file-upload | P7 | File picker |
 | input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
 | date-range-picker | P7 | Date range selection |

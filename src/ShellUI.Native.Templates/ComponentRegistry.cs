@@ -103,7 +103,9 @@ public static class ComponentRegistry
         { "toggle", (ToggleTemplate.Metadata, ToggleTemplate.Contents) },
         { "input-otp", (InputOtpTemplate.Metadata, InputOtpTemplate.Contents) },
         { "pagination", (PaginationTemplate.Metadata, PaginationTemplate.Contents) },
-        { "empty-state", (EmptyStateTemplate.Metadata, EmptyStateTemplate.Contents) }
+        { "empty-state", (EmptyStateTemplate.Metadata, EmptyStateTemplate.Contents) },
+        { "callout", (CalloutTemplate.Metadata, CalloutTemplate.Contents) },
+        { "combobox", (ComboboxTemplate.Metadata, ComboboxTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

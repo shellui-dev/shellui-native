@@ -132,6 +132,11 @@
                 <ui:Select x:Name="CountrySelect" Placeholder="Select a country" WidthRequest="280"
                            HorizontalOptions="Start" SelectedIndexChanged="OnSelectChanged" />
 
+                <!-- Combobox -->
+                <Label Text="Combobox" Style="{StaticResource SectionTitle}" />
+                <ui:Combobox x:Name="FrameworkCombobox" Placeholder="Select framework..." SearchPlaceholder="Search framework..."
+                             WidthRequest="280" HorizontalOptions="Start" ValueChanged="OnComboboxChanged" />
+
                 <!-- Checkbox / Switch / Radio -->
                 <Label Text="Checkbox, Switch, Radio Group" Style="{StaticResource SectionTitle}" />
                 <ui:Checkbox x:Name="CheckDemo" Label="Accept terms and conditions" IsChecked="True" CheckedChanged="OnCheckChanged" />
@@ -152,7 +157,8 @@
                 <Label Text="Date &amp; Time" Style="{StaticResource SectionTitle}" />
                 <FlexLayout>
                     <ui:DatePicker x:Name="DatePickerDemo" Margin="0,0,8,8" DateChanged="OnDateChanged" />
-                    <ui:TimePicker x:Name="TimePickerDemo" Margin="0,0,8,8" />
+                    <ui:TimePicker x:Name="TimePickerDemo" Time="9:30" Is24Hour="False" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
+                    <ui:TimePicker Time="18:45" Is24Hour="True" MinuteStep="15" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
                 </FlexLayout>
 
                 <Label Text="Calendar" Style="{StaticResource SectionTitle}" />
@@ -184,6 +190,20 @@
                 <ui:Alert Title="Error" Message="Your session has expired. Please log in again." Variant="Destructive" />
                 <ui:Alert Title="Saved" Message="Your changes were saved." Variant="Success" />
                 <ui:Alert Title="Storage almost full" Message="You have used 92% of your quota." Variant="Warning" />
+
+                <!-- Callout -->
+                <Label Text="Callout" Style="{StaticResource SectionTitle}" />
+                <ui:Callout Title="Note" Text="Components are copied into your project, so you own the code and can change anything." />
+                <ui:Callout Variant="Tip" Title="Tip" Text="Press Escape (or Back on Android) to close the overlay on top." />
+                <ui:Callout Variant="Warning" Title="Warning" Text="Re-running add with --force overwrites your local edits." />
+                <ui:Callout Variant="Danger" Title="Danger">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Deleting a workspace removes every project in it." FontSize="14"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                        <ui:Button Text="Review projects" Variant="Outline" Size="Sm" HorizontalOptions="Start" Clicked="OnButtonClicked" />
+                    </VerticalStackLayout>
+                </ui:Callout>
+                <ui:Callout Variant="Default" Text="A neutral callout without a title." />
 
                 <!-- Toast -->
                 <Label Text="Toast" Style="{StaticResource SectionTitle}" />

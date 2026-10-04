@@ -41,7 +41,7 @@ ICONS = [
     "map-pin", "image", "file", "file-text", "folder", "tag", "bookmark", "heart", "star",
     "thumbs-up", "shopping-cart", "credit-card", "dollar-sign", "activity", "trending-up",
     "chart-column", "zap", "sparkles", "command", "terminal", "code", "moon", "sun", "monitor",
-    "smartphone", "laptop", "wifi", "camera", "mic", "play", "pause", "volume-2",
+    "smartphone", "laptop", "wifi", "camera", "mic", "play", "pause", "volume-2", "lightbulb",
 ]
 
 NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
