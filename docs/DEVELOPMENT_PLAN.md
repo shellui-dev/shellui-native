@@ -349,13 +349,21 @@ hour-minute wheels. Native pickers drop out entirely. Matches shadcn `Select` /
 
 ### Deliverables
 
-- [ ] Portal helper (`OverlayPortal.AttachTo(Page, View)`) in `element-extensions`
-- [ ] Dialog / Drawer / Sheet templates rewritten as `ContentView` with portal attach
+- [x] Portal helper — landed 2026-10-02 as `ShellPortal` in `Shell.cs` (page layer, logical owner, anchored popups with flip + click-outside)
+- [x] Dialog / Drawer / Sheet / AlertDialog show their content in the portal layer — declare them anywhere
 - [x] Custom `Select` — trigger + floating list (landed early, 2026-09-27, with the theme-token pass)
-- [ ] Custom `DatePicker` — trigger button + `Popover` with month/year navigation + day grid
+- [x] Custom `DatePicker` — trigger + floating `calendar` component (month navigation + day grid)
 - [ ] Custom `TimePicker` — trigger button + `Popover` with hour/minute wheels
-- [ ] `MAUI.Demo` no longer needs the page-root `Grid` workaround — overlays drop in anywhere
-- [ ] Click-outside closes Dropdown / Popover / Select (needs the portal's page-level layer)
+- [x] `MAUI.Demo` no longer needs the page-root `Grid` workaround — its root is a plain `ScrollView` and overlays sit next to their triggers
+- [x] Click-outside closes Dropdown / Popover / Select / DatePicker
+- [x] `tooltip` and `hover-card` (unblocked by the portal)
+- [x] Android pass (2026-10-04, Pixel 7 / API 34 emulator): native underline and padding stripped
+  from text fields; Select list sized and placed from real layout; `BoxView`s no longer pick up
+  the stock dark background; page layer set up as the page appears (first overlay no longer
+  resets the scroll position); overlays edge-to-edge with their content kept inside the safe
+  area; Hover Card opens on tap; opt-in `ShellTheme.SyncSystemBars`
+- [x] `toggle`, `input-otp`, `pagination`, `empty-state`
+- [ ] Escape closes the open overlay (Windows / Mac Catalyst)
 
 Already in place from the 2026-09-27 pass: theme tokens (`ShellTheme`), overlay open/close
 animations, closed overlays no longer block input, triggers that wrap a Button

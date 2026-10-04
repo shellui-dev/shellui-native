@@ -56,6 +56,13 @@ ShellTheme.Apply();
 In code, bind any Color/Brush property to a token with the `Token` extension:
 `myBorder.Token(Border.StrokeProperty, ShellToken.Border);`
 
+**Android system bars (opt-in).** Set `ShellTheme.SyncSystemBars = true` before
+`EnsureInitialized()` to make the status and navigation bars follow the theme: the bars turn
+transparent over the edge-to-edge page, the page layer draws a `Background`-colored strip behind
+the status bar (so dialog backdrops and sheets cover it), and the bar icons flip with light/dark.
+Also set `colorPrimary` / `colorPrimaryDark` in `Platforms/Android/Resources/values/colors.xml` to
+your background so the splash-to-app transition doesn't flash the template's purple.
+
 ---
 
 ## Icon
@@ -117,6 +124,23 @@ shellui-native add button
 
 ---
 
+### Toggle
+Two-state button that stays pressed — transparent (or outlined) when off, `Accent` when on.
+
+```bash
+shellui-native add toggle
+```
+
+**Properties:** `IsPressed` (two-way), `Text`, `Icon`, `Variant` (Default, Outline),
+`Size` (Sm 36, Default 40, Lg 44) · **Events:** `PressedChanged`
+
+```xml
+<ui:Toggle Icon="Bookmark" Variant="Outline" IsPressed="{Binding Saved}" />
+<ui:Toggle Text="Notify me" Icon="Bell" Size="Sm" PressedChanged="OnToggled" />
+```
+
+---
+
 ### Input
 Single-line text field — 40px, one themed border (the platform control's own frame is removed),
 ring color + soft glow on focus, destructive border on error.
@@ -142,6 +166,23 @@ shellui-native add input
 ```
 
 **Events:** `TextChanged`, `Completed`
+
+---
+
+### Input OTP
+One-time-code input: a row of 40px slots over one hidden text field, so paste, autofill and the
+platform keyboard all work. The active slot shows the ring color and a blinking caret.
+
+```bash
+shellui-native add input-otp
+```
+
+**Properties:** `Length` (6), `Value` (two-way), `IsNumeric` (true — digits and numeric keyboard),
+`HasError` · **Events:** `ValueChanged`, `Completed` (every slot filled)
+
+```xml
+<ui:InputOtp Length="6" Value="{Binding Code}" Completed="OnCodeEntered" />
+```
 
 ---
 
@@ -245,17 +286,42 @@ shellui-native add slider
 
 ---
 
-### DatePicker / TimePicker
-40px themed field around the platform picker (its own frame and dividers are removed). A custom
-calendar popover is planned.
+### Calendar
+Month grid with previous/next navigation. The selected day is primary, today is accented, and
+month names, weekday names and the first day of the week follow the current culture.
 
 ```bash
-shellui-native add date-picker
+shellui-native add calendar
+```
+
+**Properties:** `SelectedDate` (DateTime?, two-way), `DisplayMonth`, `MinimumDate`, `MaximumDate` · **Events:** `DateSelected`
+
+```xml
+<ui:Calendar SelectedDate="{Binding Day}" DateSelected="OnDay" />
+```
+
+### DatePicker
+Custom-drawn: a 40px trigger (calendar icon + formatted date) that opens a `Calendar` floating
+over the page. Looks the same on every platform.
+
+```bash
+shellui-native add date-picker   # also installs calendar
+```
+
+**Properties:** `Date` (two-way), `MinimumDate`, `MaximumDate`, `Format` (.NET date format, default `MMMM d, yyyy`) · **Events:** `DateChanged`
+
+```xml
+<ui:DatePicker Date="{Binding DueDate}" Format="MMM d, yyyy" />
+```
+
+### TimePicker
+40px themed field around the platform time picker (its own frame and dividers are removed).
+
+```bash
 shellui-native add time-picker
 ```
 
-**DatePicker:** `Date` (two-way), `MinimumDate`, `MaximumDate` · **Events:** `DateChanged`
-**TimePicker:** `Time` (two-way) · **Events:** `TimeChanged`
+**Properties:** `Time` (two-way) · **Events:** `TimeChanged`
 
 ---
 
@@ -418,6 +484,23 @@ Trail with chevron separators; links turn foreground on hover.
 
 ---
 
+### Pagination
+Previous / page numbers / Next, with ellipses for skipped ranges. The current page is outlined;
+Previous and Next disable at the ends.
+
+```bash
+shellui-native add pagination
+```
+
+**Properties:** `Page` (two-way, 1-based), `TotalPages`, `SiblingCount` (pages shown each side of
+the current one, default 1), `ShowLabels` (text next to the chevrons) · **Events:** `PageChanged`
+
+```xml
+<ui:Pagination Page="{Binding Page}" TotalPages="20" PageChanged="OnPageChanged" />
+```
+
+---
+
 ## Data Display & Feedback
 
 ### Badge
@@ -434,6 +517,23 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 ### Skeleton
 Pulsing placeholder in the `Muted` token (opacity 1 → 0.5 → 1 every 2s, only while on screen).
 **Properties:** `CornerRadius` (default 6) plus `WidthRequest` / `HeightRequest`
+
+### Empty State
+Placeholder for an empty list or screen: icon in a muted tile, title, description and optional
+actions, centered. `Bordered="True"` adds a dashed outline.
+
+```bash
+shellui-native add empty-state
+```
+
+**Properties:** `Icon`, `Title`, `Description`, `Bordered` · child views become the action row
+
+```xml
+<ui:EmptyState Icon="Folder" Title="No projects yet" Bordered="True"
+               Description="Create your first project to get started.">
+    <ui:Button Text="Create project" Icon="Plus" />
+</ui:EmptyState>
+```
 
 ### Avatar
 Circular image over a muted fallback — initials, or a user icon when `Fallback` is empty. The
@@ -460,8 +560,8 @@ Rotating loader icon; spins only while on screen. **Properties:** `Size` (Sm 16,
 
 ### Toast
 Sonner-style notifications that stack in a corner, slide in, pause while hovered and dismiss
-themselves (4s default). Put one `Toaster` where it can fill the page (e.g. last child of the
-page's root Grid), then call the static API from anywhere.
+themselves (4s default). Call the static API from anywhere — toasts float above the current page.
+A `<ui:Toaster />` is optional: declare one anywhere on a page only to change position or count.
 
 ```bash
 shellui-native add toast
@@ -500,8 +600,8 @@ Modal overlays with a dimmed backdrop (tap it to close) and open/close animation
 fades and zooms in, the drawer slides up with a grab handle, the sheet slides in from the side.
 Dialog and sheet have a close (X) button.
 
-**Place them where they can fill the page** — e.g. as the last children of the page's root `Grid`.
-While closed they don't block input to the page underneath.
+**Declare them anywhere** — next to the button that opens them is fine. When opened, the content
+is shown in a page-level layer above everything else (see *How overlays float* below).
 
 ```bash
 shellui-native add dialog
@@ -512,32 +612,28 @@ shellui-native add sheet
 **Properties:** `Open` (also `SetOpen(bool)`) · **Events:** `OpenChanged` · Drawer/Sheet: `Side` (Left, Right, Top, Bottom)
 
 ```xml
-<Grid>
-    <ScrollView>
-        <ui:Button Text="Edit profile" Clicked="OnEdit" />  <!-- OnEdit: EditDialog.SetOpen(true) -->
-    </ScrollView>
-
-    <ui:Dialog x:Name="EditDialog">
-        <ui:DialogContent>
-            <ui:DialogHeader>
-                <ui:DialogTitle Text="Edit profile" />
-                <ui:DialogDescription Text="Make changes to your profile here." />
-            </ui:DialogHeader>
-            <ui:Input Text="Pedro Duarte" />
-            <ui:DialogFooter>
-                <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
-                <ui:Button Text="Save changes" Clicked="OnSave" />
-            </ui:DialogFooter>
-        </ui:DialogContent>
-    </ui:Dialog>
-</Grid>
+<ui:Dialog x:Name="EditDialog">
+    <ui:DialogTrigger><ui:Button Text="Edit profile" Variant="Outline" /></ui:DialogTrigger>
+    <ui:DialogContent>
+        <ui:DialogHeader>
+            <ui:DialogTitle Text="Edit profile" />
+            <ui:DialogDescription Text="Make changes to your profile here." />
+        </ui:DialogHeader>
+        <ui:Input Text="Pedro Duarte" />
+        <ui:DialogFooter>
+            <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+            <ui:Button Text="Save changes" Clicked="OnSave" />
+        </ui:DialogFooter>
+    </ui:DialogContent>
+</ui:Dialog>
 ```
 
 `DialogTrigger` / `DrawerTrigger` / `SheetTrigger` and `DialogClose` wrap a Button or any view.
+The trigger is optional: open from code with `EditDialog.SetOpen(true)`.
 
 ### Alert Dialog
 A confirmation that requires a choice: no close button, and the backdrop doesn't dismiss it.
-Same placement as Dialog.
+Declare it anywhere, like Dialog.
 
 ```bash
 shellui-native add alert-dialog
@@ -562,8 +658,8 @@ if (await DeleteDialog.ShowAsync())
 `AlertDialogTrigger` wraps a Button to open it from XAML instead.
 
 ### Dropdown, Popover
-Panels that float below their trigger over the following content. Opening one closes any other
-open dropdown, popover or select.
+Panels that float next to their trigger — below it, or above when there is no room, and always
+inside the window. Clicking outside, or opening another dropdown, popover or select, closes them.
 
 ```bash
 shellui-native add dropdown
@@ -593,8 +689,53 @@ shellui-native add popover
 </ui:Popover>
 ```
 
-Known limit: clicking outside an open dropdown/popover doesn't close it yet (use the trigger, pick
-an item, or open another panel). Page-level portals are planned.
+### Tooltip
+Small label shown above (or below) a view after the pointer rests on it. Pointer devices only.
+
+```bash
+shellui-native add tooltip
+```
+
+**Properties:** `Text`, `Placement` (Top, Bottom), `Delay` (ms, default 400)
+
+```xml
+<ui:Tooltip Text="Add to library">
+    <ui:Button Icon="Plus" Size="Icon" Variant="Outline" />
+</ui:Tooltip>
+```
+
+### Hover Card
+Rich content that floats next to its trigger while the pointer is over the trigger or the card.
+
+```bash
+shellui-native add hover-card
+```
+
+**Properties:** `OpenDelay` (300 ms), `CloseDelay` (200 ms), `IsOpen`
+
+On touch devices (no pointer hover) tapping the trigger toggles the card, and tapping outside
+closes it.
+
+```xml
+<ui:HoverCard>
+    <ui:HoverCardTrigger><ui:Button Text="@shellui" Variant="Link" /></ui:HoverCardTrigger>
+    <ui:HoverCardContent>
+        <Label Text="Beautifully designed components for .NET." />
+    </ui:HoverCardContent>
+</ui:HoverCard>
+```
+
+### How overlays float
+`ShellPortal` (in `Shell.cs`) keeps one layer above each page's content — set up as the page
+appears, as the last child of the page's root `Grid`; a page whose root isn't a Grid gets wrapped
+in one, once. Dialogs, drawers, sheets, menus, selects, tooltips, hover cards and toasts are all
+placed in that layer, so they are never clipped by a `ScrollView` and always draw on top. Content
+moved there keeps a link to its component, so bindings and lookups keep working.
+
+The layer is edge-to-edge: backdrops dim the whole window, drawers and sheets run under the
+system bars, and their content (plus popups and toasts) is kept clear of the bars and notch with
+`ShellPortal.GetSafeInsets`. If you build your own overlay chrome, call
+`ShellPortal.EdgeToEdge(...)` on its layouts so MAUI doesn't inset them a second time.
 
 ---
 
@@ -623,12 +764,16 @@ core helpers); components that draw icons also depend on `icon`.
 |-----------|---------------|
 | button | shell, icon, button-variants |
 | card | shell, card-header, card-content, card-footer |
-| select, checkbox, alert, breadcrumb-item, theme-toggle, avatar, spinner | shell, icon |
+| select, checkbox, alert, breadcrumb-item, theme-toggle, avatar, spinner, toggle, pagination, empty-state | shell, icon |
+| input-otp | shell |
 | alert-dialog | shell, element-extensions, button |
 | toast | shell, icon, button |
 | dialog | shell, dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close |
 | drawer / sheet | shell, *-trigger, *-content (content also installs icon for the close button) |
 | dropdown / popover | shell, *-trigger, *-content (+ dropdown-item) |
+| hover-card | shell, hover-card-trigger, hover-card-content |
+| date-picker | shell, icon, calendar |
+| tooltip | shell |
 | collapsible / accordion / tabs | element-extensions + their sub-components |
 | breadcrumb | breadcrumb-item |
 

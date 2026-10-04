@@ -17,7 +17,8 @@ Every single-line form control renders at **40px** high (matches shadcn `h-10` /
 | `Button` (Default) | 40 (from `ButtonStyle.Height`) | `(16, 0)` | Sm=36 `(12,0)`, Lg=44 `(32,0)`, Icon=40×40. Sizes to content (`HorizontalOptions=Start`) |
 | `Input` | 40 | `(12, 0)` | Native `Entry` frame stripped (`ShellPlatform.StripNativeChrome`) — one border only |
 | `Select` | 40 | `(12, 0)` | Custom-drawn trigger + floating list (rows 32) since 2026-09-27 |
-| `DatePicker` / `TimePicker` | 40 | `(4, 0)` | Themed border around the native picker, native frame/dividers stripped |
+| `DatePicker` | 40 | `(12, 0)` | Custom-drawn trigger + floating `Calendar` (32px day cells) since 2026-10-02 |
+| `TimePicker` | 40 | `(4, 0)` | Themed border around the native picker, native frame/dividers stripped |
 | `Textarea` | `MinimumHeightRequest=80` | `(12, 8)` | Multi-line — grows with content |
 | `TabsList` | 40 | `(4)` | Triggers fill the remaining 32 |
 | `Checkbox` / `RadioGroupItem` | 16×16 | — | Icon-shaped, not a field (shadcn h-4 w-4) |
@@ -166,11 +167,11 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 ### P4 — Medium (Feedback & Overlays)
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
-| **tooltip** | P4.1 | — | Tooltip | Hover tooltip (simpler than Popover) |
+| **tooltip** ✅ | P4.1 | shell | Tooltip | Done 2026-10-02 (floats in the page layer) |
 | **toast** ✅ | P4.2 | shell, icon, button | Sonner | Done 2026-09-27 — `Toaster` host + static `Toast.Show/Success/Error/...` |
 | **spinner** ✅ | P4.3 | shell, icon | Loading | Done 2026-09-27 as `spinner` (Loading's spinner variant) |
 | **alert-dialog** ✅ | P4.4 | shell, element-extensions, button | AlertDialog | Done 2026-09-27 — `ShowAsync()` returns the choice |
-| **hover-card** | P4.5 | hover-card-trigger, hover-card-content | HoverCard | Hover-triggered popover |
+| **hover-card** ✅ | P4.5 | shell, hover-card-trigger, hover-card-content | HoverCard | Done 2026-10-02 |
 
 ---
 
@@ -179,9 +180,10 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 |-----------|----------|--------------|-------------|-------|
 | **avatar** ✅ | P5.1 | shell, icon | Avatar | Done 2026-09-27 |
 | **table** | P5.2 | table-header, table-body, table-row, table-cell, table-head | Table | Data table |
-| **empty-state** | P5.3 | — | EmptyState | Empty list/state message |
+| **empty-state** ✅ | P5.3 | shell, icon | EmptyState | Done 2026-10-04 — icon tile, title, description, action row, optional dashed border |
 | **callout** | P5.4 | — | Callout | Info/warning callout block |
-| **pagination** | P5.5 | — | Pagination | Page navigation |
+| **pagination** ✅ | P5.5 | shell, icon | Pagination | Done 2026-10-04 — previous/next, sibling window, ellipses |
+| **toggle** ✅ | — | shell, icon | Toggle | Done 2026-10-04 — pressed-state button (Default / Outline) |
 
 ---
 
@@ -203,7 +205,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | chart (line, bar, pie, area) | P7 | Consider external chart lib integration |
 | combobox | P7 | Searchable select |
 | file-upload | P7 | File picker |
-| input-otp | P7 | OTP input |
+| input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
 | date-range-picker | P7 | Date range selection |
 | theme-toggle | P7 | Already in demo; consider as component |
 | copy-button | P7 | Copy to clipboard |
