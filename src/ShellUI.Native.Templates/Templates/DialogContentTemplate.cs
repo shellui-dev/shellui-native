@@ -45,7 +45,7 @@ public partial class DialogContent : ContentView, IShellOverlayContent
 
     public DialogContent()
     {
-        _backdrop = new BoxView();
+        _backdrop = new BoxView { BackgroundColor = Colors.Transparent };
         _backdrop.Token(BoxView.ColorProperty, ShellToken.Overlay);
         var tapBackdrop = new TapGestureRecognizer();
         tapBackdrop.Tapped += (_, _) => this.FindParentOfType<Dialog>()?.SetOpen(false);
@@ -90,6 +90,8 @@ public partial class DialogContent : ContentView, IShellOverlayContent
         _box.GestureRecognizers.Add(new TapGestureRecognizer());
 
         var root = new Grid { Children = { _backdrop, _box } };
+        // The backdrop dims under the system bars; the centered box stays clear of them.
+        ShellPortal.EdgeToEdge(this, root);
         root.SizeChanged += (_, _) => _box.WidthRequest = Math.Max(0, Math.Min(512, root.Width - 32));
         Content = root;
     }

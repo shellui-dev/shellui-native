@@ -103,6 +103,12 @@ public static class ShellTheme
     public const float RadiusMd = 6;
     public const float RadiusLg = 8;
 
+    // Opt-in: make Android's status and navigation bars follow the theme — transparent bars over
+    // the edge-to-edge page, a Background-colored status strip drawn by the page layer (so
+    // backdrops and panels cover it), and bar icons flipped with the theme. Set before
+    // EnsureInitialized (e.g. in App's constructor).
+    public static bool SyncSystemBars { get; set; }
+
     private static bool _initialized;
 
     // Raised after a palette is published. Resources cover colors and brushes; use this for
@@ -124,6 +130,9 @@ public static class ShellTheme
         if (app is null) return;
         _initialized = true;
         app.RequestedThemeChanged += (_, _) => Apply();
+        // Set up each page's overlay layer as it appears. Doing it on first use instead would
+        // re-parent the page content under the user's finger (Android drops the scroll position).
+        app.PageAppearing += (_, page) => page.Dispatcher.Dispatch(() => ShellPortal.GetLayer(page));
         Apply();
     }
 
@@ -137,7 +146,31 @@ public static class ShellTheme
             app.Resources[ColorKey(token)] = color;
             app.Resources[BrushKey(token)] = new SolidColorBrush(color);
         }
+        if (SyncSystemBars) ApplySystemBars(retries: 10);
         ThemeChanged?.Invoke(null, EventArgs.Empty);
+    }
+
+    private static void ApplySystemBars(int retries)
+    {
+#if ANDROID
+        var window = Platform.CurrentActivity?.Window;
+        if (window is null)
+        {
+            // No activity yet (theme applied from App's constructor): try again shortly.
+            if (retries > 0)
+                Application.Current?.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(200), () => ApplySystemBars(retries - 1));
+            return;
+        }
+#pragma warning disable CA1422 // Android 15+ draws edge-to-edge and ignores these; older versions need them.
+        window.SetStatusBarColor(Android.Graphics.Color.Transparent);
+        window.SetNavigationBarColor(Android.Graphics.Color.Transparent);
+#pragma warning restore CA1422
+        if (AndroidX.Core.View.WindowCompat.GetInsetsController(window, window.DecorView) is { } insets)
+        {
+            insets.AppearanceLightStatusBars = !IsDarkMode;
+            insets.AppearanceLightNavigationBars = !IsDarkMode;
+        }
+#endif
     }
 
     public static void SetTheme(AppTheme theme)
@@ -217,6 +250,54 @@ public static class ShellPlatform
         {
             System.Diagnostics.Debug.WriteLine($"ShellUI: could not strip native chrome: {ex.Message}");
         }
+#elif ANDROID
+        // EditText (Entry, Editor, and the date/time pickers) draws a Material underline as its
+        // background and adds its own padding.
+        if (view.Handler?.PlatformView is Android.Widget.EditText edit)
+        {
+            edit.Background = null;
+            if (!keepPadding) edit.SetPadding(0, 0, 0, 0);
+        }
+#elif IOS || MACCATALYST
+        if (view.Handler?.PlatformView is UIKit.UITextField field)
+        {
+            field.BorderStyle = UIKit.UITextBorderStyle.None;
+            field.BackgroundColor = UIKit.UIColor.Clear;
+        }
+        else if (view.Handler?.PlatformView is UIKit.UITextView text)
+        {
+            text.BackgroundColor = UIKit.UIColor.Clear;
+            if (!keepPadding)
+            {
+                text.TextContainerInset = UIKit.UIEdgeInsets.Zero;
+                text.TextContainer.LineFragmentPadding = 0;
+            }
+        }
+#endif
+    }
+
+    // For a text field that only captures input while the component draws the text itself
+    // (InputOtp): hides the platform caret and selection so nothing native shows through.
+    public static void HideCaret(View view)
+    {
+        view.HandlerChanged += (_, _) => Hide(view);
+        Hide(view);
+    }
+
+    private static void Hide(View view)
+    {
+#if WINDOWS
+        // Opacity 0 still hit-tests in WinUI, so the field keeps taking taps and focus.
+        if (view.Handler?.PlatformView is Microsoft.UI.Xaml.UIElement element) element.Opacity = 0;
+#elif ANDROID
+        if (view.Handler?.PlatformView is Android.Widget.EditText edit)
+        {
+            edit.SetCursorVisible(false);
+            edit.SetHighlightColor(Android.Graphics.Color.Transparent);
+            edit.LongClickable = false;
+        }
+#elif IOS || MACCATALYST
+        if (view.Handler?.PlatformView is UIKit.UITextField field) field.TintColor = UIKit.UIColor.Clear;
 #endif
     }
 }
@@ -283,72 +364,346 @@ public static class ShellFocus
     }
 }
 
-// Lays out an anchor (child 0) and floats every other child just below it without adding to
-// the measured size — dropdown / popover / select panels overlap the content that follows
-// instead of pushing it down. Raise ZIndex while open so the panel draws above later siblings.
-public class ShellAnchorLayout : Layout
+// Page-level layer for anything that must draw above the page: modal overlays, floating panels,
+// tooltips, toasts — the MAUI take on a React portal. Created on first use as the last child of
+// the page's root Grid (a non-Grid root is wrapped in one, once). The layer itself never takes
+// input; only what is placed in it does.
+public static class ShellPortal
 {
-    public static readonly BindableProperty AlignEndProperty =
-        BindableProperty.Create(nameof(AlignEnd), typeof(bool), typeof(ShellAnchorLayout), false);
+    private static readonly BindableProperty LayerProperty =
+        BindableProperty.CreateAttached("ShellPortalLayer", typeof(Grid), typeof(ShellPortal), null);
 
-    // Panel width matches the anchor (e.g. Select) instead of the panel's own size.
-    public static readonly BindableProperty MatchAnchorWidthProperty =
-        BindableProperty.Create(nameof(MatchAnchorWidth), typeof(bool), typeof(ShellAnchorLayout), false);
+    // Logical owner of a view that was moved into the layer (e.g. DialogContent -> its Dialog).
+    // FindParentOfType follows it, so portalled content still finds its component.
+    public static readonly BindableProperty OwnerProperty =
+        BindableProperty.CreateAttached("Owner", typeof(Element), typeof(ShellPortal), null);
 
-    public bool AlignEnd
+    public static Element? GetOwner(BindableObject view) => (Element?)view.GetValue(OwnerProperty);
+
+    // Parent in the logical sense: the portal owner when there is one, else the visual parent.
+    public static Element? LogicalParent(Element element) => GetOwner(element) ?? element.Parent;
+
+    public static Grid? GetLayer(Element? element)
     {
-        get => (bool)GetValue(AlignEndProperty);
-        set => SetValue(AlignEndProperty, value);
-    }
+        var page = FindPage(element);
+        if (page is null) return null;
+        if (page.GetValue(LayerProperty) is Grid existing) return existing;
 
-    public bool MatchAnchorWidth
-    {
-        get => (bool)GetValue(MatchAnchorWidthProperty);
-        set => SetValue(MatchAnchorWidthProperty, value);
-    }
-
-    public double Offset { get; set; } = 4;
-
-    protected override Microsoft.Maui.Layouts.ILayoutManager CreateLayoutManager() => new Manager(this);
-
-    private sealed class Manager(ShellAnchorLayout layout) : Microsoft.Maui.Layouts.ILayoutManager
-    {
-        public Size Measure(double widthConstraint, double heightConstraint)
+        if (page.Content is not Grid root)
         {
-            if (layout.Count == 0) return Size.Zero;
-            var anchor = layout[0].Measure(widthConstraint, heightConstraint);
-            for (var i = 1; i < layout.Count; i++)
-            {
-                var floatWidth = layout.MatchAnchorWidth ? anchor.Width : widthConstraint;
-                layout[i].Measure(floatWidth, double.PositiveInfinity);
-            }
-            return anchor;
+            var content = page.Content;
+            var scroll = content as ScrollView;
+            var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
+            // Edge-to-edge like the page itself, so wrapping doesn't change how the content is inset.
+            root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
+            page.Content = root;
+            if (content != null) root.Children.Add(content);
+            // Normally this runs as the page appears (see ShellTheme.EnsureInitialized); if it
+            // runs later, re-parenting must not lose where the user had scrolled to.
+            if (scroll != null && (scrollX > 0 || scrollY > 0))
+                scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
         }
 
-        public Size ArrangeChildren(Rect bounds)
+        // The layer covers the whole window (backdrops dim under the system bars); content placed
+        // in it uses GetSafeInsets to stay clear of them.
+        var layer = new Grid
         {
-            if (layout.Count == 0) return bounds.Size;
-            var anchorView = layout[0];
-            var anchorWidth = anchorView.HorizontalLayoutAlignment == Microsoft.Maui.Primitives.LayoutAlignment.Fill
-                ? bounds.Width
-                : Math.Min(anchorView.DesiredSize.Width, bounds.Width);
-            var anchorX = bounds.X;
-            anchorView.Arrange(new Rect(anchorX, bounds.Y, anchorWidth, anchorView.DesiredSize.Height));
-            var top = bounds.Y + anchorView.DesiredSize.Height + layout.Offset;
-            for (var i = 1; i < layout.Count; i++)
+            ZIndex = 10000,
+            InputTransparent = true,
+            CascadeInputTransparent = false,
+            SafeAreaEdges = SafeAreaEdges.None
+        };
+        Grid.SetRowSpan(layer, Math.Max(1, root.RowDefinitions.Count));
+        Grid.SetColumnSpan(layer, Math.Max(1, root.ColumnDefinitions.Count));
+        root.Children.Add(layer);
+        page.SetValue(LayerProperty, layer);
+#if ANDROID
+        if (ShellTheme.SyncSystemBars) AddStatusBarScrim(layer);
+#endif
+        return layer;
+    }
+
+#if ANDROID
+    // With SyncSystemBars the system bars are transparent and the page draws under them. This
+    // strip is the status bar's background: page content scrolls beneath it, while backdrops and
+    // panels (added to the layer after it) cover it.
+    private static void AddStatusBarScrim(Grid layer)
+    {
+        var scrim = new BoxView
+        {
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.Start,
+            HeightRequest = 0,
+            InputTransparent = true
+        };
+        scrim.Token(BoxView.ColorProperty, ShellToken.Background);
+        layer.Children.Add(scrim);
+        void Fit() => scrim.HeightRequest = GetSafeInsets(layer).Top;
+        layer.SizeChanged += (_, _) => Fit();
+        layer.Loaded += (_, _) => Fit();
+        Fit();
+    }
+#endif
+
+    private static ContentPage? FindPage(Element? element)
+    {
+        for (var e = element; e != null; e = LogicalParent(e))
+            if (e is ContentPage found) return found;
+
+        // Not in a tree (e.g. Toast.Show from a view model): use the page on screen.
+        var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+        while (true)
+        {
+            switch (page)
             {
-                var child = layout[i];
-                var width = layout.MatchAnchorWidth ? anchorWidth : child.DesiredSize.Width;
-                var x = layout.AlignEnd ? anchorX + anchorWidth - width : anchorX;
-                child.Arrange(new Rect(x, top, width, child.DesiredSize.Height));
+                case Microsoft.Maui.Controls.Shell shell: page = shell.CurrentPage; continue;
+                case NavigationPage nav: page = nav.CurrentPage; continue;
+                case FlyoutPage flyout: page = flyout.Detail; continue;
+                case TabbedPage tabs: page = tabs.CurrentPage; continue;
             }
-            return bounds.Size;
+            break;
         }
+        return page as ContentPage;
+    }
+
+    // Moves `view` into the layer above the page that contains `owner`. Returns false when there
+    // is no page yet (caller should fall back to showing the view in place).
+    public static bool Attach(Element owner, View view)
+    {
+        var layer = GetLayer(owner);
+        if (layer is null) return false;
+        if (view.Parent == layer) return true;
+        Detach(view);
+        view.SetValue(OwnerProperty, owner);
+        view.BindingContext = owner.BindingContext;
+        layer.Children.Add(view);
+        return true;
+    }
+
+    public static void Detach(View view)
+    {
+        if (view.Parent is Layout layout) layout.Children.Remove(view);
+        else if (view.Parent is ContentView host && host.Content == view) host.Content = null;
+    }
+
+    // Opts overlay chrome out of MAUI's automatic safe-area padding: backdrops and panels run
+    // under the system bars and pad their own content with GetSafeInsets instead.
+    public static void EdgeToEdge(params View[] views)
+    {
+        foreach (var view in views)
+        {
+            switch (view)
+            {
+                case Layout layout: layout.SafeAreaEdges = SafeAreaEdges.None; break;
+                case ScrollView scroll: scroll.SafeAreaEdges = SafeAreaEdges.None; break;
+                case Border border: border.SafeAreaEdges = SafeAreaEdges.None; break;
+                case ContentView content: content.SafeAreaEdges = SafeAreaEdges.None; break;
+            }
+        }
+    }
+
+    // How far the system bars / notch reach into `view`, in device-independent units. Zero on
+    // an edge the view doesn't touch (e.g. the top of a page below a navigation bar).
+    public static Thickness GetSafeInsets(VisualElement view)
+    {
+#if ANDROID
+        if (view.Handler?.PlatformView is Android.Views.View native &&
+            AndroidX.Core.View.ViewCompat.GetRootWindowInsets(native) is { } windowInsets)
+        {
+            var bars = windowInsets.GetInsets(AndroidX.Core.View.WindowInsetsCompat.Type.SystemBars() |
+                                              AndroidX.Core.View.WindowInsetsCompat.Type.DisplayCutout());
+            var density = native.Resources?.DisplayMetrics?.Density ?? 1f;
+            if (bars != null)
+            {
+                var at = new int[2];
+                native.GetLocationInWindow(at);
+                var window = native.RootView;
+                double right = bars.Right, bottom = bars.Bottom;
+                if (window != null && native.Width > 0 && native.Height > 0)
+                {
+                    right = Math.Max(0, bars.Right - (window.Width - at[0] - native.Width));
+                    bottom = Math.Max(0, bars.Bottom - (window.Height - at[1] - native.Height));
+                }
+                return new Thickness(
+                    Math.Max(0, bars.Left - at[0]) / density,
+                    Math.Max(0, bars.Top - at[1]) / density,
+                    right / density,
+                    bottom / density);
+            }
+        }
+#elif IOS || MACCATALYST
+        if (view.Handler?.PlatformView is UIKit.UIView { Window: { } window })
+        {
+            var i = window.SafeAreaInsets;
+            return new Thickness(i.Left, i.Top, i.Right, i.Bottom);
+        }
+#endif
+        return new Thickness(0);
+    }
+
+    // Top-left of `view` in the layer's coordinates. Asks the platform where both really are
+    // (scrolling, transforms and safe areas included); falls back to walking the tree.
+    public static Point GetPosition(VisualElement view, Grid layer)
+    {
+#if ANDROID
+        if (view.Handler?.PlatformView is Android.Views.View nativeView && layer.Handler?.PlatformView is Android.Views.View nativeLayer)
+        {
+            var a = new int[2];
+            var l = new int[2];
+            nativeView.GetLocationInWindow(a);
+            nativeLayer.GetLocationInWindow(l);
+            var density = nativeView.Resources?.DisplayMetrics?.Density ?? 1f;
+            return new Point((a[0] - l[0]) / density, (a[1] - l[1]) / density);
+        }
+#elif IOS || MACCATALYST
+        if (view.Handler?.PlatformView is UIKit.UIView nativeView && layer.Handler?.PlatformView is UIKit.UIView nativeLayer)
+        {
+            var p = nativeView.ConvertPointToView(CoreGraphics.CGPoint.Empty, nativeLayer);
+            return new Point(p.X, p.Y);
+        }
+#elif WINDOWS
+        if (view.Handler?.PlatformView is Microsoft.UI.Xaml.UIElement nativeView && layer.Handler?.PlatformView is Microsoft.UI.Xaml.UIElement nativeLayer)
+        {
+            var p = nativeView.TransformToVisual(nativeLayer).TransformPoint(new Windows.Foundation.Point(0, 0));
+            return new Point(p.X, p.Y);
+        }
+#endif
+        double x = 0, y = 0;
+        var root = layer.Parent;
+        for (Element? e = view; e is VisualElement ve && e != root; e = e.Parent)
+        {
+            x += ve.X + ve.TranslationX;
+            y += ve.Y + ve.TranslationY;
+            if (ve.Parent is ScrollView scroll)
+            {
+                x -= scroll.ScrollX;
+                y -= scroll.ScrollY;
+            }
+        }
+        return new Point(x - layer.X, y - layer.Y);
+    }
+
+    // Floats `panel` next to `anchor` in the page layer. Returns a handle to close it, or null
+    // when there is no page to float over.
+    public static ShellPopupHandle? ShowPopup(View anchor, View panel, ShellPopupOptions? options = null)
+    {
+        options ??= new ShellPopupOptions();
+        var layer = GetLayer(anchor);
+        if (layer is null) return null;
+
+        View? catcher = null;
+        var handle = new ShellPopupHandle(panel, () => catcher);
+        if (options.Modal)
+        {
+            // Transparent full-page catcher: a click outside the panel dismisses it.
+            var surface = new Grid { BackgroundColor = Colors.Transparent };
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += (_, _) => options.OnDismiss?.Invoke();
+            surface.GestureRecognizers.Add(tap);
+            catcher = surface;
+            layer.Children.Add(surface);
+        }
+
+        Detach(panel);
+        panel.SetValue(OwnerProperty, options.Owner ?? anchor);
+        panel.BindingContext = (options.Owner ?? anchor).BindingContext;
+        panel.HorizontalOptions = LayoutOptions.Start;
+        panel.VerticalOptions = LayoutOptions.Start;
+        panel.Margin = new Thickness(0);
+        panel.Opacity = 0;
+        panel.IsVisible = true;
+        if (options.MatchAnchorWidth) panel.WidthRequest = anchor.Width;
+        layer.Children.Add(panel);
+
+        _ = PlaceAsync(anchor, panel, layer, options, handle);
+        return handle;
+    }
+
+    // Platforms disagree on what an unarranged view measures to (e.g. a ScrollView's height), so
+    // wait for the real layout and position from the size the panel actually got.
+    private static async Task PlaceAsync(View anchor, View panel, Grid layer, ShellPopupOptions options, ShellPopupHandle handle)
+    {
+        for (var i = 0; i < 30 && (panel.Width <= 0 || panel.Height <= 0); i++)
+            await Task.Delay(16);
+        if (handle.IsClosed) return;
+
+        var size = new Size(panel.Width, panel.Height);
+        var origin = GetPosition(anchor, layer);
+        const double edge = 8;
+        var safe = GetSafeInsets(layer);
+        var minTop = safe.Top + edge;
+        var maxBottom = layer.Height - safe.Bottom - edge;
+
+        var x = options.Align switch
+        {
+            ShellPopupAlign.Center => origin.X + (anchor.Width - size.Width) / 2,
+            ShellPopupAlign.End => origin.X + anchor.Width - size.Width,
+            _ => origin.X
+        };
+        var below = origin.Y + anchor.Height + options.Offset;
+        var above = origin.Y - size.Height - options.Offset;
+        var fitsBelow = below + size.Height <= maxBottom;
+        var fitsAbove = above >= minTop;
+        var top = options.Placement == ShellPopupPlacement.Top
+            ? (fitsAbove || !fitsBelow ? above : below)
+            : (fitsBelow || !fitsAbove ? below : above);
+        var placedAbove = top < origin.Y;
+
+        x = Math.Max(safe.Left + edge, Math.Min(x, layer.Width - safe.Right - size.Width - edge));
+        top = Math.Max(minTop, Math.Min(top, maxBottom - size.Height));
+        panel.Margin = new Thickness(x, top, 0, 0);
+
+        // Grow from the edge nearest the anchor.
+        panel.AnchorY = placedAbove ? 1 : 0;
+        panel.Scale = 0.95;
+        await Task.WhenAll(panel.FadeToAsync(1, 120, Easing.CubicOut), panel.ScaleToAsync(1, 120, Easing.CubicOut));
     }
 }
 
-// Floating panels (Dropdown, Popover, Select). Only one is open at a time: opening another
-// closes the previous one, like clicking outside a menu on the web.
+public enum ShellPopupPlacement { Bottom, Top }
+public enum ShellPopupAlign { Start, Center, End }
+
+public sealed class ShellPopupOptions
+{
+    public ShellPopupPlacement Placement { get; init; } = ShellPopupPlacement.Bottom;
+    public ShellPopupAlign Align { get; init; } = ShellPopupAlign.Start;
+    public double Offset { get; init; } = 4;
+    public bool MatchAnchorWidth { get; init; }
+    // Modal popups get a click-outside catcher (menus, selects); tooltips and hover cards don't.
+    public bool Modal { get; init; } = true;
+    public Action? OnDismiss { get; init; }
+    // Logical owner for FindParentOfType / BindingContext; defaults to the anchor.
+    public Element? Owner { get; init; }
+}
+
+public sealed class ShellPopupHandle
+{
+    private readonly View _panel;
+    private readonly Func<View?> _catcher;
+    private bool _closed;
+
+    internal bool IsClosed => _closed;
+
+    internal ShellPopupHandle(View panel, Func<View?> catcher)
+    {
+        _panel = panel;
+        _catcher = catcher;
+    }
+
+    public async Task CloseAsync()
+    {
+        if (_closed) return;
+        _closed = true;
+        if (_catcher() is { } catcher) ShellPortal.Detach(catcher);
+        _panel.AbortAnimation("FadeTo");
+        _panel.AbortAnimation("ScaleTo");
+        await Task.WhenAll(_panel.FadeToAsync(0, 90, Easing.CubicIn), _panel.ScaleToAsync(0.95, 90, Easing.CubicIn));
+        ShellPortal.Detach(_panel);
+    }
+}
+
+// Floating panels with a click-outside catcher (Dropdown, Popover, Select). Only one is open at
+// a time: opening another closes the previous one.
 public interface IShellPopup
 {
     void Close();
@@ -371,64 +726,6 @@ public static class ShellPopups
             _open = null;
     }
 
-    // ZIndex only orders siblings, so a floating panel must raise every ancestor (up to the
-    // scroll view / page) above the content that follows it. Ancestors are ref-counted: two
-    // panels in the same row share them, and one closing must not lower the other.
-    // Returns the undo action.
-    private static readonly Dictionary<VisualElement, (int Original, int Count)> _raised = new();
-
-    public static Action RaiseAboveSiblings(VisualElement host)
-    {
-        var views = new List<VisualElement>();
-        for (Element? e = host; e is VisualElement ve && e is not Page && e is not ScrollView; e = e.Parent)
-        {
-            if (ve.Parent is not Layout) continue;
-            views.Add(ve);
-            if (_raised.TryGetValue(ve, out var entry))
-                _raised[ve] = (entry.Original, entry.Count + 1);
-            else
-            {
-                _raised[ve] = (ve.ZIndex, 1);
-                ve.ZIndex = 1000;
-            }
-        }
-        var undone = false;
-        return () =>
-        {
-            if (undone) return;
-            undone = true;
-            foreach (var view in views)
-            {
-                if (!_raised.TryGetValue(view, out var entry)) continue;
-                if (entry.Count > 1) _raised[view] = (entry.Original, entry.Count - 1);
-                else
-                {
-                    _raised.Remove(view);
-                    view.ZIndex = entry.Original;
-                }
-            }
-        };
-    }
-
-    // Shared open/close motion: fade + zoom-in-95 from the top edge.
-    public static async Task AnimateAsync(VisualElement panel, bool open)
-    {
-        panel.AbortAnimation("ShellPopup");
-        panel.AnchorY = 0;
-        if (open)
-        {
-            panel.Opacity = 0;
-            panel.Scale = 0.95;
-            panel.IsVisible = true;
-            await Task.WhenAll(panel.FadeToAsync(1, 120, Easing.CubicOut), panel.ScaleToAsync(1, 120, Easing.CubicOut));
-        }
-        else
-        {
-            await Task.WhenAll(panel.FadeToAsync(0, 90, Easing.CubicIn), panel.ScaleToAsync(0.95, 90, Easing.CubicIn));
-            panel.IsVisible = false;
-        }
-    }
-
     public static Shadow PanelShadow() => new()
     {
         Brush = new SolidColorBrush(Colors.Black),
@@ -438,17 +735,88 @@ public static class ShellPopups
     };
 }
 
+// Shared host for trigger + floating content (Dropdown, Popover, HoverCard). The trigger renders
+// in place; the content child is held back and floated in the page layer while open.
+public abstract class ShellPopoverHost : Grid, IShellPopup
+{
+    public static readonly BindableProperty IsOpenProperty =
+        BindableProperty.Create(nameof(IsOpen), typeof(bool), typeof(ShellPopoverHost), false,
+            propertyChanged: (b, o, n) => ((ShellPopoverHost)b).OnOpenChanged());
+
+    public bool IsOpen
+    {
+        get => (bool)GetValue(IsOpenProperty);
+        set => SetValue(IsOpenProperty, value);
+    }
+
+    public event EventHandler<bool>? IsOpenChanged;
+
+    private View? _content;
+    private ShellPopupHandle? _handle;
+
+    protected ShellPopoverHost()
+    {
+        HorizontalOptions = LayoutOptions.Start;
+    }
+
+    protected abstract bool IsContent(Element child);
+
+    // Click-outside catcher + single-open behavior. Hover cards turn this off.
+    protected virtual bool Modal => true;
+    protected virtual ShellPopupPlacement Placement => ShellPopupPlacement.Bottom;
+    protected virtual ShellPopupAlign Align => ShellPopupAlign.Start;
+
+    protected View? PopupContent => _content;
+
+    protected override void OnChildAdded(Element child)
+    {
+        base.OnChildAdded(child);
+        if (!IsContent(child) || child is not View view) return;
+        _content = view;
+        view.SetValue(ShellPortal.OwnerProperty, this);
+        // Hold the content out of the tree until it is opened.
+        Dispatcher.Dispatch(() => { if (view.Parent == this) Children.Remove(view); });
+    }
+
+    public void SetOpen(bool value) => IsOpen = value;
+    public void Toggle() => IsOpen = !IsOpen;
+    public void Close() => IsOpen = false;
+
+    private void OnOpenChanged()
+    {
+        IsOpenChanged?.Invoke(this, IsOpen);
+        if (IsOpen)
+        {
+            if (_content is null) return;
+            if (Modal) ShellPopups.Opened(this);
+            _handle = ShellPortal.ShowPopup(this, _content, new ShellPopupOptions
+            {
+                Placement = Placement,
+                Align = Align,
+                Modal = Modal,
+                Owner = this,
+                OnDismiss = Close
+            });
+        }
+        else
+        {
+            if (Modal) ShellPopups.Closed(this);
+            var handle = _handle;
+            _handle = null;
+            if (handle != null) _ = handle.CloseAsync();
+        }
+    }
+}
+
 // Content of a modal overlay (DialogContent, DrawerContent, SheetContent): animates itself in/out.
 public interface IShellOverlayContent
 {
     Task AnimateAsync(bool open);
 }
 
-// Shared host for Dialog / Drawer / Sheet. Children: an optional *Trigger (rendered inline) and
-// the *Content (rendered in a full-size layer that is hidden until Open).
-// The overlay fills this host, so place the host where it can fill the page — e.g. as the last
-// child of the page's root Grid. While closed the host is input-transparent: it never blocks
-// the content underneath.
+// Shared host for Dialog / Drawer / Sheet / AlertDialog. Children: an optional *Trigger (rendered
+// in place) and the *Content, which is held back and shown in the page layer while Open — so the
+// host can be declared anywhere on the page, next to the button that opens it.
 public abstract class ShellOverlayHost : Grid
 {
     public static readonly BindableProperty OpenProperty =
@@ -463,18 +831,15 @@ public abstract class ShellOverlayHost : Grid
 
     public event EventHandler<bool>? OpenChanged;
 
-    private readonly VerticalStackLayout _triggerContainer;
-    private readonly Grid _overlayLayer;
+    private View? _content;
+    private int _triggers;
     private int _version;
 
     protected ShellOverlayHost()
     {
-        InputTransparent = true;
-        CascadeInputTransparent = false;
-        _triggerContainer = new VerticalStackLayout { Spacing = 0, VerticalOptions = LayoutOptions.Start };
-        _overlayLayer = new Grid { IsVisible = false, ZIndex = 1000 };
-        Children.Add(_triggerContainer);
-        Children.Add(_overlayLayer);
+        // With no trigger the host is an empty, invisible placeholder that takes no space.
+        IsVisible = false;
+        HorizontalOptions = LayoutOptions.Start;
     }
 
     protected abstract bool IsTrigger(Element child);
@@ -482,14 +847,16 @@ public abstract class ShellOverlayHost : Grid
     protected override void OnChildAdded(Element child)
     {
         base.OnChildAdded(child);
-        if (child == _triggerContainer || child == _overlayLayer) return;
-        Dispatcher.Dispatch(() =>
+        if (IsTrigger(child))
         {
-            if (child is not IView view) return;
-            Children.Remove(view);
-            if (IsTrigger(child)) _triggerContainer.Children.Add(view);
-            else _overlayLayer.Children.Add(view);
-        });
+            _triggers++;
+            IsVisible = true;
+            return;
+        }
+        if (child is not View view) return;
+        _content = view;
+        view.SetValue(ShellPortal.OwnerProperty, this);
+        Dispatcher.Dispatch(() => { if (view.Parent == this) Children.Remove(view); });
     }
 
     public void SetOpen(bool value) => Open = value;
@@ -498,18 +865,17 @@ public abstract class ShellOverlayHost : Grid
     {
         var version = ++_version;
         OpenChanged?.Invoke(this, Open);
-        var content = _overlayLayer.Children.OfType<IShellOverlayContent>().FirstOrDefault();
+        if (_content is null) return;
+        var animated = _content as IShellOverlayContent;
         if (Open)
         {
-            InputTransparent = false;
-            _overlayLayer.IsVisible = true;
-            if (content != null) await content.AnimateAsync(true);
+            if (!ShellPortal.Attach(this, _content)) return;
+            if (animated != null) await animated.AnimateAsync(true);
         }
         else
         {
-            InputTransparent = true;
-            if (content != null) await content.AnimateAsync(false);
-            if (version == _version) _overlayLayer.IsVisible = false;
+            if (animated != null) await animated.AnimateAsync(false);
+            if (version == _version) ShellPortal.Detach(_content);
         }
     }
 
@@ -561,7 +927,7 @@ public abstract class ShellTriggerView : ContentView, IShellTrigger
     // Called by interactive children (Button) after they handle a click.
     public static void ActivateAncestor(Element from)
     {
-        for (var p = from.Parent; p != null; p = p.Parent)
+        for (var p = ShellPortal.LogicalParent(from); p != null; p = ShellPortal.LogicalParent(p))
         {
             if (p is IShellTrigger trigger)
             {

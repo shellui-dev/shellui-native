@@ -29,11 +29,35 @@ NEW = {
                     ["dialog", "confirm", "modal", "alert"]),
     "Toast": ("toast", "Toast", "Sonner-style stacked notifications (Toaster + Toast API)", "Feedback",
               ["toast", "sonner", "notification", "snackbar"]),
+    "Tooltip": ("tooltip", "Tooltip", "Hover tooltip for any view", "Overlay",
+                ["tooltip", "hover", "hint"]),
+    "HoverCard": ("hover-card", "Hover Card", "Rich content that floats next to its trigger on hover", "Overlay",
+                  ["hover", "card", "preview", "popover"]),
+    "HoverCardTrigger": ("hover-card-trigger", "Hover Card Trigger", "View that opens a hover card while hovered", "Overlay",
+                         ["hover", "card", "trigger"]),
+    "HoverCardContent": ("hover-card-content", "Hover Card Content", "Floating panel of a hover card", "Overlay",
+                         ["hover", "card", "content"]),
+    "Calendar": ("calendar", "Calendar", "Month calendar with day selection", "Form",
+                 ["calendar", "date", "picker"]),
+    "Toggle": ("toggle", "Toggle", "Two-state button that stays pressed", "Form",
+               ["toggle", "button", "pressed"]),
+    "InputOtp": ("input-otp", "Input OTP", "One-time-code input with a slot per character", "Form",
+                 ["otp", "code", "verification", "input"]),
+    "Pagination": ("pagination", "Pagination", "Page navigation with previous/next and ellipsis", "Navigation",
+                   ["pagination", "pages", "navigation"]),
+    "EmptyState": ("empty-state", "Empty State", "Placeholder for an empty list or screen", "DataDisplay",
+                   ["empty", "placeholder", "state"]),
+}
+
+# Component-to-component dependencies the code scan can't infer.
+EXTRA_DEPS = {
+    "HoverCard": ["hover-card-trigger", "hover-card-content"],
+    "DatePicker": ["calendar"],
 }
 
 SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|\bShellPlatform\b|\bShellPopups\b|"
-                       r"\bShellTriggerView\b|\bShellOverlayHost\b|\bShellAnchorLayout\b|\bIShellFocusable\b|"
-                       r"\bIShellPopup\b|\bIShellOverlayContent\b")
+                       r"\bShellTriggerView\b|\bShellOverlayHost\b|\bShellPopoverHost\b|\bShellPortal\b|"
+                       r"\bShellPopup\w+\b|\bIShellFocusable\b|\bIShellPopup\b|\bIShellOverlayContent\b")
 ICON_API = re.compile(r"\bnew Icon\b|\bIconName\b")
 EXT_API = re.compile(r"\bFindParentOfType\b|\bFindDescendantsOfType\b|\bAnimateExpandAsync\b")
 
@@ -56,12 +80,14 @@ def compute_deps(name: str, source: str, existing: list[str]) -> list[str]:
         shared.append("shell")
     if name != "Icon" and ICON_API.search(source):
         shared.append("icon")
-    if name != "ElementExtensions" and EXT_API.search(source):
+    # Shell is the base layer: element-extensions depends on it, never the reverse.
+    if name not in ("ElementExtensions", "Shell") and EXT_API.search(source):
         shared.append("element-extensions")
     # Composites that render ShellUI Buttons (AlertDialog footer, Toast action).
     if name not in ("Button", "ButtonVariants") and re.search(r"\bnew Button\b|\bButtonVariant\b", source):
         shared.append("button")
     rest = [d for d in existing if d not in ("shell", "icon", "element-extensions", "button")]
+    rest += [d for d in EXTRA_DEPS.get(name, []) if d not in rest]
     return shared + rest
 
 

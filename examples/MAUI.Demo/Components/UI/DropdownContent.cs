@@ -25,6 +25,5 @@ public partial class DropdownContent : ContentView
         panel.Token(VisualElement.BackgroundColorProperty, ShellToken.Popover);
         panel.Token(Border.StrokeProperty, ShellToken.Border);
         Content = panel;
-        IsVisible = false;
     }
 }

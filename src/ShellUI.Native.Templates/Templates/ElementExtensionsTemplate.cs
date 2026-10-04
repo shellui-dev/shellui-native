@@ -12,7 +12,7 @@ public static class ElementExtensionsTemplate
         Description = "Shared extension methods for compositional components (FindParentOfType)",
         Category = ComponentCategory.Utility,
         FilePath = "ElementExtensions.cs",
-        Dependencies = new List<string>(),
+        Dependencies = new List<string> { "shell" },
         IsAvailable = false, // Hidden from list; installed as dependency of overlay components
         Tags = new List<string> { "utility", "extensions", "composition" }
     };
@@ -24,13 +24,15 @@ public static class ElementExtensionsTemplate
 // Tree + animation helpers for compositional components (Dialog, Tabs, Accordion, ...).
 public static class ElementExtensions
 {
+    // Nearest ancestor of type T. Follows portal owners, so content that was moved into the page
+    // layer (DialogContent, DropdownContent, ...) still finds the component it belongs to.
     public static T? FindParentOfType<T>(this Element element) where T : Element
     {
-        var p = element.Parent;
+        var p = ShellPortal.LogicalParent(element);
         while (p != null)
         {
             if (p is T t) return t;
-            p = p.Parent;
+            p = ShellPortal.LogicalParent(p);
         }
         return null;
     }

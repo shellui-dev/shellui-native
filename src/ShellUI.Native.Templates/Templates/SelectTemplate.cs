@@ -21,8 +21,8 @@ public static class SelectTemplate
 
 namespace YourProjectNamespace.Components.UI;
 
-// Select — shadcn-style trigger (h-10 rounded-md border, chevrons icon) and a floating list
-// with a check on the selected item. Custom-drawn, so it looks the same on every platform.
+// Select — shadcn-style trigger (h-10 rounded-md border, chevrons icon) and a list that floats
+// in the page layer, with a check on the selected item. Clicking outside closes it. Custom-drawn, so it looks the same on every platform.
 // Usage: <ui:Select Placeholder=""Pick a country"" /> then set ItemsSource in code or by binding.
 public partial class Select : ContentView, IShellPopup
 {
@@ -63,11 +63,15 @@ public partial class Select : ContentView, IShellPopup
 
     public event EventHandler? SelectedIndexChanged;
 
-    private Action? _restoreZ;
+    private ShellPopupHandle? _handle;
     private readonly Border _trigger;
     private readonly Label _value;
     private readonly Border _panel;
     private readonly VerticalStackLayout _list;
+    private readonly ScrollView _scroll;
+
+    private const double ItemHeight = 32;
+    private const double MaxListHeight = 280;
 
     public Select()
     {
@@ -97,19 +101,19 @@ public partial class Select : ContentView, IShellPopup
         ShellFocus.MakeFocusable(this, () => { if (IsEnabled) SetOpen(!IsOpen); });
 
         _list = new VerticalStackLayout { Spacing = 0 };
+        _scroll = new ScrollView { Content = _list };
         _panel = new Border
         {
-            Content = new ScrollView { Content = _list, MaximumHeightRequest = 280 },
+            Content = _scroll,
             Padding = new Thickness(4),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
-            Shadow = ShellPopups.PanelShadow(),
-            IsVisible = false
+            Shadow = ShellPopups.PanelShadow()
         };
         _panel.Token(VisualElement.BackgroundColorProperty, ShellToken.Popover);
         _panel.Token(Border.StrokeProperty, ShellToken.Border);
 
-        Content = new ShellAnchorLayout { MatchAnchorWidth = true, Children = { _trigger, _panel } };
+        Content = _trigger;
         UpdateTrigger();
     }
 
@@ -120,25 +124,24 @@ public partial class Select : ContentView, IShellPopup
         _trigger.Token(Border.StrokeProperty, open ? ShellToken.Ring : ShellToken.Input);
         if (open)
         {
-            _restoreZ?.Invoke();
-            _restoreZ = ShellPopups.RaiseAboveSiblings(this);
             ShellPopups.Opened(this);
-            _ = ShellPopups.AnimateAsync(_panel, true);
+            _handle = ShellPortal.ShowPopup(_trigger, _panel, new ShellPopupOptions
+            {
+                MatchAnchorWidth = true,
+                Owner = this,
+                OnDismiss = Close
+            });
         }
         else
         {
             ShellPopups.Closed(this);
-            _ = CloseAsync();
+            var handle = _handle;
+            _handle = null;
+            if (handle != null) _ = handle.CloseAsync();
         }
     }
 
     public void Close() => SetOpen(false);
-
-    private async Task CloseAsync()
-    {
-        await ShellPopups.AnimateAsync(_panel, false);
-        if (!IsOpen) { _restoreZ?.Invoke(); _restoreZ = null; }
-    }
 
     private static void OnSelectedIndexChanged(BindableObject b, object o, object n)
     {
@@ -159,6 +162,9 @@ public partial class Select : ContentView, IShellPopup
     {
         _list.Children.Clear();
         var items = ItemsSource;
+        // Explicit height: a ScrollView sizes to its content on some platforms and stretches to
+        // the available space on others.
+        _scroll.HeightRequest = Math.Min((items?.Count ?? 0) * ItemHeight, MaxListHeight);
         if (items == null) return;
         for (var i = 0; i < items.Count; i++)
             _list.Children.Add(CreateItem(items[i], i));
@@ -182,7 +188,7 @@ public partial class Select : ContentView, IShellPopup
         var item = new Border
         {
             Content = row,
-            HeightRequest = 32,
+            HeightRequest = ItemHeight,
             Padding = new Thickness(8, 0),
             StrokeThickness = 0,
             StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusSm },

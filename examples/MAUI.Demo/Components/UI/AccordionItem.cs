@@ -24,7 +24,7 @@ public partial class AccordionItem : ContentView
     public AccordionItem()
     {
         _stack = new VerticalStackLayout { Spacing = 0 };
-        _divider = new BoxView { HeightRequest = 1 };
+        _divider = new BoxView { HeightRequest = 1, BackgroundColor = Colors.Transparent };
         _divider.Token(BoxView.ColorProperty, ShellToken.Border);
         Content = new VerticalStackLayout { Spacing = 0, Children = { _stack, _divider } };
     }

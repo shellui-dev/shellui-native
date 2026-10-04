@@ -3,13 +3,15 @@ namespace MAUI.Demo.Components.UI;
 // Tree + animation helpers for compositional components (Dialog, Tabs, Accordion, ...).
 public static class ElementExtensions
 {
+    // Nearest ancestor of type T. Follows portal owners, so content that was moved into the page
+    // layer (DialogContent, DropdownContent, ...) still finds the component it belongs to.
     public static T? FindParentOfType<T>(this Element element) where T : Element
     {
-        var p = element.Parent;
+        var p = ShellPortal.LogicalParent(element);
         while (p != null)
         {
             if (p is T t) return t;
-            p = p.Parent;
+            p = ShellPortal.LogicalParent(p);
         }
         return null;
     }

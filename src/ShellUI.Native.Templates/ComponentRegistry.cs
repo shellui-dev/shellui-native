@@ -94,7 +94,16 @@ public static class ComponentRegistry
         { "alert-dialog", (AlertDialogTemplate.Metadata, AlertDialogTemplate.Contents) },
         { "toast", (ToastTemplate.Metadata, ToastTemplate.Contents) },
         { "spinner", (SpinnerTemplate.Metadata, SpinnerTemplate.Contents) },
-        { "avatar", (AvatarTemplate.Metadata, AvatarTemplate.Contents) }
+        { "avatar", (AvatarTemplate.Metadata, AvatarTemplate.Contents) },
+        { "tooltip", (TooltipTemplate.Metadata, TooltipTemplate.Contents) },
+        { "hover-card", (HoverCardTemplate.Metadata, HoverCardTemplate.Contents) },
+        { "hover-card-trigger", (HoverCardTriggerTemplate.Metadata, HoverCardTriggerTemplate.Contents) },
+        { "hover-card-content", (HoverCardContentTemplate.Metadata, HoverCardContentTemplate.Contents) },
+        { "calendar", (CalendarTemplate.Metadata, CalendarTemplate.Contents) },
+        { "toggle", (ToggleTemplate.Metadata, ToggleTemplate.Contents) },
+        { "input-otp", (InputOtpTemplate.Metadata, InputOtpTemplate.Contents) },
+        { "pagination", (PaginationTemplate.Metadata, PaginationTemplate.Contents) },
+        { "empty-state", (EmptyStateTemplate.Metadata, EmptyStateTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

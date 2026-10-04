@@ -42,6 +42,8 @@ public partial class Progress : ContentView
         BindableProperty.Create(nameof(ShowLabel), typeof(bool), typeof(Progress),
             false, propertyChanged: OnVisualPropertyChanged);
 
+    private const double TrackHeight = 8;
+
     private readonly Grid _track;
     private readonly BoxView _trackFill;
     private readonly Border _fill;
@@ -76,15 +78,15 @@ public partial class Progress : ContentView
     public Progress()
     {
         // Track tint is the fill color at 20% (bg-primary/20), so it follows the variant.
-        _trackFill = new BoxView { Opacity = 0.2, CornerRadius = 999 };
+        _trackFill = new BoxView { Opacity = 0.2, CornerRadius = TrackHeight / 2, BackgroundColor = Colors.Transparent };
         _fill = new Border
         {
             StrokeThickness = 0,
-            StrokeShape = new RoundRectangle { CornerRadius = 999 },
+            StrokeShape = new RoundRectangle { CornerRadius = (float)(TrackHeight / 2) },
             HorizontalOptions = LayoutOptions.Start,
             WidthRequest = 0
         };
-        _track = new Grid { HeightRequest = 8, Children = { _trackFill, _fill } };
+        _track = new Grid { HeightRequest = TrackHeight, Children = { _trackFill, _fill } };
         _track.SizeChanged += (_, _) => UpdateFill(animate: false);
 
         _label = new Label

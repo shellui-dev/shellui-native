@@ -38,7 +38,7 @@ public partial class Separator : ContentView
 
     public Separator()
     {
-        _line = new BoxView();
+        _line = new BoxView { BackgroundColor = Colors.Transparent };
         _line.Token(BoxView.ColorProperty, ShellToken.Border);
         Content = _line;
         UpdateVisualState();

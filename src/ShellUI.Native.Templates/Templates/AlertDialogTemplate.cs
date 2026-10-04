@@ -147,7 +147,7 @@ internal sealed class AlertDialogPanel : ContentView, IShellOverlayContent
     public AlertDialogPanel(AlertDialog owner)
     {
         _owner = owner;
-        _backdrop = new BoxView();
+        _backdrop = new BoxView { BackgroundColor = Colors.Transparent };
         _backdrop.Token(BoxView.ColorProperty, ShellToken.Overlay);
         // Alert dialogs require a choice: swallow backdrop taps instead of closing.
         _backdrop.GestureRecognizers.Add(new TapGestureRecognizer());
@@ -190,6 +190,8 @@ internal sealed class AlertDialogPanel : ContentView, IShellOverlayContent
         _box.GestureRecognizers.Add(new TapGestureRecognizer());
 
         var root = new Grid { Children = { _backdrop, _box } };
+        // The backdrop dims under the system bars; the centered box stays clear of them.
+        ShellPortal.EdgeToEdge(this, root);
         root.SizeChanged += (_, _) => _box.WidthRequest = Math.Max(0, Math.Min(512, root.Width - 32));
         Content = root;
     }

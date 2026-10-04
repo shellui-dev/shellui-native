@@ -35,7 +35,7 @@ public partial class SheetContent : ContentView, IShellOverlayContent
 
     public SheetContent()
     {
-        _backdrop = new BoxView();
+        _backdrop = new BoxView { BackgroundColor = Colors.Transparent };
         _backdrop.Token(BoxView.ColorProperty, ShellToken.Overlay);
         var tapBackdrop = new TapGestureRecognizer();
         tapBackdrop.Tapped += (_, _) => this.FindParentOfType<Sheet>()?.SetOpen(false);
@@ -64,9 +64,11 @@ public partial class SheetContent : ContentView, IShellOverlayContent
         closeTap.Tapped += (_, _) => this.FindParentOfType<Sheet>()?.SetOpen(false);
         close.GestureRecognizers.Add(closeTap);
 
+        var scroll = new ScrollView { Content = _body };
+        var inner = new Grid { Children = { scroll, close } };
         _panel = new Border
         {
-            Content = new Grid { Children = { new ScrollView { Content = _body }, close } },
+            Content = inner,
             Padding = new Thickness(24),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = 0 },
@@ -77,6 +79,7 @@ public partial class SheetContent : ContentView, IShellOverlayContent
         _panel.GestureRecognizers.Add(new TapGestureRecognizer());
 
         _root = new Grid { Children = { _backdrop, _panel } };
+        ShellPortal.EdgeToEdge(this, _root, _panel, inner, scroll, _body);
         _root.SizeChanged += (_, _) => ApplySide();
         Content = _root;
     }
@@ -100,6 +103,13 @@ public partial class SheetContent : ContentView, IShellOverlayContent
             _ => LayoutOptions.Fill
         };
         _panel.WidthRequest = vertical ? Math.Min(384, _root.Width * 0.75) : -1;
+        // The panel runs under the system bars; its content doesn't.
+        var safe = ShellPortal.GetSafeInsets(_root);
+        _panel.Padding = new Thickness(
+            24 + (side == SheetSide.Left ? safe.Left : 0),
+            24 + (side != SheetSide.Bottom ? safe.Top : 0),
+            24 + (side == SheetSide.Right ? safe.Right : 0),
+            24 + (side != SheetSide.Top ? safe.Bottom : 0));
     }
 
     private (double X, double Y) Offscreen() => Side switch

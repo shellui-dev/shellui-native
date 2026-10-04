@@ -36,7 +36,7 @@ public partial class DrawerContent : ContentView, IShellOverlayContent
 
     public DrawerContent()
     {
-        _backdrop = new BoxView();
+        _backdrop = new BoxView { BackgroundColor = Colors.Transparent };
         _backdrop.Token(BoxView.ColorProperty, ShellToken.Overlay);
         var tapBackdrop = new TapGestureRecognizer();
         tapBackdrop.Tapped += (_, _) => this.FindParentOfType<Drawer>()?.SetOpen(false);
@@ -44,6 +44,7 @@ public partial class DrawerContent : ContentView, IShellOverlayContent
 
         _handle = new BoxView
         {
+            BackgroundColor = Colors.Transparent,
             HeightRequest = 6,
             WidthRequest = 100,
             CornerRadius = 3,
@@ -54,9 +55,11 @@ public partial class DrawerContent : ContentView, IShellOverlayContent
 
         _body = new VerticalStackLayout { Spacing = 16, Padding = new Thickness(16, 16, 16, 24) };
 
+        var scroll = new ScrollView { Content = _body };
+        var stack = new VerticalStackLayout { Spacing = 0, Children = { _handle, scroll } };
         _panel = new Border
         {
-            Content = new VerticalStackLayout { Spacing = 0, Children = { _handle, new ScrollView { Content = _body } } },
+            Content = stack,
             StrokeThickness = 1,
             Shadow = new Shadow { Brush = new SolidColorBrush(Colors.Black), Offset = new Point(0, -4), Radius = 16, Opacity = 0.15f }
         };
@@ -65,6 +68,7 @@ public partial class DrawerContent : ContentView, IShellOverlayContent
         _panel.GestureRecognizers.Add(new TapGestureRecognizer());
 
         _root = new Grid { Children = { _backdrop, _panel } };
+        ShellPortal.EdgeToEdge(this, _root, _panel, stack, scroll, _body);
         _root.SizeChanged += (_, _) => ApplySide();
         Content = _root;
     }
@@ -89,6 +93,13 @@ public partial class DrawerContent : ContentView, IShellOverlayContent
         };
         _panel.WidthRequest = horizontal ? -1 : Math.Min(320, _root.Width * 0.85);
         _panel.MaximumHeightRequest = horizontal && _root.Height > 0 ? _root.Height * 0.8 : double.PositiveInfinity;
+        // The panel runs under the system bars; its content doesn't.
+        var safe = ShellPortal.GetSafeInsets(_root);
+        _body.Padding = new Thickness(
+            16 + (side == DrawerSide.Left ? safe.Left : 0),
+            16 + (side is DrawerSide.Top or DrawerSide.Left or DrawerSide.Right ? safe.Top : 0),
+            16 + (side == DrawerSide.Right ? safe.Right : 0),
+            24 + (side != DrawerSide.Top ? safe.Bottom : 0));
         _handle.IsVisible = side == DrawerSide.Bottom;
         const float r = 10;
         _panel.StrokeShape = new RoundRectangle

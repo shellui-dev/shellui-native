@@ -3,12 +3,13 @@ using MAUI.Demo.Components.UI.Variants;
 
 namespace MAUI.Demo.Components.UI;
 
-// Sonner-style toasts. Put one Toaster where it can fill the page (e.g. last child of the page's
-// root Grid), then call from anywhere:
+// Sonner-style toasts. Call from anywhere — toasts float in the page layer:
 //   Toast.Show("Event created", "Sunday, December 03 at 9:00 AM");
 //   Toast.Success("Profile saved");
 //   Toast.Error("Upload failed", actionText: "Retry", action: Retry);
 // Toasts stack in a corner, slide in, pause while hovered and dismiss themselves.
+// Optional: declare <ui:Toaster Position="TopRight" MaxVisible="5" /> anywhere on a page to
+// configure them; without one, a default Toaster (bottom-right, 3 visible) is created on demand.
 public static class Toast
 {
     private static WeakReference<Toaster>? _toaster;
@@ -25,10 +26,17 @@ public static class Toast
         TimeSpan? duration = null, string? actionText = null, Action? action = null)
     {
         var id = Guid.NewGuid().ToString("N");
-        if (_toaster != null && _toaster.TryGetTarget(out var toaster))
-            toaster.Add(new ToastItem(id, message, description, variant, duration ?? TimeSpan.FromSeconds(4), actionText, action));
-        else
-            System.Diagnostics.Debug.WriteLine("ShellUI: Toast.Show called but no <ui:Toaster /> is on the page.");
+        if (_toaster == null || !_toaster.TryGetTarget(out var toaster) || !toaster.IsAttached)
+        {
+            toaster = new Toaster();
+            if (!toaster.Attach())
+            {
+                System.Diagnostics.Debug.WriteLine("ShellUI: Toast.Show called before any page is on screen.");
+                return id;
+            }
+            Register(toaster);
+        }
+        toaster.Add(new ToastItem(id, message, description, variant, duration ?? TimeSpan.FromSeconds(4), actionText, action));
         return id;
     }
 
@@ -62,8 +70,9 @@ public enum ToasterPosition { BottomRight, BottomCenter, TopRight, TopCenter }
 internal sealed record ToastItem(string Id, string Message, string? Description, ToastVariant Variant,
     TimeSpan Duration, string? ActionText, Action? Action);
 
-// Host for toasts. Input passes through everywhere except the toasts themselves.
-public partial class Toaster : Grid
+// Configures where toasts appear. Its stack lives in the page layer, so the Toaster itself takes
+// no space and can be declared anywhere on the page.
+public partial class Toaster : ContentView
 {
     public static readonly BindableProperty PositionProperty =
         BindableProperty.Create(nameof(Position), typeof(ToasterPosition), typeof(Toaster), ToasterPosition.BottomRight,
@@ -88,15 +97,34 @@ public partial class Toaster : Grid
 
     public Toaster()
     {
-        InputTransparent = true;
-        CascadeInputTransparent = false;
-        ZIndex = 2000;
-        _stack = new VerticalStackLayout { Spacing = 8, Margin = new Thickness(16) };
-        Children.Add(_stack);
-        SizeChanged += (_, _) => _stack.WidthRequest = Math.Max(0, Math.Min(356, Width - 32));
+        _stack = new VerticalStackLayout { Spacing = 8, Margin = new Thickness(16), ZIndex = 2000 };
         UpdatePosition();
-        Loaded += (_, _) => Toast.Register(this);
-        Unloaded += (_, _) => Toast.Unregister(this);
+        Loaded += (_, _) => { if (Attach()) Toast.Register(this); };
+        Unloaded += (_, _) =>
+        {
+            ShellPortal.Detach(_stack);
+            Toast.Unregister(this);
+        };
+    }
+
+    internal bool IsAttached => _stack.Parent != null;
+
+    // Places the toast stack in the page layer (of this Toaster's page, or the page on screen).
+    internal bool Attach()
+    {
+        if (!ShellPortal.Attach(this, _stack)) return false;
+        if (_stack.Parent is Grid layer)
+        {
+            void Fit()
+            {
+                _stack.WidthRequest = Math.Max(0, Math.Min(356, layer.Width - 32));
+                var safe = ShellPortal.GetSafeInsets(layer);
+                _stack.Margin = new Thickness(16 + safe.Left, 16 + safe.Top, 16 + safe.Right, 16 + safe.Bottom);
+            }
+            layer.SizeChanged += (_, _) => Fit();
+            Fit();
+        }
+        return true;
     }
 
     private bool IsTop => Position is ToasterPosition.TopRight or ToasterPosition.TopCenter;
