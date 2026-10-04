@@ -49,11 +49,8 @@ public partial class MainPage : ContentPage
         Report($"Slider: {e.NewValue:F0}");
     }
 
-    private void OnDialogTriggerClicked(object? sender, EventArgs e) => DemoDialog.SetOpen(true);
     private void OnDialogSave(object? sender, EventArgs e) { DemoDialog.SetOpen(false); Report("Dialog: saved"); }
-    private void OnDrawerTriggerClicked(object? sender, EventArgs e) => DemoDrawer.SetOpen(true);
     private void OnDrawerSubmit(object? sender, EventArgs e) { DemoDrawer.SetOpen(false); Report("Drawer: submitted"); }
-    private void OnSheetTriggerClicked(object? sender, EventArgs e) => DemoSheet.SetOpen(true);
     private void OnSheetSave(object? sender, EventArgs e) { DemoSheet.SetOpen(false); Report("Sheet: saved"); }
 
     private async void OnAlertDialogClicked(object? sender, EventArgs e)
@@ -71,6 +68,13 @@ public partial class MainPage : ContentPage
     private void OnToastInfo(object? sender, EventArgs e) => Toast.Info("New version available");
     private void OnToastAction(object? sender, EventArgs e) =>
         Toast.Show("Message archived", actionText: "Undo", action: () => Report("Toast: undo clicked"));
+
+    private void OnDateChanged(object? sender, DateChangedEventArgs e) => Report($"Date: {e.NewDate:d}");
+    private void OnCalendarSelected(object? sender, DateTime date) => Report($"Calendar: {date:d}");
+
+    private void OnTogglePressed(object? sender, bool pressed) => Report($"Toggle: {(pressed ? "on" : "off")}");
+    private void OnOtpCompleted(object? sender, string code) => Report($"OTP complete: {code}");
+    private void OnPageChanged(object? sender, int page) => Report($"Page: {page}");
 
     private void OnDropdownItem(object? sender, EventArgs e) => Report($"Dropdown: {(sender as DropdownItem)?.Text}");
     private void OnTabChanged(object? sender, (string Old, string New) e) => Report($"Tab: {e.New}");

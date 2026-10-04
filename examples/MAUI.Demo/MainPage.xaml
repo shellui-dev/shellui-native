@@ -38,8 +38,7 @@
         </Style>
     </ContentPage.Resources>
 
-    <!-- Dialog / Drawer / Sheet sit at page root (after the ScrollView) so their overlay fills the window. -->
-    <Grid>
+    <!-- Overlays are declared next to their triggers: ShellUI floats them in a page-level layer. -->
         <ScrollView>
             <VerticalStackLayout Padding="24,24,24,48" Spacing="16" MaximumWidthRequest="760">
 
@@ -82,6 +81,15 @@
                     <ui:Button x:Name="LoadingBtn" Text="Click to load" Variant="Secondary" Margin="0,0,8,8" Clicked="OnLoadingClicked" />
                 </FlexLayout>
 
+                <!-- Toggle -->
+                <Label Text="Toggle" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Toggle Icon="Star" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
+                    <ui:Toggle Icon="Bookmark" Variant="Outline" IsPressed="True" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
+                    <ui:Toggle Text="Bold" Variant="Outline" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
+                    <ui:Toggle Text="Notify me" Icon="Bell" Size="Sm" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
+                </FlexLayout>
+
                 <!-- Badge -->
                 <Label Text="Badge" Style="{StaticResource SectionTitle}" />
                 <FlexLayout>
@@ -111,6 +119,10 @@
                 </VerticalStackLayout>
                 <ui:Input Text="Read-only value" IsReadOnly="True" />
 
+                <!-- Input OTP -->
+                <Label Text="Input OTP" Style="{StaticResource SectionTitle}" />
+                <ui:InputOtp x:Name="OtpDemo" Length="6" Completed="OnOtpCompleted" />
+
                 <!-- Textarea -->
                 <Label Text="Textarea" Style="{StaticResource SectionTitle}" />
                 <ui:Textarea x:Name="NotesInput" Placeholder="Type your message here." />
@@ -139,13 +151,20 @@
                 <!-- Date / Time -->
                 <Label Text="Date &amp; Time" Style="{StaticResource SectionTitle}" />
                 <FlexLayout>
-                    <ui:DatePicker x:Name="DatePickerDemo" Margin="0,0,8,8" />
+                    <ui:DatePicker x:Name="DatePickerDemo" Margin="0,0,8,8" DateChanged="OnDateChanged" />
                     <ui:TimePicker x:Name="TimePickerDemo" Margin="0,0,8,8" />
                 </FlexLayout>
 
+                <Label Text="Calendar" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 6"
+                        Padding="12" HorizontalOptions="Start">
+                    <ui:Calendar x:Name="CalendarDemo" DateSelected="OnCalendarSelected" />
+                </Border>
+
                 <!-- Card -->
                 <Label Text="Card" Style="{StaticResource SectionTitle}" />
-                <ui:Card WidthRequest="380" HorizontalOptions="Start">
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=380}"
+                         HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
                     <ui:CardHeader Title="Create project" Description="Deploy your new project in one click." />
                     <ui:CardContent>
                         <VerticalStackLayout Spacing="8">
@@ -199,12 +218,82 @@
                 <!-- Overlays -->
                 <Label Text="Alert Dialog" Style="{StaticResource SectionTitle}" />
                 <ui:Button Text="Delete account" Variant="Destructive" Clicked="OnAlertDialogClicked" />
+                <ui:AlertDialog x:Name="DeleteDialog"
+                                Title="Are you absolutely sure?"
+                                Description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                                ConfirmText="Delete account"
+                                ConfirmVariant="Destructive" />
 
                 <Label Text="Dialog, Drawer, Sheet" Style="{StaticResource SectionTitle}" />
                 <FlexLayout>
-                    <ui:Button Text="Open dialog" Variant="Outline" Margin="0,0,8,8" Clicked="OnDialogTriggerClicked" />
-                    <ui:Button Text="Open drawer" Variant="Outline" Margin="0,0,8,8" Clicked="OnDrawerTriggerClicked" />
-                    <ui:Button Text="Open sheet" Variant="Outline" Margin="0,0,8,8" Clicked="OnSheetTriggerClicked" />
+                    <ui:Dialog x:Name="DemoDialog" Margin="0,0,8,8">
+                        <ui:DialogTrigger><ui:Button Text="Open dialog" Variant="Outline" /></ui:DialogTrigger>
+                        <ui:DialogContent>
+                            <ui:DialogHeader>
+                                <ui:DialogTitle Text="Edit profile" />
+                                <ui:DialogDescription Text="Make changes to your profile here. Click save when you are done." />
+                            </ui:DialogHeader>
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                                <ui:Input Text="Pedro Duarte" />
+                            </VerticalStackLayout>
+                            <ui:DialogFooter>
+                                <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+                                <ui:Button Text="Save changes" Clicked="OnDialogSave" />
+                            </ui:DialogFooter>
+                        </ui:DialogContent>
+                    </ui:Dialog>
+
+                    <ui:Drawer x:Name="DemoDrawer" Margin="0,0,8,8">
+                        <ui:DrawerTrigger><ui:Button Text="Open drawer" Variant="Outline" /></ui:DrawerTrigger>
+                        <ui:DrawerContent>
+                            <Label Text="Move goal" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
+                            <Label Text="Set your daily activity goal." Style="{StaticResource Muted}" HorizontalOptions="Center" />
+                            <Label Text="350 kcal/day" FontSize="30" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
+                            <ui:Button Text="Submit" HorizontalOptions="Fill" Clicked="OnDrawerSubmit" />
+                        </ui:DrawerContent>
+                    </ui:Drawer>
+
+                    <ui:Sheet x:Name="DemoSheet" Margin="0,0,8,8">
+                        <ui:SheetTrigger><ui:Button Text="Open sheet" Variant="Outline" /></ui:SheetTrigger>
+                        <ui:SheetContent>
+                            <Label Text="Edit profile" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                            <Label Text="Make changes to your profile here." Style="{StaticResource Muted}" />
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                                <ui:Input Text="Pedro Duarte" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Username" Style="{StaticResource FieldLabel}" />
+                                <ui:Input Text="@peduarte" />
+                            </VerticalStackLayout>
+                            <ui:Button Text="Save changes" Clicked="OnSheetSave" />
+                        </ui:SheetContent>
+                    </ui:Sheet>
+                </FlexLayout>
+
+                <!-- Tooltip / Hover card -->
+                <Label Text="Tooltip &amp; Hover Card" Style="{StaticResource SectionTitle}" />
+                <FlexLayout>
+                    <ui:Tooltip Text="Add to library" Margin="0,0,8,8">
+                        <ui:Button Icon="Plus" Size="Icon" Variant="Outline" Clicked="OnButtonClicked" />
+                    </ui:Tooltip>
+                    <ui:Tooltip Text="Tooltips can sit below too" Placement="Bottom" Margin="0,0,8,8">
+                        <ui:Button Text="Hover me" Variant="Outline" Clicked="OnButtonClicked" />
+                    </ui:Tooltip>
+                    <ui:HoverCard Margin="0,0,8,8">
+                        <ui:HoverCardTrigger><ui:Button Text="@shellui" Variant="Link" /></ui:HoverCardTrigger>
+                        <ui:HoverCardContent>
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <ui:Avatar Fallback="SU" VerticalOptions="Start" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="@shellui" Style="{StaticResource FieldLabel}" />
+                                    <Label Text="Beautifully designed components for .NET: Blazor, MAUI and Avalonia." Style="{StaticResource Body}" />
+                                    <Label Text="Joined December 2025" Style="{StaticResource Muted}" FontSize="12" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </ui:HoverCardContent>
+                    </ui:HoverCard>
                 </FlexLayout>
 
                 <Label Text="Dropdown &amp; Popover" Style="{StaticResource SectionTitle}" />
@@ -305,6 +394,10 @@
                     <ui:BreadcrumbItem Text="Breadcrumb" IsCurrent="True" />
                 </ui:Breadcrumb>
 
+                <!-- Pagination -->
+                <Label Text="Pagination" Style="{StaticResource SectionTitle}" />
+                <ui:Pagination x:Name="PaginationDemo" Page="5" TotalPages="20" PageChanged="OnPageChanged" />
+
                 <!-- Skeleton -->
                 <Label Text="Skeleton" Style="{StaticResource SectionTitle}" />
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
@@ -314,6 +407,14 @@
                         <ui:Skeleton HeightRequest="16" WidthRequest="200" HorizontalOptions="Start" />
                     </VerticalStackLayout>
                 </Grid>
+
+                <!-- Empty state -->
+                <Label Text="Empty State" Style="{StaticResource SectionTitle}" />
+                <ui:EmptyState Icon="Folder" Title="No projects yet" Bordered="True"
+                               Description="You haven't created any projects. Get started by creating your first one.">
+                    <ui:Button Text="Create project" Icon="Plus" Clicked="OnButtonClicked" />
+                    <ui:Button Text="Import" Variant="Outline" Clicked="OnButtonClicked" />
+                </ui:EmptyState>
 
                 <!-- Scroll area -->
                 <Label Text="Scroll Area" Style="{StaticResource SectionTitle}" />
@@ -330,57 +431,5 @@
                 <Label Text="Built with ShellUI Native." Style="{StaticResource Muted}" HorizontalOptions="Center" />
             </VerticalStackLayout>
         </ScrollView>
-
-        <!-- ============ Page-root overlays ============ -->
-        <ui:Dialog x:Name="DemoDialog">
-            <ui:DialogContent>
-                <ui:DialogHeader>
-                    <ui:DialogTitle Text="Edit profile" />
-                    <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
-                </ui:DialogHeader>
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Name" Style="{StaticResource FieldLabel}" />
-                    <ui:Input Text="Pedro Duarte" />
-                </VerticalStackLayout>
-                <ui:DialogFooter>
-                    <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
-                    <ui:Button Text="Save changes" Clicked="OnDialogSave" />
-                </ui:DialogFooter>
-            </ui:DialogContent>
-        </ui:Dialog>
-
-        <ui:Drawer x:Name="DemoDrawer">
-            <ui:DrawerContent>
-                <Label Text="Move goal" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
-                <Label Text="Set your daily activity goal." Style="{StaticResource Muted}" HorizontalOptions="Center" />
-                <Label Text="350 kcal/day" FontSize="30" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" HorizontalOptions="Center" />
-                <ui:Button Text="Submit" HorizontalOptions="Fill" Clicked="OnDrawerSubmit" />
-            </ui:DrawerContent>
-        </ui:Drawer>
-
-        <ui:AlertDialog x:Name="DeleteDialog"
-                        Title="Are you absolutely sure?"
-                        Description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
-                        ConfirmText="Delete account"
-                        ConfirmVariant="Destructive" />
-
-        <ui:Toaster />
-
-        <ui:Sheet x:Name="DemoSheet">
-            <ui:SheetContent>
-                <Label Text="Edit profile" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
-                <Label Text="Make changes to your profile here." Style="{StaticResource Muted}" />
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Name" Style="{StaticResource FieldLabel}" />
-                    <ui:Input Text="Pedro Duarte" />
-                </VerticalStackLayout>
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Username" Style="{StaticResource FieldLabel}" />
-                    <ui:Input Text="@peduarte" />
-                </VerticalStackLayout>
-                <ui:Button Text="Save changes" Clicked="OnSheetSave" />
-            </ui:SheetContent>
-        </ui:Sheet>
-    </Grid>
 
 </ContentPage>
