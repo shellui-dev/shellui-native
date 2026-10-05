@@ -386,9 +386,9 @@ public static class ShellFocus
 }
 
 // Page-level layer for anything that must draw above the page: modal overlays, floating panels,
-// tooltips, toasts — the MAUI take on a React portal. Created on first use as the last child of
-// the page's root Grid (a non-Grid root is wrapped in one, once). The layer itself never takes
-// input; only what is placed in it does.
+// tooltips, toasts — the MAUI take on a React portal. Set up as the page appears: the page content
+// is wrapped in a Grid, once, and the layer is that Grid's last child. The layer itself never
+// takes input; only what is placed in it does.
 public static class ShellPortal
 {
     private static readonly BindableProperty LayerProperty =
@@ -410,20 +410,19 @@ public static class ShellPortal
         if (page is null) return null;
         if (page.GetValue(LayerProperty) is Grid existing) return existing;
 
-        if (page.Content is not Grid root)
-        {
-            var content = page.Content;
-            var scroll = content as ScrollView;
-            var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
-            // Edge-to-edge like the page itself, so wrapping doesn't change how the content is inset.
-            root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
-            page.Content = root;
-            if (content != null) root.Children.Add(content);
-            // Normally this runs as the page appears (see ShellTheme.EnsureInitialized); if it
-            // runs later, re-parenting must not lose where the user had scrolled to.
-            if (scroll != null && (scrollX > 0 || scrollY > 0))
-                scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
-        }
+        // The page content is always wrapped, even when it already is a Grid: the wrapper spans
+        // the whole window while the content keeps its own safe-area insets, so the layer can
+        // reach under the system bars without moving anything on the page.
+        var content = page.Content;
+        var scroll = content as ScrollView;
+        var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
+        var root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
+        page.Content = root;
+        if (content != null) root.Children.Add(content);
+        // Normally this runs as the page appears (see ShellTheme.EnsureInitialized); if it runs
+        // later, re-parenting must not lose where the user had scrolled to.
+        if (scroll != null && (scrollX > 0 || scrollY > 0))
+            scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
 
         // The layer covers the whole window (backdrops dim under the system bars); content placed
         // in it uses GetSafeInsets to stay clear of them.
@@ -434,8 +433,6 @@ public static class ShellPortal
             CascadeInputTransparent = false,
             SafeAreaEdges = SafeAreaEdges.None
         };
-        Grid.SetRowSpan(layer, Math.Max(1, root.RowDefinitions.Count));
-        Grid.SetColumnSpan(layer, Math.Max(1, root.ColumnDefinitions.Count));
         root.Children.Add(layer);
         page.SetValue(LayerProperty, layer);
 #if ANDROID

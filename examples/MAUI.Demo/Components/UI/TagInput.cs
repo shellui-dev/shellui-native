@@ -63,6 +63,7 @@ public partial class TagInput : ContentView
             FontSize = 14,
             BackgroundColor = Colors.Transparent,
             HeightRequest = 28,
+            MinimumHeightRequest = 28, // Android gives text fields a 44dp minimum otherwise
             Margin = new Thickness(2, 2),
             ClearButtonVisibility = ClearButtonVisibility.Never,
             IsTextPredictionEnabled = false
@@ -71,7 +72,11 @@ public partial class TagInput : ContentView
         _entry.Token(Entry.PlaceholderColorProperty, ShellToken.MutedForeground);
         ShellPlatform.StripNativeChrome(_entry);
         ShellFocus.Track(_entry);
-        _entry.Completed += (_, _) => AddFromEntry();
+        _entry.Completed += (_, _) =>
+        {
+            AddFromEntry();
+            KeepTyping();
+        };
         _entry.TextChanged += (_, e) =>
         {
             // Typing or pasting a separator commits everything before it.
@@ -118,6 +123,24 @@ public partial class TagInput : ContentView
     {
         var next = new List<string>(Current);
         if (next.Remove(tag)) Tags = next;
+    }
+
+    // Enter usually dismisses the soft keyboard; stay in the field so several tags can be
+    // entered in a row.
+    private void KeepTyping()
+    {
+        Dispatcher.Dispatch(async () =>
+        {
+            try
+            {
+                _entry.Focus();
+                await _entry.ShowSoftInputAsync(CancellationToken.None);
+            }
+            catch (Exception)
+            {
+                // No soft keyboard on this platform, or the field is gone: nothing to keep open.
+            }
+        });
     }
 
     private void AddFromEntry()
