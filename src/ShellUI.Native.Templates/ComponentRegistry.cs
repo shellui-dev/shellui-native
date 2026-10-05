@@ -105,7 +105,11 @@ public static class ComponentRegistry
         { "pagination", (PaginationTemplate.Metadata, PaginationTemplate.Contents) },
         { "empty-state", (EmptyStateTemplate.Metadata, EmptyStateTemplate.Contents) },
         { "callout", (CalloutTemplate.Metadata, CalloutTemplate.Contents) },
-        { "combobox", (ComboboxTemplate.Metadata, ComboboxTemplate.Contents) }
+        { "combobox", (ComboboxTemplate.Metadata, ComboboxTemplate.Contents) },
+        { "table", (TableTemplate.Metadata, TableTemplate.Contents) },
+        { "context-menu", (ContextMenuTemplate.Metadata, ContextMenuTemplate.Contents) },
+        { "carousel", (CarouselTemplate.Metadata, CarouselTemplate.Contents) },
+        { "stepper", (StepperTemplate.Metadata, StepperTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

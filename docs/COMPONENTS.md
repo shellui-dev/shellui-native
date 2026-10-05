@@ -517,6 +517,33 @@ Trail with chevron separators; links turn foreground on hover.
 
 ---
 
+### Stepper
+Step-by-step flow: numbered circles joined by lines (the active one filled, completed ones
+checked), the active step's content, and Previous / Next / Confirm buttons. A step becomes
+clickable once it has been reached.
+
+```bash
+shellui-native add stepper
+```
+
+**Properties (Stepper):** `CurrentStep` (two-way, 0-based), `ShowNavigation` (true),
+`PreviousText`, `NextText`, `ConfirmText` · **Events:** `CurrentStepChanged`, `Confirmed` ·
+**Methods:** `Next()`, `Previous()`
+
+**Properties (StepperStep):** `Title`, `Description` · its child view is the step's content
+
+```xml
+<ui:Stepper Confirmed="OnDone">
+    <ui:StepperStep Title="Account" Description="Your details">
+        <ui:Input Placeholder="you@example.com" />
+    </ui:StepperStep>
+    <ui:StepperStep Title="Plan"> ... </ui:StepperStep>
+    <ui:StepperStep Title="Review"> ... </ui:StepperStep>
+</ui:Stepper>
+```
+
+---
+
 ### Pagination
 Previous / page numbers / Next, with ellipses for skipped ranges. The current page is outlined;
 Previous and Next disable at the ends.
@@ -550,6 +577,60 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 ### Skeleton
 Pulsing placeholder in the `Muted` token (opacity 1 → 0.5 → 1 every 2s, only while on screen).
 **Properties:** `CornerRadius` (default 6) plus `WidthRequest` / `HeightRequest`
+
+### Table
+Rows inside a rounded border: a header row in the muted foreground, body rows divided by a
+hairline that tint on hover, and an optional caption.
+
+```bash
+shellui-native add table
+```
+
+**Properties (Table):** `Columns` (Grid column widths, e.g. `2*,*,*,100`), `Caption`, `Bordered`
+(true), `MinimumContentWidth` (below this width the table scrolls sideways instead of squeezing)
+
+**TableRow:** `IsSelected`, `Tapped` event · **TableHead:** `Text`, `HorizontalTextAlignment` ·
+**TableCell:** `Text`, `HorizontalTextAlignment`, `IsBold`, or any child view
+
+```xml
+<ui:Table Columns="*,*,1.4*,90" Caption="A list of your recent invoices.">
+    <ui:TableHeader>
+        <ui:TableHead Text="Invoice" />
+        <ui:TableHead Text="Status" />
+        <ui:TableHead Text="Method" />
+        <ui:TableHead Text="Amount" HorizontalTextAlignment="End" />
+    </ui:TableHeader>
+    <ui:TableRow Tapped="OnRowTapped">
+        <ui:TableCell Text="INV001" IsBold="True" />
+        <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalOptions="Start" /></ui:TableCell>
+        <ui:TableCell Text="Credit Card" />
+        <ui:TableCell Text="$250.00" HorizontalTextAlignment="End" />
+    </ui:TableRow>
+</ui:Table>
+```
+
+Use star and fixed widths in `Columns`: every row is its own grid, so an `Auto` column would size
+per row. For long lists, put a `TableHeader` above a `CollectionView` whose item template is a
+`TableRow` with the same `Columns` set on the row itself.
+
+### Carousel
+One slide at a time in a rounded frame. Swipe, use the round arrow buttons or tap a dot to move.
+Each child view is a slide.
+
+```bash
+shellui-native add carousel
+```
+
+**Properties:** `Position` (two-way), `Loop` (true), `ShowArrows`, `ShowDots`, `AutoPlay`,
+`AutoPlayInterval` (ms, default 3000), `AspectRatio` (width / height, default 16:9; `0` to size it
+with `HeightRequest` instead) · **Events:** `PositionChanged` · **Methods:** `Next()`, `Previous()`
+
+```xml
+<ui:Carousel AspectRatio="2" AutoPlay="True">
+    <Image Source="one.jpg" Aspect="AspectFill" />
+    <Image Source="two.jpg" Aspect="AspectFill" />
+</ui:Carousel>
+```
 
 ### Empty State
 Placeholder for an empty list or screen: icon in a muted tile, title, description and optional
@@ -739,6 +820,33 @@ shellui-native add popover
 </ui:Popover>
 ```
 
+### Context Menu
+Right-click the trigger (long-press on touch) to open a menu at the pointer. Clicking outside,
+picking an item or pressing Escape closes it.
+
+```bash
+shellui-native add context-menu
+```
+
+**ContextMenuItem:** `Text`, `Icon`, `Shortcut` (hint text, display only), `IsDestructive`,
+`IsEnabled` · **Events:** `Clicked` · **ContextMenuSeparator** divides groups ·
+`ContextMenu.OpenAt(point)` opens it from code
+
+```xml
+<ui:ContextMenu>
+    <ui:ContextMenuTrigger>
+        <Border HeightRequest="120"> ... </Border>
+    </ui:ContextMenuTrigger>
+    <ui:ContextMenuContent>
+        <ui:ContextMenuItem Text="Copy" Icon="Copy" Shortcut="Ctrl+C" Clicked="OnCopy" />
+        <ui:ContextMenuSeparator />
+        <ui:ContextMenuItem Text="Delete" Icon="Trash2" IsDestructive="True" Clicked="OnDelete" />
+    </ui:ContextMenuContent>
+</ui:ContextMenu>
+```
+
+On touch devices the menu opens under the trigger rather than at the finger.
+
 ### Tooltip
 Small label shown above (or below) a view after the pointer rests on it. Pointer devices only.
 
@@ -827,6 +935,10 @@ core helpers); components that draw icons also depend on `icon`.
 | dialog | shell, dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close |
 | drawer / sheet | shell, *-trigger, *-content (content also installs icon for the close button) |
 | dropdown / popover | shell, *-trigger, *-content (+ dropdown-item) |
+| table | shell |
+| carousel | shell, icon |
+| context-menu | shell, icon, element-extensions |
+| stepper | shell, icon, button |
 | hover-card | shell, hover-card-trigger, hover-card-content |
 | date-picker | shell, icon, calendar |
 | tooltip | shell |

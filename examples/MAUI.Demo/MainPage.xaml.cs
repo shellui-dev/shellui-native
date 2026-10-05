@@ -86,6 +86,21 @@ public partial class MainPage : ContentPage
     private void OnOtpCompleted(object? sender, string code) => Report($"OTP complete: {code}");
     private void OnPageChanged(object? sender, int page) => Report($"Page: {page}");
 
+    private void OnContextMenuItem(object? sender, EventArgs e) => Report($"Context menu: {(sender as ContextMenuItem)?.Text}");
+    private void OnStepChanged(object? sender, int step) => Report($"Stepper: step {step + 1}");
+    private void OnStepperConfirmed(object? sender, EventArgs e) => Toast.Success("Workspace created");
+    private void OnCarouselChanged(object? sender, int position) => Report($"Carousel: slide {position + 1}");
+
+    private TableRow? _selectedRow;
+    private void OnTableRowTapped(object? sender, EventArgs e)
+    {
+        if (sender is not TableRow row) return;
+        if (_selectedRow != null) _selectedRow.IsSelected = false;
+        _selectedRow = row;
+        row.IsSelected = true;
+        Report($"Table: {row.Children.OfType<TableCell>().FirstOrDefault()?.Text}");
+    }
+
     private void OnDropdownItem(object? sender, EventArgs e) => Report($"Dropdown: {(sender as DropdownItem)?.Text}");
     private void OnTabChanged(object? sender, (string Old, string New) e) => Report($"Tab: {e.New}");
 

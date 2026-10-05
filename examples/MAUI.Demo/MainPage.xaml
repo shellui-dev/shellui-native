@@ -340,6 +340,26 @@
                     </ui:Popover>
                 </FlexLayout>
 
+                <!-- Context menu -->
+                <Label Text="Context Menu" Style="{StaticResource SectionTitle}" />
+                <ui:ContextMenu>
+                    <ui:ContextMenuTrigger>
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeDashArray="4,4"
+                                StrokeShape="RoundRectangle 6" HeightRequest="120" BackgroundColor="Transparent">
+                            <Label Text="Right-click here (long-press on touch)" Style="{StaticResource Muted}" FontSize="14"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </ui:ContextMenuTrigger>
+                    <ui:ContextMenuContent>
+                        <ui:ContextMenuItem Text="Back" Icon="ArrowLeft" Shortcut="Alt+Left" Clicked="OnContextMenuItem" />
+                        <ui:ContextMenuItem Text="Reload" Icon="RefreshCw" Shortcut="Ctrl+R" Clicked="OnContextMenuItem" />
+                        <ui:ContextMenuItem Text="Copy link" Icon="Link" Clicked="OnContextMenuItem" />
+                        <ui:ContextMenuItem Text="Save as..." Icon="Save" IsEnabled="False" />
+                        <ui:ContextMenuSeparator />
+                        <ui:ContextMenuItem Text="Delete" Icon="Trash2" IsDestructive="True" Clicked="OnContextMenuItem" />
+                    </ui:ContextMenuContent>
+                </ui:ContextMenu>
+
                 <!-- Collapsible -->
                 <Label Text="Collapsible" Style="{StaticResource SectionTitle}" />
                 <ui:Collapsible>
@@ -406,6 +426,28 @@
                     </ui:TabsContent>
                 </ui:Tabs>
 
+                <!-- Stepper -->
+                <Label Text="Stepper" Style="{StaticResource SectionTitle}" />
+                <ui:Stepper x:Name="StepperDemo" CurrentStepChanged="OnStepChanged" Confirmed="OnStepperConfirmed">
+                    <ui:StepperStep Title="Account" Description="Your details">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                            <ui:Input Placeholder="you@example.com" Keyboard="Email" />
+                        </VerticalStackLayout>
+                    </ui:StepperStep>
+                    <ui:StepperStep Title="Plan" Description="Pick a tier">
+                        <ui:RadioGroup Value="pro">
+                            <ui:RadioGroupItem Value="free" Text="Free" />
+                            <ui:RadioGroupItem Value="pro" Text="Pro" />
+                            <ui:RadioGroupItem Value="team" Text="Team" />
+                        </ui:RadioGroup>
+                    </ui:StepperStep>
+                    <ui:StepperStep Title="Review" Description="Confirm and finish">
+                        <Label Text="Everything looks good. Press Confirm to create the workspace." FontSize="14"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                    </ui:StepperStep>
+                </ui:Stepper>
+
                 <!-- Breadcrumb -->
                 <Label Text="Breadcrumb" Style="{StaticResource SectionTitle}" />
                 <ui:Breadcrumb>
@@ -418,6 +460,29 @@
                 <Label Text="Pagination" Style="{StaticResource SectionTitle}" />
                 <ui:Pagination x:Name="PaginationDemo" Page="5" TotalPages="20" PageChanged="OnPageChanged" />
 
+                <!-- Carousel -->
+                <Label Text="Carousel" Style="{StaticResource SectionTitle}" />
+                <ui:Carousel x:Name="CarouselDemo" AspectRatio="2.4" WidthRequest="{OnIdiom Phone=-1, Default=560}"
+                             HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}"
+                             PositionChanged="OnCarouselChanged">
+                    <Grid BackgroundColor="{DynamicResource ShellUIMuted}">
+                        <Label Text="1" FontSize="48" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                    </Grid>
+                    <Grid BackgroundColor="{DynamicResource ShellUISecondary}">
+                        <Label Text="2" FontSize="48" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                    </Grid>
+                    <Grid BackgroundColor="{DynamicResource ShellUIAccent}">
+                        <Label Text="3" FontSize="48" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                    </Grid>
+                    <Grid BackgroundColor="{DynamicResource ShellUIMuted}">
+                        <Label Text="4" FontSize="48" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                    </Grid>
+                </ui:Carousel>
+
                 <!-- Skeleton -->
                 <Label Text="Skeleton" Style="{StaticResource SectionTitle}" />
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
@@ -427,6 +492,41 @@
                         <ui:Skeleton HeightRequest="16" WidthRequest="200" HorizontalOptions="Start" />
                     </VerticalStackLayout>
                 </Grid>
+
+                <!-- Table -->
+                <Label Text="Table" Style="{StaticResource SectionTitle}" />
+                <ui:Table Columns="*,*,1.4*,90" MinimumContentWidth="440" Caption="A list of your recent invoices.">
+                    <ui:TableHeader>
+                        <ui:TableHead Text="Invoice" />
+                        <ui:TableHead Text="Status" />
+                        <ui:TableHead Text="Method" />
+                        <ui:TableHead Text="Amount" HorizontalTextAlignment="End" />
+                    </ui:TableHeader>
+                    <ui:TableRow Tapped="OnTableRowTapped">
+                        <ui:TableCell Text="INV001" IsBold="True" />
+                        <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalOptions="Start" VerticalOptions="Center" /></ui:TableCell>
+                        <ui:TableCell Text="Credit Card" />
+                        <ui:TableCell Text="$250.00" HorizontalTextAlignment="End" />
+                    </ui:TableRow>
+                    <ui:TableRow Tapped="OnTableRowTapped">
+                        <ui:TableCell Text="INV002" IsBold="True" />
+                        <ui:TableCell><ui:Badge Text="Pending" Variant="Warning" HorizontalOptions="Start" VerticalOptions="Center" /></ui:TableCell>
+                        <ui:TableCell Text="PayPal" />
+                        <ui:TableCell Text="$150.00" HorizontalTextAlignment="End" />
+                    </ui:TableRow>
+                    <ui:TableRow Tapped="OnTableRowTapped">
+                        <ui:TableCell Text="INV003" IsBold="True" />
+                        <ui:TableCell><ui:Badge Text="Unpaid" Variant="Destructive" HorizontalOptions="Start" VerticalOptions="Center" /></ui:TableCell>
+                        <ui:TableCell Text="Bank Transfer" />
+                        <ui:TableCell Text="$350.00" HorizontalTextAlignment="End" />
+                    </ui:TableRow>
+                    <ui:TableRow Tapped="OnTableRowTapped">
+                        <ui:TableCell Text="INV004" IsBold="True" />
+                        <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalOptions="Start" VerticalOptions="Center" /></ui:TableCell>
+                        <ui:TableCell Text="Credit Card" />
+                        <ui:TableCell Text="$450.00" HorizontalTextAlignment="End" />
+                    </ui:TableRow>
+                </ui:Table>
 
                 <!-- Empty state -->
                 <Label Text="Empty State" Style="{StaticResource SectionTitle}" />

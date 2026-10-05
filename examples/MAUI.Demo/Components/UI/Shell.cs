@@ -630,6 +630,13 @@ public static class ShellPortal
 
         var size = new Size(panel.Width, panel.Height);
         var origin = GetPosition(anchor, layer);
+        var anchorSize = new Size(anchor.Width, anchor.Height);
+        if (options.AnchorPoint is { } point)
+        {
+            // Open at a point inside the anchor (context menus): a zero-size anchor there.
+            origin = new Point(origin.X + point.X, origin.Y + point.Y);
+            anchorSize = Size.Zero;
+        }
         const double edge = 8;
         var safe = GetSafeInsets(layer);
         var minTop = safe.Top + edge;
@@ -637,11 +644,11 @@ public static class ShellPortal
 
         var x = options.Align switch
         {
-            ShellPopupAlign.Center => origin.X + (anchor.Width - size.Width) / 2,
-            ShellPopupAlign.End => origin.X + anchor.Width - size.Width,
+            ShellPopupAlign.Center => origin.X + (anchorSize.Width - size.Width) / 2,
+            ShellPopupAlign.End => origin.X + anchorSize.Width - size.Width,
             _ => origin.X
         };
-        var below = origin.Y + anchor.Height + options.Offset;
+        var below = origin.Y + anchorSize.Height + options.Offset;
         var above = origin.Y - size.Height - options.Offset;
         var fitsBelow = below + size.Height <= maxBottom;
         var fitsAbove = above >= minTop;
@@ -670,6 +677,8 @@ public sealed class ShellPopupOptions
     public ShellPopupAlign Align { get; init; } = ShellPopupAlign.Start;
     public double Offset { get; init; } = 4;
     public bool MatchAnchorWidth { get; init; }
+    // Position inside the anchor to open at instead of its edge (e.g. where the user right-clicked).
+    public Point? AnchorPoint { get; init; }
     // Modal popups get a click-outside catcher (menus, selects); tooltips and hover cards don't.
     public bool Modal { get; init; } = true;
     public Action? OnDismiss { get; init; }
@@ -850,6 +859,8 @@ public abstract class ShellPopoverHost : Grid, IShellPopup
     protected virtual bool Modal => true;
     protected virtual ShellPopupPlacement Placement => ShellPopupPlacement.Bottom;
     protected virtual ShellPopupAlign Align => ShellPopupAlign.Start;
+    protected virtual Point? AnchorPoint => null;
+    protected virtual double Offset => 4;
 
     protected View? PopupContent => _content;
 
@@ -878,6 +889,8 @@ public abstract class ShellPopoverHost : Grid, IShellPopup
             {
                 Placement = Placement,
                 Align = Align,
+                Offset = Offset,
+                AnchorPoint = AnchorPoint,
                 Modal = Modal,
                 Owner = this,
                 OnDismiss = Close
