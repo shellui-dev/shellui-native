@@ -26,8 +26,7 @@ namespace YourProjectNamespace.Components.UI;
 //   <ui:WrapLayout Spacing=""8"" LineSpacing=""8"">
 //       <ui:Button Text=""One"" /> <ui:Button Text=""Two"" /> ...
 //   </ui:WrapLayout>
-// Unlike FlexLayout it measures children once per layout pass, which matters on Windows: a long
-// page with many FlexLayouts can run WinUI into its layout-cycle limit.
+// Each child is measured once per layout pass.
 public partial class WrapLayout : Layout
 {
     // Gap between children in a row.

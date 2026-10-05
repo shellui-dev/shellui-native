@@ -44,8 +44,7 @@ public partial class Timeline : ContentView
         Loaded += (_, _) => Refresh();
     }
 
-    // Items don't know their place: the timeline tells each one whether it is first or last,
-    // so the line starts at the first marker and stops at the last.
+    // The timeline tells each item if it is first or last, so the line starts and stops at a marker.
     private void Refresh()
     {
         var items = _stack.Children.OfType<TimelineItem>().ToList();

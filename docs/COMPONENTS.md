@@ -1111,9 +1111,8 @@ on Android close the one on top; an Alert Dialog treats that as Cancel. With not
 keeps its normal behavior. Call `ShellDismiss.DismissTop()` to do the same from your own code.
 
 ### How overlays float
-`ShellPortal` (in `Shell.cs`) keeps one layer above each page's content — set up as the page
-appears, as the last child of the page's root `Grid`; a page whose root isn't a Grid gets wrapped
-in one, once. Dialogs, drawers, sheets, menus, selects, tooltips, hover cards and toasts are all
+`ShellPortal` (in `Shell.cs`) keeps one layer above each page's content. As the page appears, its
+content is wrapped in a `Grid`, once, and the layer is that Grid's last child. Dialogs, drawers, sheets, menus, selects, tooltips, hover cards and toasts are all
 placed in that layer, so they are never clipped by a `ScrollView` and always draw on top. Content
 moved there keeps a link to its component, so bindings and lookups keep working.
 
@@ -1126,11 +1125,11 @@ system bars, and their content (plus popups and toasts) is kept clear of the bar
 
 ## Long pages on Windows
 
-WinUI gives a window 250 layout passes to settle. In .NET MAUI every `Border` sets its outline
-path the first time it is arranged, which asks for another pass, so a single page holding several
-hundred Borders (most ShellUI components are built from them) can run out and crash at startup
-with `Layout cycle detected`. An ordinary screen is nowhere near the limit; a "kitchen sink" page
-is.
+WinUI gives a window 250 layout passes to settle, and a very large page can run out and crash at
+startup with `Layout cycle detected`. The demo hit this when every component was on one page:
+WinUI's trace showed layout still reaching new elements when the passes ran out, with `Border`
+outline updates each asking for another pass. An ordinary screen is nowhere near the limit; a
+"kitchen sink" page is.
 
 If you hit it, lay out less at once: split the page, or keep sections collapsed
 (`IsVisible="False"`) until they are needed, since hidden content is not laid out. The demo does

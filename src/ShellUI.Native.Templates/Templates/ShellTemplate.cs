@@ -410,17 +410,15 @@ public static class ShellPortal
         if (page is null) return null;
         if (page.GetValue(LayerProperty) is Grid existing) return existing;
 
-        // The page content is always wrapped, even when it already is a Grid: the wrapper spans
-        // the whole window while the content keeps its own safe-area insets, so the layer can
-        // reach under the system bars without moving anything on the page.
+        // Always wrapped, even a Grid root: the wrapper spans the window while the content keeps
+        // its own safe-area insets, so the layer can reach under the system bars.
         var content = page.Content;
         var scroll = content as ScrollView;
         var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
         var root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
         page.Content = root;
         if (content != null) root.Children.Add(content);
-        // Normally this runs as the page appears (see ShellTheme.EnsureInitialized); if it runs
-        // later, re-parenting must not lose where the user had scrolled to.
+        // Re-parenting must not lose the scroll position if this runs after the page appeared.
         if (scroll != null && (scrollX > 0 || scrollY > 0))
             scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
 

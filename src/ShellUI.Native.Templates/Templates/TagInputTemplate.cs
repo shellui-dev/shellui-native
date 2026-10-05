@@ -144,8 +144,7 @@ public partial class TagInput : ContentView
         if (next.Remove(tag)) Tags = next;
     }
 
-    // Enter usually dismisses the soft keyboard; stay in the field so several tags can be
-    // entered in a row.
+    // Enter dismisses the soft keyboard; stay in the field so tags can be entered in a row.
     private void KeepTyping()
     {
         Dispatcher.Dispatch(async () =>
@@ -157,7 +156,7 @@ public partial class TagInput : ContentView
             }
             catch (Exception)
             {
-                // No soft keyboard on this platform, or the field is gone: nothing to keep open.
+                // No soft keyboard here, or the field is gone.
             }
         });
     }

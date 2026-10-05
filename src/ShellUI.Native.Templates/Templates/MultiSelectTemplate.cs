@@ -125,8 +125,7 @@ public partial class MultiSelect : ContentView, IShellPopup
         var tap = new TapGestureRecognizer();
         tap.Tapped += (_, _) =>
         {
-            // A tap on a chip's × reaches the trigger too on some platforms; it removed a value,
-            // it should not also open or close the panel.
+            // A tap on a chip's × can reach the trigger too; it must not toggle the panel.
             if (_chipTapped) { _chipTapped = false; return; }
             if (!IsEnabled) return;
             ShellFocus.FocusPressed(this);
@@ -218,8 +217,7 @@ public partial class MultiSelect : ContentView, IShellPopup
                 Owner = this,
                 OnDismiss = Close
             });
-            // Type-to-filter straight away where there is a hardware keyboard; on touch devices
-            // the soft keyboard would cover the list, so the user taps the field to search.
+            // Desktop only: on touch the soft keyboard would cover the list.
             if (DeviceInfo.Idiom == DeviceIdiom.Desktop)
                 Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(150), () => { if (IsOpen) _search.Focus(); });
         }

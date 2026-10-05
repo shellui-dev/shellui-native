@@ -130,8 +130,7 @@ public partial class Table : ContentView
         }
     }
 
-    // Rows don't know their place in the table: the table hands them their columns and tells
-    // the last one to drop its divider.
+    // The table hands rows their columns and tells the last one to drop its divider.
     private void Refresh()
     {
         var widths = ParseColumns(Columns);
@@ -168,8 +167,7 @@ public partial class Table : ContentView
         FitScrollContent();
     }
 
-    // Inside a horizontal ScrollView the rows would measure at their minimum width, so they
-    // are given the larger of the visible width and the minimum.
+    // Inside a horizontal ScrollView rows measure at their minimum width; give them a real one.
     private void FitScrollContent()
     {
         if (MinimumContentWidth <= 0 || _frame.Width <= 0) return;

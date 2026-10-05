@@ -154,8 +154,7 @@ public partial class NumberInput : ContentView
         return number;
     }
 
-    // Reads what the user typed: a number is clamped and kept, empty clears the value, and
-    // anything else puts the last good value back.
+    // A typed number is clamped and kept, empty clears the value, anything else is reverted.
     private void Commit()
     {
         var text = _entry.Text?.Trim();
