@@ -109,7 +109,14 @@ public static class ComponentRegistry
         { "table", (TableTemplate.Metadata, TableTemplate.Contents) },
         { "context-menu", (ContextMenuTemplate.Metadata, ContextMenuTemplate.Contents) },
         { "carousel", (CarouselTemplate.Metadata, CarouselTemplate.Contents) },
-        { "stepper", (StepperTemplate.Metadata, StepperTemplate.Contents) }
+        { "stepper", (StepperTemplate.Metadata, StepperTemplate.Contents) },
+        { "toggle-group", (ToggleGroupTemplate.Metadata, ToggleGroupTemplate.Contents) },
+        { "number-input", (NumberInputTemplate.Metadata, NumberInputTemplate.Contents) },
+        { "tag-input", (TagInputTemplate.Metadata, TagInputTemplate.Contents) },
+        { "kbd", (KbdTemplate.Metadata, KbdTemplate.Contents) },
+        { "stat-card", (StatCardTemplate.Metadata, StatCardTemplate.Contents) },
+        { "timeline", (TimelineTemplate.Metadata, TimelineTemplate.Contents) },
+        { "wrap-layout", (WrapLayoutTemplate.Metadata, WrapLayoutTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

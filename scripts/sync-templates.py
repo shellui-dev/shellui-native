@@ -57,6 +57,20 @@ NEW = {
                  ["carousel", "slider", "slides", "gallery"]),
     "Stepper": ("stepper", "Stepper", "Step-by-step flow with numbered steps and navigation", "Navigation",
                 ["stepper", "wizard", "steps", "progress"]),
+    "ToggleGroup": ("toggle-group", "Toggle Group", "Row of toggles with single or multiple selection", "Form",
+                    ["toggle", "group", "segmented", "selection"]),
+    "NumberInput": ("number-input", "Number Input", "Number field with decrement and increment buttons", "Form",
+                    ["number", "input", "stepper", "quantity"]),
+    "TagInput": ("tag-input", "Tag Input", "Text field that turns entries into removable tags", "Form",
+                 ["tags", "chips", "input", "labels"]),
+    "Kbd": ("kbd", "Kbd", "Keyboard key hint", "DataDisplay",
+            ["keyboard", "shortcut", "key"]),
+    "StatCard": ("stat-card", "Stat Card", "Dashboard metric with trend and description", "DataDisplay",
+                 ["stat", "metric", "kpi", "dashboard"]),
+    "Timeline": ("timeline", "Timeline", "Vertical list of events joined by a line", "DataDisplay",
+                 ["timeline", "history", "activity", "steps"]),
+    "WrapLayout": ("wrap-layout", "Wrap Layout", "Children flow left to right and wrap onto new rows", "Layout",
+                   ["wrap", "flow", "flex", "layout"]),
     "EmptyState": ("empty-state", "Empty State", "Placeholder for an empty list or screen", "DataDisplay",
                    ["empty", "placeholder", "state"]),
 }
@@ -65,6 +79,7 @@ NEW = {
 EXTRA_DEPS = {
     "HoverCard": ["hover-card-trigger", "hover-card-content"],
     "DatePicker": ["calendar"],
+    "TagInput": ["wrap-layout"],
 }
 
 SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|\bShellPlatform\b|\bShellPopups\b|"
