@@ -398,7 +398,11 @@ The remaining MAUI data-display and advanced tiers, built demo-first like Phase 
   arcs in `activity`, which crashed the app
 - [x] Demo shows one category at a time (a single page of every component exceeded WinUI's
   layout-pass limit; see COMPONENTS.md, "Long pages on Windows")
-- [ ] Android pass for the second batch; iOS pass for everything
+- [x] Android pass for the second batch (2026-10-05): fixed the overlay layer for a Grid page root
+  and the tag-input keyboard / height
+- [x] `multi-select`, `tree-view`, `copy-button`, `link-card`, `aspect-ratio` — run on Windows and
+  Android
+- [ ] iOS / Mac Catalyst pass for everything
 - [ ] Escape closes the overlay on top on Mac Catalyst
 - [ ] `resizable`, `navbar`, `sidebar` (P6.4–P6.6)
 

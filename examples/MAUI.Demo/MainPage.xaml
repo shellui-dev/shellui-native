@@ -142,6 +142,17 @@
                     <ui:Kbd Text="Esc" />
                 </HorizontalStackLayout>
 
+                <!-- Copy button -->
+                <Label Text="Copy Button" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 6"
+                        BackgroundColor="{DynamicResource ShellUIMuted}" Padding="12,4,4,4" HorizontalOptions="Start">
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="shellui-native add button" FontFamily="monospace" FontSize="13" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIForeground}" />
+                        <ui:CopyButton Text="shellui-native add button" Copied="OnCopied" />
+                    </HorizontalStackLayout>
+                </Border>
+                <ui:CopyButton Text="https://shellui.dev" Label="Copy link" Copied="OnCopied" />
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupForms" Spacing="16" IsVisible="False">
@@ -188,6 +199,12 @@
                 <Label Text="Combobox" Style="{StaticResource SectionTitle}" />
                 <ui:Combobox x:Name="FrameworkCombobox" Placeholder="Select framework..." SearchPlaceholder="Search framework..."
                              WidthRequest="280" HorizontalOptions="Start" ValueChanged="OnComboboxChanged" />
+
+                <!-- Multi select -->
+                <Label Text="Multi Select" Style="{StaticResource SectionTitle}" />
+                <ui:MultiSelect x:Name="FrameworkMultiSelect" Placeholder="Select frameworks..." SearchPlaceholder="Search framework..."
+                                WidthRequest="{OnIdiom Phone=-1, Default=360}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}"
+                                ValuesChanged="OnMultiSelectChanged" />
 
                 <!-- Checkbox / Switch / Radio -->
                 <Label Text="Checkbox, Switch, Radio Group" Style="{StaticResource SectionTitle}" />
@@ -249,6 +266,13 @@
                     <ui:StatCard Title="Active now" Value="573" Change="steady" Icon="Activity"
                                  WidthRequest="230" Margin="0,0,12,12" />
                 </ui:WrapLayout>
+
+                <!-- Link card -->
+                <Label Text="Link Card" Style="{StaticResource SectionTitle}" />
+                <ui:LinkCard Title="Documentation" Description="Guides, theming and the full component reference."
+                             Icon="FileText" Clicked="OnLinkCardClicked" WidthRequest="{OnIdiom Phone=-1, Default=420}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}" />
+                <ui:LinkCard Title="Source on GitHub" Description="Browse the code, report issues and contribute."
+                             Icon="Code" Clicked="OnLinkCardClicked" WidthRequest="{OnIdiom Phone=-1, Default=420}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}" />
 
                 <!-- Alert -->
                 <Label Text="Alert" Style="{StaticResource SectionTitle}" />
@@ -532,6 +556,24 @@
                 <Label Text="Pagination" Style="{StaticResource SectionTitle}" />
                 <ui:Pagination x:Name="PaginationDemo" Page="5" TotalPages="20" PageChanged="OnPageChanged" />
 
+                <!-- Tree view -->
+                <Label Text="Tree View" Style="{StaticResource SectionTitle}" />
+                <ui:TreeView x:Name="FileTree" SelectedValue="MainPage.xaml" SelectedValueChanged="OnTreeSelected"
+                             WidthRequest="{OnIdiom Phone=-1, Default=320}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:TreeViewItem Text="src" Icon="Folder" IsExpanded="True">
+                        <ui:TreeViewItem Text="Components" Icon="Folder" IsExpanded="True">
+                            <ui:TreeViewItem Text="Button.cs" Icon="File" />
+                            <ui:TreeViewItem Text="Card.cs" Icon="File" />
+                            <ui:TreeViewItem Text="Dialog.cs" Icon="File" />
+                        </ui:TreeViewItem>
+                        <ui:TreeViewItem Text="Resources" Icon="Folder">
+                            <ui:TreeViewItem Text="appicon.svg" Icon="Image" />
+                        </ui:TreeViewItem>
+                        <ui:TreeViewItem Text="MainPage.xaml" Icon="FileText" />
+                        <ui:TreeViewItem Text="App.xaml" Icon="FileText" />
+                    </ui:TreeViewItem>
+                    <ui:TreeViewItem Text="README.md" Icon="FileText" />
+                </ui:TreeView>
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupData" Spacing="16" IsVisible="False">
@@ -557,6 +599,16 @@
                                TextColor="{DynamicResource ShellUIForeground}" />
                     </Grid>
                 </ui:Carousel>
+
+                <!-- Aspect ratio -->
+                <Label Text="Aspect Ratio" Style="{StaticResource SectionTitle}" />
+                <ui:AspectRatio Ratio="1.7778" WidthRequest="{OnIdiom Phone=-1, Default=360}"
+                                HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource ShellUIMuted}">
+                        <Label Text="16 : 9" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                               TextColor="{DynamicResource ShellUIMutedForeground}" />
+                    </Border>
+                </ui:AspectRatio>
 
                 <!-- Skeleton -->
                 <Label Text="Skeleton" Style="{StaticResource SectionTitle}" />

@@ -11,6 +11,11 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany", "Japan" };
         TagsInput.Tags = new List<string> { "maui", "design-system" };
+        FrameworkMultiSelect.ItemsSource = new List<string>
+        {
+            ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native"
+        };
+        FrameworkMultiSelect.Values = new List<string> { ".NET MAUI", "Blazor" };
         FrameworkCombobox.ItemsSource = new List<string>
         {
             ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native", "SwiftUI", "Jetpack Compose"
@@ -111,6 +116,12 @@ public partial class MainPage : ContentPage
         Report($"Toggle group: {(values.Count == 0 ? "none" : string.Join(", ", values))}");
     private void OnNumberChanged(object? sender, decimal? value) => Report($"Number: {(value.HasValue ? value.ToString() : "empty")}");
     private void OnTagsChanged(object? sender, IReadOnlyList<string> tags) => Report($"Tags: {string.Join(", ", tags)}");
+
+    private void OnCopied(object? sender, EventArgs e) => Report($"Copied: {(sender as CopyButton)?.Text}");
+    private void OnMultiSelectChanged(object? sender, IReadOnlyList<string> values) =>
+        Report($"Multi select: {(values.Count == 0 ? "none" : string.Join(", ", values))}");
+    private void OnLinkCardClicked(object? sender, EventArgs e) => Report($"Link card: {(sender as LinkCard)?.Title}");
+    private void OnTreeSelected(object? sender, string? value) => Report($"Tree: {value}");
 
     private void OnContextMenuItem(object? sender, EventArgs e) => Report($"Context menu: {(sender as ContextMenuItem)?.Text}");
     private void OnStepChanged(object? sender, int step) => Report($"Stepper: step {step + 1}");

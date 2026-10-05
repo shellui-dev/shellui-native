@@ -71,6 +71,16 @@ NEW = {
                  ["timeline", "history", "activity", "steps"]),
     "WrapLayout": ("wrap-layout", "Wrap Layout", "Children flow left to right and wrap onto new rows", "Layout",
                    ["wrap", "flow", "flex", "layout"]),
+    "CopyButton": ("copy-button", "Copy Button", "Copies text to the clipboard and confirms with a check", "Utility",
+                   ["copy", "clipboard", "button"]),
+    "AspectRatio": ("aspect-ratio", "Aspect Ratio", "Keeps content at a fixed width / height ratio", "Layout",
+                    ["aspect", "ratio", "layout", "media"]),
+    "LinkCard": ("link-card", "Link Card", "Tappable card with icon, title and description", "Navigation",
+                 ["link", "card", "navigation"]),
+    "TreeView": ("tree-view", "Tree View", "Expandable tree of rows with selection", "Navigation",
+                 ["tree", "hierarchy", "files", "navigation"]),
+    "MultiSelect": ("multi-select", "Multi Select", "Searchable select for several options, shown as chips", "Form",
+                    ["select", "multiple", "chips", "search"]),
     "EmptyState": ("empty-state", "Empty State", "Placeholder for an empty list or screen", "DataDisplay",
                    ["empty", "placeholder", "state"]),
 }
@@ -80,6 +90,7 @@ EXTRA_DEPS = {
     "HoverCard": ["hover-card-trigger", "hover-card-content"],
     "DatePicker": ["calendar"],
     "TagInput": ["wrap-layout"],
+    "MultiSelect": ["wrap-layout"],
 }
 
 SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|\bShellPlatform\b|\bShellPopups\b|"

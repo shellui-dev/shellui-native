@@ -116,7 +116,12 @@ public static class ComponentRegistry
         { "kbd", (KbdTemplate.Metadata, KbdTemplate.Contents) },
         { "stat-card", (StatCardTemplate.Metadata, StatCardTemplate.Contents) },
         { "timeline", (TimelineTemplate.Metadata, TimelineTemplate.Contents) },
-        { "wrap-layout", (WrapLayoutTemplate.Metadata, WrapLayoutTemplate.Contents) }
+        { "wrap-layout", (WrapLayoutTemplate.Metadata, WrapLayoutTemplate.Contents) },
+        { "copy-button", (CopyButtonTemplate.Metadata, CopyButtonTemplate.Contents) },
+        { "aspect-ratio", (AspectRatioTemplate.Metadata, AspectRatioTemplate.Contents) },
+        { "link-card", (LinkCardTemplate.Metadata, LinkCardTemplate.Contents) },
+        { "tree-view", (TreeViewTemplate.Metadata, TreeViewTemplate.Contents) },
+        { "multi-select", (MultiSelectTemplate.Metadata, MultiSelectTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

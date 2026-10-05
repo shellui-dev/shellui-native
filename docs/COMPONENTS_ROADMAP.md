@@ -213,6 +213,11 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | kbd ✅ | — | Done 2026-10-05 |
 | stat-card ✅ | — | Done 2026-10-05 — title, value, trend pill, description, icon |
 | timeline ✅ | — | Done 2026-10-05 — dot or icon markers joined by a line |
+| multi-select ✅ | — | Done 2026-10-05 — searchable, chips in the trigger, panel stays open while picking |
+| tree-view ✅ | — | Done 2026-10-05 — nested items, expand / collapse, selection |
+| copy-button ✅ | P7 | Done 2026-10-05 — clipboard copy with a check confirmation |
+| link-card ✅ | — | Done 2026-10-05 — tappable card that can open a URL |
+| aspect-ratio ✅ | — | Done 2026-10-05 |
 | wrap-layout ✅ | — | Done 2026-10-05 — wrapping layout used by tag-input and the demo's button rows |
 | theme-toggle | P7 | Already in demo; consider as component |
 | copy-button | P7 | Copy to clipboard |

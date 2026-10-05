@@ -362,6 +362,32 @@ shellui-native add combobox
 
 ---
 
+### Multi Select
+Like Combobox, for several options: the trigger shows the picked options as removable chips, and
+the floating panel has a search field and a checked list. Picking toggles an option and leaves
+the panel open; click outside, press Escape or (on Android) go back to close it.
+
+```bash
+shellui-native add multi-select   # also installs wrap-layout
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| ItemsSource | IList&lt;string&gt; | null | Options |
+| Values | IList&lt;string&gt; | null | Picked options (two-way) |
+| Placeholder | string | "Select..." | Shown when nothing is picked |
+| SearchPlaceholder | string | "Search..." | Placeholder of the filter field |
+| EmptyText | string | "No results found." | Shown when nothing matches |
+
+```xml
+<ui:MultiSelect Placeholder="Select frameworks..." ItemsSource="{Binding Frameworks}"
+                Values="{Binding Picked}" />
+```
+
+**Events:** `ValuesChanged` · **Methods:** `Toggle(option)`
+
+---
+
 ### Slider
 Platform slider tinted with the theme (primary range and thumb, secondary track).
 
@@ -446,6 +472,21 @@ shellui-native add theme-toggle
 ---
 
 ## Layout Components
+
+### Aspect Ratio
+Keeps its content at a fixed width / height ratio: the height follows the width.
+
+```bash
+shellui-native add aspect-ratio
+```
+
+**Properties:** `Ratio` (width divided by height; default 16:9 = 1.7778)
+
+```xml
+<ui:AspectRatio Ratio="1.7778">
+    <Image Source="cover.jpg" Aspect="AspectFill" />
+</ui:AspectRatio>
+```
 
 ### Wrap Layout
 `flex flex-wrap gap-2`: children flow left to right and wrap onto new rows, centered vertically
@@ -598,6 +639,48 @@ Trail with chevron separators; links turn foreground on hover.
 
 ---
 
+### Tree View
+Tree of expandable rows with selection. Tapping a row selects it and, when it has children,
+expands or collapses it. Nested `TreeViewItem`s are the children.
+
+```bash
+shellui-native add tree-view
+```
+
+**Properties (TreeView):** `SelectedValue` (two-way) · **Events:** `SelectedValueChanged`
+
+**Properties (TreeViewItem):** `Text`, `Value` (defaults to `Text`), `Icon`, `IsExpanded` (two-way)
+
+```xml
+<ui:TreeView SelectedValue="{Binding Path}">
+    <ui:TreeViewItem Text="src" Icon="Folder" IsExpanded="True">
+        <ui:TreeViewItem Text="Components" Icon="Folder">
+            <ui:TreeViewItem Text="Button.cs" Icon="File" />
+        </ui:TreeViewItem>
+        <ui:TreeViewItem Text="App.xaml" Icon="FileText" />
+    </ui:TreeViewItem>
+</ui:TreeView>
+```
+
+---
+
+### Link Card
+Tappable card with an optional icon, a title, a description and an arrow. Tapping raises
+`Clicked` and opens `Url` in the system browser when one is set.
+
+```bash
+shellui-native add link-card
+```
+
+**Properties:** `Title`, `Description`, `Icon`, `Url` · **Events:** `Clicked`
+
+```xml
+<ui:LinkCard Title="Documentation" Description="Guides and the component reference."
+             Icon="FileText" Url="https://example.com/docs" />
+```
+
+---
+
 ### Stepper
 Step-by-step flow: numbered circles joined by lines (the active one filled, completed ones
 checked), the active step's content, and Previous / Next / Confirm buttons. A step becomes
@@ -649,6 +732,21 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 
 ```xml
 <ui:Badge Text="New" Variant="Success" />
+```
+
+### Copy Button
+Ghost icon button that copies `Text` to the clipboard; the icon turns into a check for two
+seconds. `Label` adds text next to the icon.
+
+```bash
+shellui-native add copy-button
+```
+
+**Properties:** `Text` (what gets copied), `Label` · **Events:** `Copied` · **Methods:** `CopyAsync()`
+
+```xml
+<ui:CopyButton Text="shellui-native add button" />
+<ui:CopyButton Text="{Binding ShareUrl}" Label="Copy link" />
 ```
 
 ### Kbd
@@ -1081,6 +1179,10 @@ core helpers); components that draw icons also depend on `icon`.
 | tag-input | shell, icon, wrap-layout |
 | kbd | shell |
 | wrap-layout | — |
+| multi-select | shell, icon, wrap-layout |
+| tree-view | shell, icon, element-extensions |
+| copy-button, link-card | shell, icon |
+| aspect-ratio | — |
 | hover-card | shell, hover-card-trigger, hover-card-content |
 | date-picker | shell, icon, calendar |
 | tooltip | shell |
