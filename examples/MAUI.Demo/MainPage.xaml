@@ -32,67 +32,97 @@
             <Setter Property="FontSize" Value="14" />
             <Setter Property="TextColor" Value="{DynamicResource ShellUIMutedForeground}" />
         </Style>
-        <Style TargetType="FlexLayout">
-            <Setter Property="Wrap" Value="Wrap" />
-            <Setter Property="AlignItems" Value="Center" />
+        <!-- Rows of buttons: children carry their own margins. -->
+        <Style TargetType="ui:WrapLayout">
+            <Setter Property="Spacing" Value="0" />
+            <Setter Property="LineSpacing" Value="0" />
         </Style>
     </ContentPage.Resources>
 
-    <!-- Overlays are declared next to their triggers: ShellUI floats them in a page-level layer. -->
-        <ScrollView>
-            <VerticalStackLayout Padding="24,24,24,48" Spacing="16" MaximumWidthRequest="760">
+    <!-- The header stays put; one category of components shows at a time. A single page with
+         every component on it is too much for one layout pass on Windows (see docs/COMPONENTS.md,
+         "Long pages on Windows"). Overlays are declared next to their triggers: ShellUI floats
+         them in a page-level layer. -->
+    <Grid RowDefinitions="Auto,*">
+        <VerticalStackLayout Padding="24,24,24,0" Spacing="12" MaximumWidthRequest="760">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="ShellUI Native" FontSize="30" FontAttributes="Bold"
+                           TextColor="{DynamicResource ShellUIForeground}" />
+                    <Label Text="Beautifully designed components for .NET MAUI" Style="{StaticResource Muted}" />
+                </VerticalStackLayout>
+                <ui:ThemeToggle x:Name="ThemeToggleSwitch" Grid.Column="1" VerticalOptions="Start" />
+            </Grid>
+            <Label x:Name="StatusLabel" Text="Interact with a component to see its events here."
+                   Style="{StaticResource Muted}" FontSize="13" />
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" HeightRequest="36">
+                <ui:ToggleGroup x:Name="CategoryPicker" Value="buttons" ValueChanged="OnCategoryChanged">
+                    <ui:ToggleGroupItem Value="buttons" Text="Buttons" />
+                    <ui:ToggleGroupItem Value="forms" Text="Forms" />
+                    <ui:ToggleGroupItem Value="feedback" Text="Feedback" />
+                    <ui:ToggleGroupItem Value="overlays" Text="Overlays" />
+                    <ui:ToggleGroupItem Value="navigation" Text="Navigation" />
+                    <ui:ToggleGroupItem Value="data" Text="Data" />
+                </ui:ToggleGroup>
+            </ScrollView>
+            <ui:Separator />
+        </VerticalStackLayout>
 
-                <!-- Header -->
-                <Grid ColumnDefinitions="*,Auto">
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="ShellUI Native" FontSize="30" FontAttributes="Bold"
-                               TextColor="{DynamicResource ShellUIForeground}" />
-                        <Label Text="Beautifully designed components for .NET MAUI" Style="{StaticResource Muted}" />
-                    </VerticalStackLayout>
-                    <ui:ThemeToggle x:Name="ThemeToggleSwitch" Grid.Column="1" VerticalOptions="Start" />
-                </Grid>
-                <Label x:Name="StatusLabel" Text="Interact with a component to see its events here."
-                       Style="{StaticResource Muted}" FontSize="13" />
-                <ui:Separator />
+        <ScrollView x:Name="PageScroll" Grid.Row="1">
+            <VerticalStackLayout Padding="24,16,24,48" Spacing="16" MaximumWidthRequest="760">
 
+                <VerticalStackLayout x:Name="GroupButtons" Spacing="16">
                 <!-- Button -->
                 <Label Text="Button" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Button Text="Default" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Secondary" Variant="Secondary" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Outline" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Destructive" Variant="Destructive" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Ghost" Variant="Ghost" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Link" Variant="Link" Margin="0,0,8,8" Clicked="OnButtonClicked" />
-                </FlexLayout>
-                <FlexLayout>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
                     <ui:Button Text="Small" Size="Sm" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Default" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Large" Size="Lg" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="New item" Icon="Plus" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Delete" Icon="Trash2" Variant="Destructive" Margin="0,0,8,8" Clicked="OnButtonClicked" />
-                </FlexLayout>
-                <FlexLayout>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
                     <ui:Button Icon="Heart" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Icon="Share2" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Icon="Bookmark" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Icon="Settings" Size="Icon" Variant="Ghost" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button x:Name="LoadingBtn" Text="Click to load" Variant="Secondary" Margin="0,0,8,8" Clicked="OnLoadingClicked" />
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <!-- Toggle -->
                 <Label Text="Toggle" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Toggle Icon="Star" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
                     <ui:Toggle Icon="Bookmark" Variant="Outline" IsPressed="True" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
                     <ui:Toggle Text="Bold" Variant="Outline" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
                     <ui:Toggle Text="Notify me" Icon="Bell" Size="Sm" Margin="0,0,8,8" PressedChanged="OnTogglePressed" />
-                </FlexLayout>
+                </ui:WrapLayout>
+
+                <!-- Toggle group -->
+                <Label Text="Toggle Group" Style="{StaticResource SectionTitle}" />
+                <ui:ToggleGroup x:Name="ViewToggleGroup" Value="week" ValueChanged="OnToggleGroupChanged">
+                    <ui:ToggleGroupItem Value="day" Text="Day" />
+                    <ui:ToggleGroupItem Value="week" Text="Week" />
+                    <ui:ToggleGroupItem Value="month" Text="Month" />
+                </ui:ToggleGroup>
+                <ui:ToggleGroup Multiple="True" Variant="Outline" ValuesChanged="OnToggleGroupValues">
+                    <ui:ToggleGroupItem Value="star" Icon="Star" />
+                    <ui:ToggleGroupItem Value="heart" Icon="Heart" />
+                    <ui:ToggleGroupItem Value="bookmark" Icon="Bookmark" />
+                </ui:ToggleGroup>
 
                 <!-- Badge -->
                 <Label Text="Badge" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Badge Text="Default" Margin="0,0,8,8" />
                     <ui:Badge Text="Secondary" Variant="Secondary" Margin="0,0,8,8" />
                     <ui:Badge Text="Outline" Variant="Outline" Margin="0,0,8,8" />
@@ -100,8 +130,21 @@
                     <ui:Badge Text="Success" Variant="Success" Margin="0,0,8,8" />
                     <ui:Badge Text="Warning" Variant="Warning" Margin="0,0,8,8" />
                     <ui:Badge Text="Info" Variant="Info" Margin="0,0,8,8" />
-                </FlexLayout>
+                </ui:WrapLayout>
 
+                <!-- Kbd -->
+                <Label Text="Kbd" Style="{StaticResource SectionTitle}" />
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="Open search with" Style="{StaticResource Muted}" FontSize="14" VerticalOptions="Center" />
+                    <ui:Kbd Text="Ctrl" />
+                    <ui:Kbd Text="K" />
+                    <Label Text="or close with" Style="{StaticResource Muted}" FontSize="14" VerticalOptions="Center" />
+                    <ui:Kbd Text="Esc" />
+                </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupForms" Spacing="16" IsVisible="False">
                 <!-- Input -->
                 <Label Text="Input" Style="{StaticResource SectionTitle}" />
                 <VerticalStackLayout Spacing="8">
@@ -122,6 +165,15 @@
                 <!-- Input OTP -->
                 <Label Text="Input OTP" Style="{StaticResource SectionTitle}" />
                 <ui:InputOtp x:Name="OtpDemo" Length="6" Completed="OnOtpCompleted" />
+
+                <!-- Number input -->
+                <Label Text="Number Input" Style="{StaticResource SectionTitle}" />
+                <ui:NumberInput x:Name="QuantityInput" Value="2" Minimum="0" Maximum="10" WidthRequest="160"
+                                HorizontalOptions="Start" ValueChanged="OnNumberChanged" />
+
+                <!-- Tag input -->
+                <Label Text="Tag Input" Style="{StaticResource SectionTitle}" />
+                <ui:TagInput x:Name="TagsInput" Placeholder="Add a label and press Enter..." MaxTags="6" TagsChanged="OnTagsChanged" />
 
                 <!-- Textarea -->
                 <Label Text="Textarea" Style="{StaticResource SectionTitle}" />
@@ -155,11 +207,11 @@
 
                 <!-- Date / Time -->
                 <Label Text="Date &amp; Time" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:DatePicker x:Name="DatePickerDemo" Margin="0,0,8,8" DateChanged="OnDateChanged" />
                     <ui:TimePicker x:Name="TimePickerDemo" Time="9:30" Is24Hour="False" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
                     <ui:TimePicker Time="18:45" Is24Hour="True" MinuteStep="15" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <Label Text="Calendar" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 6"
@@ -167,6 +219,9 @@
                     <ui:Calendar x:Name="CalendarDemo" DateSelected="OnCalendarSelected" />
                 </Border>
 
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupFeedback" Spacing="16" IsVisible="False">
                 <!-- Card -->
                 <Label Text="Card" Style="{StaticResource SectionTitle}" />
                 <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=380}"
@@ -183,6 +238,17 @@
                         <ui:Button Text="Deploy" Clicked="OnButtonClicked" />
                     </ui:CardFooter>
                 </ui:Card>
+
+                <!-- Stat card -->
+                <Label Text="Stat Card" Style="{StaticResource SectionTitle}" />
+                <ui:WrapLayout>
+                    <ui:StatCard Title="Total revenue" Value="$45,231.89" Change="+20.1%" Trend="Up" Icon="DollarSign"
+                                 Description="from last month" WidthRequest="230" Margin="0,0,12,12" />
+                    <ui:StatCard Title="Churn" Value="2.4%" Change="-0.6%" Trend="Down" Icon="Users"
+                                 Description="from last month" WidthRequest="230" Margin="0,0,12,12" />
+                    <ui:StatCard Title="Active now" Value="573" Change="steady" Icon="Activity"
+                                 WidthRequest="230" Margin="0,0,12,12" />
+                </ui:WrapLayout>
 
                 <!-- Alert -->
                 <Label Text="Alert" Style="{StaticResource SectionTitle}" />
@@ -207,14 +273,14 @@
 
                 <!-- Toast -->
                 <Label Text="Toast" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Button Text="Show toast" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastDefault" />
                     <ui:Button Text="Success" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastSuccess" />
                     <ui:Button Text="Error" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastError" />
                     <ui:Button Text="Warning" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastWarning" />
                     <ui:Button Text="Info" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastInfo" />
                     <ui:Button Text="With action" Variant="Outline" Margin="0,0,8,8" Clicked="OnToastAction" />
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <!-- Avatar & Spinner -->
                 <Label Text="Avatar" Style="{StaticResource SectionTitle}" />
@@ -235,6 +301,9 @@
                     <ui:Button Text="Saving" IsLoading="True" Variant="Secondary" />
                 </HorizontalStackLayout>
 
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupOverlays" Spacing="16" IsVisible="False">
                 <!-- Overlays -->
                 <Label Text="Alert Dialog" Style="{StaticResource SectionTitle}" />
                 <ui:Button Text="Delete account" Variant="Destructive" Clicked="OnAlertDialogClicked" />
@@ -245,7 +314,7 @@
                                 ConfirmVariant="Destructive" />
 
                 <Label Text="Dialog, Drawer, Sheet" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Dialog x:Name="DemoDialog" Margin="0,0,8,8">
                         <ui:DialogTrigger><ui:Button Text="Open dialog" Variant="Outline" /></ui:DialogTrigger>
                         <ui:DialogContent>
@@ -290,11 +359,11 @@
                             <ui:Button Text="Save changes" Clicked="OnSheetSave" />
                         </ui:SheetContent>
                     </ui:Sheet>
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <!-- Tooltip / Hover card -->
                 <Label Text="Tooltip &amp; Hover Card" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Tooltip Text="Add to library" Margin="0,0,8,8">
                         <ui:Button Icon="Plus" Size="Icon" Variant="Outline" Clicked="OnButtonClicked" />
                     </ui:Tooltip>
@@ -314,10 +383,10 @@
                             </Grid>
                         </ui:HoverCardContent>
                     </ui:HoverCard>
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <Label Text="Dropdown &amp; Popover" Style="{StaticResource SectionTitle}" />
-                <FlexLayout>
+                <ui:WrapLayout>
                     <ui:Dropdown Margin="0,0,8,8">
                         <ui:DropdownTrigger>
                             <ui:Button Text="Open menu" Variant="Outline" Icon="ChevronDown" IconPosition="Right" />
@@ -338,7 +407,7 @@
                             <ui:Input Placeholder="Width" />
                         </ui:PopoverContent>
                     </ui:Popover>
-                </FlexLayout>
+                </ui:WrapLayout>
 
                 <!-- Context menu -->
                 <Label Text="Context Menu" Style="{StaticResource SectionTitle}" />
@@ -360,6 +429,9 @@
                     </ui:ContextMenuContent>
                 </ui:ContextMenu>
 
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupNavigation" Spacing="16" IsVisible="False">
                 <!-- Collapsible -->
                 <Label Text="Collapsible" Style="{StaticResource SectionTitle}" />
                 <ui:Collapsible>
@@ -460,6 +532,9 @@
                 <Label Text="Pagination" Style="{StaticResource SectionTitle}" />
                 <ui:Pagination x:Name="PaginationDemo" Page="5" TotalPages="20" PageChanged="OnPageChanged" />
 
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupData" Spacing="16" IsVisible="False">
                 <!-- Carousel -->
                 <Label Text="Carousel" Style="{StaticResource SectionTitle}" />
                 <ui:Carousel x:Name="CarouselDemo" AspectRatio="2.4" WidthRequest="{OnIdiom Phone=-1, Default=560}"
@@ -536,6 +611,20 @@
                     <ui:Button Text="Import" Variant="Outline" Clicked="OnButtonClicked" />
                 </ui:EmptyState>
 
+                <!-- Timeline -->
+                <Label Text="Timeline" Style="{StaticResource SectionTitle}" />
+                <ui:Timeline>
+                    <ui:TimelineItem Title="Order placed" Time="09:12" Text="We received your order and sent a confirmation." />
+                    <ui:TimelineItem Title="Payment confirmed" Time="09:14" Icon="CreditCard" Text="Charged to the card ending in 4242." />
+                    <ui:TimelineItem Title="Shipped" Time="14:40" Icon="Send" IsActive="True">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Your parcel is on its way." FontSize="14" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                            <ui:Badge Text="In transit" Variant="Info" HorizontalOptions="Start" />
+                        </VerticalStackLayout>
+                    </ui:TimelineItem>
+                    <ui:TimelineItem Title="Delivered" Text="Expected tomorrow." />
+                </ui:Timeline>
+
                 <!-- Scroll area -->
                 <Label Text="Scroll Area" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}"
@@ -547,9 +636,12 @@
                     </ui:ScrollArea>
                 </Border>
 
+                </VerticalStackLayout>
+
                 <ui:Separator Margin="0,24,0,0" />
                 <Label Text="Built with ShellUI Native." Style="{StaticResource Muted}" HorizontalOptions="Center" />
             </VerticalStackLayout>
         </ScrollView>
+    </Grid>
 
 </ContentPage>
