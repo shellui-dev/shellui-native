@@ -207,6 +207,13 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | file-upload | P7 | File picker |
 | input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
 | date-range-picker | P7 | Date range selection |
+| toggle-group ✅ | — | Done 2026-10-05 — single or multiple selection, Default / Outline |
+| number-input ✅ | — | Done 2026-10-05 — − / + buttons, min / max clamp, decimal value |
+| tag-input ✅ | — | Done 2026-10-05 — chips with remove, Enter / comma / semicolon to commit |
+| kbd ✅ | — | Done 2026-10-05 |
+| stat-card ✅ | — | Done 2026-10-05 — title, value, trend pill, description, icon |
+| timeline ✅ | — | Done 2026-10-05 — dot or icon markers joined by a line |
+| wrap-layout ✅ | — | Done 2026-10-05 — wrapping layout used by tag-input and the demo's button rows |
 | theme-toggle | P7 | Already in demo; consider as component |
 | copy-button | P7 | Copy to clipboard |
 | toggle | P7 | Toggle button (vs Switch) |

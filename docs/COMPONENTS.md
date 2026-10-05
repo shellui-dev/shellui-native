@@ -141,6 +141,32 @@ shellui-native add toggle
 
 ---
 
+### Toggle Group
+A row of toggles that work as one control: pick one (the default) or several (`Multiple`).
+
+```bash
+shellui-native add toggle-group
+```
+
+**Properties (ToggleGroup):** `Value` (two-way; the pressed item, `null` when none), `Multiple`,
+`Values` (two-way; the pressed items in `Multiple` mode), `Variant` (Default, Outline) ·
+**Events:** `ValueChanged`, `ValuesChanged`
+
+**Properties (ToggleGroupItem):** `Value`, `Text`, `Icon`
+
+```xml
+<ui:ToggleGroup Value="{Binding View}">
+    <ui:ToggleGroupItem Value="day" Text="Day" />
+    <ui:ToggleGroupItem Value="week" Text="Week" />
+    <ui:ToggleGroupItem Value="month" Text="Month" />
+</ui:ToggleGroup>
+```
+
+In single mode, tapping the pressed item clears the selection. To always keep one pressed, set
+`Value` back in `ValueChanged` when it arrives as `null`.
+
+---
+
 ### Input
 Single-line text field — 40px, one themed border (the platform control's own frame is removed),
 ring color + soft glow on focus, destructive border on error.
@@ -182,6 +208,41 @@ shellui-native add input-otp
 
 ```xml
 <ui:InputOtp Length="6" Value="{Binding Code}" Completed="OnCodeEntered" />
+```
+
+---
+
+### Number Input
+Number field with − and + buttons. The value is clamped to `Minimum` / `Maximum`, and the buttons
+dim at the limits. Typing is committed on Enter or when the field loses focus; text that isn't a
+number puts the last value back.
+
+```bash
+shellui-native add number-input
+```
+
+**Properties:** `Value` (`decimal?`, two-way; `null` when empty), `Minimum`, `Maximum`, `Step` (1),
+`Placeholder` · **Events:** `ValueChanged`
+
+```xml
+<ui:NumberInput Value="{Binding Quantity}" Minimum="1" Maximum="10" WidthRequest="160" />
+```
+
+---
+
+### Tag Input
+Text field that turns entries into removable chips. Enter, a comma or a semicolon commits what was
+typed (so pasting `a, b, c` adds three tags); the × on a chip removes it.
+
+```bash
+shellui-native add tag-input   # also installs wrap-layout
+```
+
+**Properties:** `Tags` (`IList<string>`, two-way), `Placeholder`, `MaxTags` (0 = no limit),
+`AllowDuplicates` · **Events:** `TagsChanged` · **Methods:** `Add(tag)`, `Remove(tag)`
+
+```xml
+<ui:TagInput Tags="{Binding Labels}" Placeholder="Add a label..." MaxTags="6" />
 ```
 
 ---
@@ -386,6 +447,26 @@ shellui-native add theme-toggle
 
 ## Layout Components
 
+### Wrap Layout
+`flex flex-wrap gap-2`: children flow left to right and wrap onto new rows, centered vertically
+within their row. Use it for button rows, chips and tag lists.
+
+```bash
+shellui-native add wrap-layout
+```
+
+**Properties:** `Spacing` (8, between children), `LineSpacing` (8, between rows), `LastChildFill`
+(the last child takes the rest of its row), `MinimumLastChildWidth` (96)
+
+```xml
+<ui:WrapLayout>
+    <ui:Button Text="One" />
+    <ui:Button Text="Two" Variant="Outline" />
+</ui:WrapLayout>
+```
+
+Prefer it to `FlexLayout` for simple wrapping: it measures each child once per layout pass.
+
 ### Card
 `rounded-xl border bg-card shadow-sm` container.
 
@@ -568,6 +649,48 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 
 ```xml
 <ui:Badge Text="New" Variant="Success" />
+```
+
+### Kbd
+Keyboard key hint. **Properties:** `Text`
+
+```xml
+<ui:Kbd Text="Ctrl" /> <ui:Kbd Text="K" />
+```
+
+### Stat Card
+Dashboard metric: a muted title with an optional icon, the value in large bold text, a change
+pill tinted by trend, and an optional description.
+
+```bash
+shellui-native add stat-card
+```
+
+**Properties:** `Title`, `Value`, `Change`, `Trend` (Neutral, Up, Down), `Description`, `Icon`
+
+```xml
+<ui:StatCard Title="Total revenue" Value="$45,231.89" Change="+20.1%" Trend="Up"
+             Icon="DollarSign" Description="from last month" />
+```
+
+### Timeline
+Vertical list of events joined by a hairline. Each item has a marker (a dot, or a circled icon),
+a title, a time and details.
+
+```bash
+shellui-native add timeline
+```
+
+**Properties (TimelineItem):** `Title`, `Time`, `Text`, `Icon`, `IsActive` · a child view becomes
+the item's body
+
+```xml
+<ui:Timeline>
+    <ui:TimelineItem Title="Order placed" Time="09:12" Text="We received your order." />
+    <ui:TimelineItem Title="Shipped" Time="14:40" Icon="Send" IsActive="True">
+        <ui:Badge Text="In transit" Variant="Info" HorizontalOptions="Start" />
+    </ui:TimelineItem>
+</ui:Timeline>
 ```
 
 ### Progress
@@ -903,6 +1026,20 @@ system bars, and their content (plus popups and toasts) is kept clear of the bar
 
 ---
 
+## Long pages on Windows
+
+WinUI gives a window 250 layout passes to settle. In .NET MAUI every `Border` sets its outline
+path the first time it is arranged, which asks for another pass, so a single page holding several
+hundred Borders (most ShellUI components are built from them) can run out and crash at startup
+with `Layout cycle detected`. An ordinary screen is nowhere near the limit; a "kitchen sink" page
+is.
+
+If you hit it, lay out less at once: split the page, or keep sections collapsed
+(`IsVisible="False"`) until they are needed, since hidden content is not laid out. The demo does
+this, showing one category of components at a time.
+
+---
+
 ## Adding Components
 
 ```bash
@@ -939,6 +1076,11 @@ core helpers); components that draw icons also depend on `icon`.
 | carousel | shell, icon |
 | context-menu | shell, icon, element-extensions |
 | stepper | shell, icon, button |
+| toggle-group | shell, icon, element-extensions |
+| number-input, stat-card, timeline | shell, icon |
+| tag-input | shell, icon, wrap-layout |
+| kbd | shell |
+| wrap-layout | — |
 | hover-card | shell, hover-card-trigger, hover-card-content |
 | date-picker | shell, icon, calendar |
 | tooltip | shell |

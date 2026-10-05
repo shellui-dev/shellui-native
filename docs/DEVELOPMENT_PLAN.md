@@ -389,7 +389,16 @@ The remaining MAUI data-display and advanced tiers, built demo-first like Phase 
 - [x] `context-menu` — opens at the pointer on right-click; long-press on touch
 - [x] `carousel` — swipe, arrows, dots, loop, auto-play
 - [x] `stepper` — numbered steps with completed / active states and built-in navigation
-- [ ] Android + iOS pass for this batch (built for Android, not yet run on a device)
+- [x] Android pass for the four above plus combobox, time picker, callout and back-to-close
+  (2026-10-05, Pixel 7 / API 34, light and dark): fixed popup top padding, context-menu long-press
+  and toast offset
+- [x] `toggle-group`, `number-input`, `tag-input`, `kbd`, `stat-card`, `timeline`, `wrap-layout`
+  (Windows only so far)
+- [x] Icon generator converts arcs to Bezier curves — MAUI on Windows failed to draw the small
+  arcs in `activity`, which crashed the app
+- [x] Demo shows one category at a time (a single page of every component exceeded WinUI's
+  layout-pass limit; see COMPONENTS.md, "Long pages on Windows")
+- [ ] Android pass for the second batch; iOS pass for everything
 - [ ] Escape closes the overlay on top on Mac Catalyst
 - [ ] `resizable`, `navbar`, `sidebar` (P6.4–P6.6)
 
