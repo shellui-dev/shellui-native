@@ -57,7 +57,9 @@ public partial class ContextMenu : ShellPopoverHost
 // The surface that opens the enclosing ContextMenu on right-click / long-press.
 public partial class ContextMenuTrigger : ContentView
 {
+#if ANDROID || IOS || MACCATALYST
     private object? _hooked;
+#endif
 
     public ContextMenuTrigger()
     {
@@ -73,25 +75,32 @@ public partial class ContextMenuTrigger : ContentView
 
     private void Open(Point? point) => this.FindParentOfType<ContextMenu>()?.OpenAt(point);
 
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        if (propertyName != nameof(Content)) return;
+        if (Content is View content) content.HandlerChanged += (_, _) => HookLongPress();
+        HookLongPress();
+    }
+
     private void HookLongPress()
     {
-        var native = Handler?.PlatformView;
+#if ANDROID
+        // Listen on the content, not on this view: this view's gesture handling takes the touch
+        // stream before Android's own long-press detection would see it.
+        var native = (Content as View)?.Handler?.PlatformView as Android.Views.View
+                     ?? Handler?.PlatformView as Android.Views.View;
         if (native is null || ReferenceEquals(native, _hooked)) return;
         _hooked = native;
-#if ANDROID
-        if (native is Android.Views.View view)
-        {
-            view.LongClickable = true;
-            view.LongClick += (_, e) => { e.Handled = true; Open(null); };
-        }
+        native.LongClickable = true;
+        native.LongClick += (_, e) => { e.Handled = true; Open(null); };
 #elif IOS || MACCATALYST
-        if (native is UIKit.UIView view)
+        if (Handler?.PlatformView is not UIKit.UIView native || ReferenceEquals(native, _hooked)) return;
+        _hooked = native;
+        native.AddGestureRecognizer(new UIKit.UILongPressGestureRecognizer(gesture =>
         {
-            view.AddGestureRecognizer(new UIKit.UILongPressGestureRecognizer(gesture =>
-            {
-                if (gesture.State == UIKit.UIGestureRecognizerState.Began) Open(null);
-            }));
-        }
+            if (gesture.State == UIKit.UIGestureRecognizerState.Began) Open(null);
+        }));
 #endif
     }
 }

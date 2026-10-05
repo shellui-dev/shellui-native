@@ -112,6 +112,8 @@ public partial class Toaster : ContentView
     // Places the toast stack in the page layer (of this Toaster's page, or the page on screen).
     internal bool Attach()
     {
+        // The stack keeps itself clear of the system bars with its margin (see Fit).
+        ShellPortal.EdgeToEdge(_stack);
         if (!ShellPortal.Attach(this, _stack)) return false;
         if (_stack.Parent is Grid layer)
         {

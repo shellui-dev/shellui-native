@@ -631,7 +631,10 @@ public static class ShellPortal
         panel.BindingContext = (options.Owner ?? anchor).BindingContext;
         panel.HorizontalOptions = LayoutOptions.Start;
         panel.VerticalOptions = LayoutOptions.Start;
-        panel.Margin = new Thickness(0);
+        // Start inside the safe area: a panel first laid out under the status bar gets padded
+        // for it, and keeps that padding after it is moved into place.
+        var inset = GetSafeInsets(layer);
+        panel.Margin = new Thickness(inset.Left + 8, inset.Top + 8, 0, 0);
         panel.Opacity = 0;
         panel.IsVisible = true;
         if (options.MatchAnchorWidth) panel.WidthRequest = anchor.Width;
