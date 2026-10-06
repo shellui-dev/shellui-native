@@ -16,9 +16,8 @@ Short-lived sub-branches (`feat/<phase>/<slice>`) cut off the phase branch and m
 into it, not directly into `main`.
 
 ```
-main   ← Phase 1a merged (2026-07-05), Phase 1b merged (2026-08-29 via PR #2)
- └─ feat/p3-navigation-layout         ← Phase 1c (active) — MAUI P3 tier (tabs, accordion, …)
- └─ feat/p4-overlay-portal            ← Phase 1d (queued after 1c) — portal rewrite + shadcn-style controls
+main   ← Phase 1a (2026-07-05), 1b (2026-08-29, PR #2), 1c + 1d (2026-10-05, PR #3) merged
+ └─ feat/p5-p6-components             ← Phase 1e (active) — MAUI P5/P6 tier (table, context menu, carousel, stepper, …)
  └─ feat/avalonia-implementation      ← Phase 2 (planned) — Avalonia templates + reference impl
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
@@ -36,8 +35,8 @@ main   ← Phase 1a merged (2026-07-05), Phase 1b merged (2026-08-29 via PR #2)
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a + 1b merged | 44 platform-keyed components, `SupportsPlatform` registry, xUnit 199/199, sizing + token contracts locked |
-| `feat/p3-navigation-layout` | `main` | **Next** | Phase 1c — MAUI P3 (tabs, accordion, collapsible, breadcrumb, scroll-area, skeleton) |
+| `main` | — | Phase 1a–1d merged | 76 platform-keyed components, theme tokens, overlay portal, xUnit 408/408 |
+| `feat/p5-p6-components` | `main` | **Active** | Phase 1e — MAUI P5/P6 (table, context-menu, carousel, stepper; 80 components, xUnit 428/428) |
 
 ---
 
@@ -240,7 +239,7 @@ public static class ButtonTemplate
 
 ---
 
-## Phase 1c — `feat/p3-navigation-layout` (**in review**)
+## Phase 1c — `feat/p3-navigation-layout` (**merged 2026-10-05 via [PR #3](https://github.com/shellui-dev/shellui-native/pull/3)**)
 
 Finish MAUI's component vocabulary through P3 before opening the cross-platform front.
 Rationale: Phase 2 (Avalonia) turns every new MAUI component into two components to
@@ -317,7 +316,7 @@ nullable `Date`/`Time` + non-generic `ItemsSource` adaptations. Proper fixes →
 
 ---
 
-## Phase 1d — `feat/p4-overlay-portal` (queued after Phase 1c)
+## Phase 1d — overlay portal (**merged 2026-10-05 with Phase 1c in PR #3**; the separate `feat/p4-overlay-portal` branch was never cut)
 
 Surface polish pass driven by live testing on Windows 2026-08-30. Two distinct problems
 that both need architectural fixes rather than sizing tweaks.
@@ -380,7 +379,45 @@ Date/Time pickers inside a themed border with the native frame stripped.
 
 ---
 
-## Phase 2 — `feat/avalonia-implementation` (queued after Phase 1d)
+## Phase 1e — `feat/p5-p6-components` (active)
+
+The remaining MAUI data-display and advanced tiers, built demo-first like Phase 1d.
+
+### Deliverables
+
+- [x] `table` — header, rows with hover / selection / tap, caption, sideways scroll below a minimum width
+- [x] `context-menu` — opens at the pointer on right-click; long-press on touch
+- [x] `carousel` — swipe, arrows, dots, loop, auto-play
+- [x] `stepper` — numbered steps with completed / active states and built-in navigation
+- [x] Android pass for the four above plus combobox, time picker, callout and back-to-close
+  (2026-10-05, Pixel 7 / API 34, light and dark): fixed popup top padding, context-menu long-press
+  and toast offset
+- [x] `toggle-group`, `number-input`, `tag-input`, `kbd`, `stat-card`, `timeline`, `wrap-layout`
+  (Windows only so far)
+- [x] Icon generator converts arcs to Bezier curves — MAUI on Windows failed to draw the small
+  arcs in `activity`, which crashed the app
+- [x] Demo shows one category at a time (a single page of every component exceeded WinUI's
+  layout-pass limit; see COMPONENTS.md, "Long pages on Windows")
+- [x] Android pass for the second batch (2026-10-05): fixed the overlay layer for a Grid page root
+  and the tag-input keyboard / height
+- [x] `multi-select`, `tree-view`, `copy-button`, `link-card`, `aspect-ratio` — run on Windows and
+  Android
+- [ ] iOS / Mac Catalyst pass for everything
+- [ ] Escape closes the overlay on top on Mac Catalyst
+- [ ] `resizable`, `navbar`, `sidebar` (P6.4–P6.6)
+
+Each family ships as one template (e.g. `table` holds Table, TableHeader, TableRow, TableHead
+and TableCell) rather than one template per part.
+
+### Exit criteria
+
+1. Every new component clicked through in `MAUI.Demo` on Windows and on an Android device
+2. `dotnet build` clean for the Windows and Android targets, `dotnet test` green
+3. Docs and roadmap updated
+
+---
+
+## Phase 2 — `feat/avalonia-implementation` (queued after Phase 1e)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 

@@ -207,7 +207,91 @@ def svg_to_path(svg: str) -> str:
         parts.append(element_to_path(tag, dict(ATTR.findall(raw))))
     if not parts:
         raise ValueError("no shapes")
-    return " ".join(parts)
+    return arcs_to_curves(" ".join(parts))
+
+
+def arc_to_cubics(x1, y1, rx, ry, rotation, large, sweep, x2, y2):
+    """SVG elliptical arc -> cubic Bezier segments (c1x, c1y, c2x, c2y, x, y), each <= 90 degrees."""
+    if (x1, y1) == (x2, y2):
+        return []
+    rx, ry = abs(rx), abs(ry)
+    if rx == 0 or ry == 0:
+        return [(x1, y1, x2, y2, x2, y2)]
+    phi = math.radians(rotation)
+    cos_phi, sin_phi = math.cos(phi), math.sin(phi)
+    dx, dy = (x1 - x2) / 2, (y1 - y2) / 2
+    x1p = cos_phi * dx + sin_phi * dy
+    y1p = -sin_phi * dx + cos_phi * dy
+    # Radii too small to span the endpoints are scaled up (SVG spec, F.6.6).
+    scale = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry)
+    if scale > 1:
+        rx, ry = rx * math.sqrt(scale), ry * math.sqrt(scale)
+    num = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p
+    den = rx * rx * y1p * y1p + ry * ry * x1p * x1p
+    coef = math.sqrt(max(0.0, num / den)) * (-1 if large == sweep else 1)
+    cxp, cyp = coef * rx * y1p / ry, -coef * ry * x1p / rx
+    cx = cos_phi * cxp - sin_phi * cyp + (x1 + x2) / 2
+    cy = sin_phi * cxp + cos_phi * cyp + (y1 + y2) / 2
+
+    def angle(ux, uy, vx, vy):
+        return math.atan2(ux * vy - uy * vx, ux * vx + uy * vy)
+
+    ux, uy = (x1p - cxp) / rx, (y1p - cyp) / ry
+    theta = angle(1, 0, ux, uy)
+    delta = angle(ux, uy, (-x1p - cxp) / rx, (-y1p - cyp) / ry)
+    if not sweep and delta > 0:
+        delta -= 2 * math.pi
+    elif sweep and delta < 0:
+        delta += 2 * math.pi
+
+    count = max(1, math.ceil(abs(delta) / (math.pi / 2) - 1e-9))
+    step = delta / count
+    t = 4 / 3 * math.tan(step / 4)
+
+    def point(px, py):
+        return (cx + rx * cos_phi * px - ry * sin_phi * py, cy + rx * sin_phi * px + ry * cos_phi * py)
+
+    curves = []
+    for i in range(count):
+        a1 = theta + i * step
+        a2 = a1 + step
+        c1 = point(math.cos(a1) - t * math.sin(a1), math.sin(a1) + t * math.cos(a1))
+        c2 = point(math.cos(a2) + t * math.sin(a2), math.sin(a2) - t * math.cos(a2))
+        end = (x2, y2) if i == count - 1 else point(math.cos(a2), math.sin(a2))
+        curves.append((*c1, *c2, *end))
+    return curves
+
+
+def arcs_to_curves(d: str) -> str:
+    """Rewrite every arc (A) in an absolute path as cubic Beziers (C).
+
+    The output then only uses M, L, C and Z, which every platform draws the same way. Arc
+    handling differs per platform and is the fragile part: on Windows MAUI fails to draw some
+    arcs at all (e.g. the radius-0.25 arcs in "activity"), which takes the app down.
+    """
+    tokens = d.split()
+    sizes = {"M": 2, "L": 2, "T": 2, "C": 6, "S": 4, "Q": 4, "A": 7, "Z": 0}
+    out = []
+    x = y = sx = sy = 0.0
+    i = 0
+    while i < len(tokens):
+        cmd = tokens[i]
+        args = [float(v) for v in tokens[i + 1:i + 1 + sizes[cmd]]]
+        i += 1 + sizes[cmd]
+        if cmd == "A":
+            rx, ry, rotation, large, sweep, nx, ny = args
+            for curve in arc_to_cubics(x, y, rx, ry, rotation, bool(large), bool(sweep), nx, ny):
+                out.append("C " + " ".join(fmt(v) for v in curve))
+            x, y = nx, ny
+            continue
+        out.append(" ".join([cmd] + [fmt(v) for v in args]))
+        if cmd == "Z":
+            x, y = sx, sy
+        else:
+            x, y = args[-2], args[-1]
+            if cmd == "M":
+                sx, sy = x, y
+    return " ".join(out)
 
 
 def pascal(kebab: str) -> str:

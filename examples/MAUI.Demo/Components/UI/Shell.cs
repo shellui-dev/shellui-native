@@ -365,9 +365,9 @@ public static class ShellFocus
 }
 
 // Page-level layer for anything that must draw above the page: modal overlays, floating panels,
-// tooltips, toasts — the MAUI take on a React portal. Created on first use as the last child of
-// the page's root Grid (a non-Grid root is wrapped in one, once). The layer itself never takes
-// input; only what is placed in it does.
+// tooltips, toasts — the MAUI take on a React portal. Set up as the page appears: the page content
+// is wrapped in a Grid, once, and the layer is that Grid's last child. The layer itself never
+// takes input; only what is placed in it does.
 public static class ShellPortal
 {
     private static readonly BindableProperty LayerProperty =
@@ -389,20 +389,17 @@ public static class ShellPortal
         if (page is null) return null;
         if (page.GetValue(LayerProperty) is Grid existing) return existing;
 
-        if (page.Content is not Grid root)
-        {
-            var content = page.Content;
-            var scroll = content as ScrollView;
-            var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
-            // Edge-to-edge like the page itself, so wrapping doesn't change how the content is inset.
-            root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
-            page.Content = root;
-            if (content != null) root.Children.Add(content);
-            // Normally this runs as the page appears (see ShellTheme.EnsureInitialized); if it
-            // runs later, re-parenting must not lose where the user had scrolled to.
-            if (scroll != null && (scrollX > 0 || scrollY > 0))
-                scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
-        }
+        // Always wrapped, even a Grid root: the wrapper spans the window while the content keeps
+        // its own safe-area insets, so the layer can reach under the system bars.
+        var content = page.Content;
+        var scroll = content as ScrollView;
+        var (scrollX, scrollY) = (scroll?.ScrollX ?? 0, scroll?.ScrollY ?? 0);
+        var root = new Grid { SafeAreaEdges = SafeAreaEdges.None };
+        page.Content = root;
+        if (content != null) root.Children.Add(content);
+        // Re-parenting must not lose the scroll position if this runs after the page appeared.
+        if (scroll != null && (scrollX > 0 || scrollY > 0))
+            scroll.Dispatcher.Dispatch(() => _ = scroll.ScrollToAsync(scrollX, scrollY, false));
 
         // The layer covers the whole window (backdrops dim under the system bars); content placed
         // in it uses GetSafeInsets to stay clear of them.
@@ -413,8 +410,6 @@ public static class ShellPortal
             CascadeInputTransparent = false,
             SafeAreaEdges = SafeAreaEdges.None
         };
-        Grid.SetRowSpan(layer, Math.Max(1, root.RowDefinitions.Count));
-        Grid.SetColumnSpan(layer, Math.Max(1, root.ColumnDefinitions.Count));
         root.Children.Add(layer);
         page.SetValue(LayerProperty, layer);
 #if ANDROID
@@ -610,7 +605,10 @@ public static class ShellPortal
         panel.BindingContext = (options.Owner ?? anchor).BindingContext;
         panel.HorizontalOptions = LayoutOptions.Start;
         panel.VerticalOptions = LayoutOptions.Start;
-        panel.Margin = new Thickness(0);
+        // Start inside the safe area: a panel first laid out under the status bar gets padded
+        // for it, and keeps that padding after it is moved into place.
+        var inset = GetSafeInsets(layer);
+        panel.Margin = new Thickness(inset.Left + 8, inset.Top + 8, 0, 0);
         panel.Opacity = 0;
         panel.IsVisible = true;
         if (options.MatchAnchorWidth) panel.WidthRequest = anchor.Width;
@@ -630,6 +628,13 @@ public static class ShellPortal
 
         var size = new Size(panel.Width, panel.Height);
         var origin = GetPosition(anchor, layer);
+        var anchorSize = new Size(anchor.Width, anchor.Height);
+        if (options.AnchorPoint is { } point)
+        {
+            // Open at a point inside the anchor (context menus): a zero-size anchor there.
+            origin = new Point(origin.X + point.X, origin.Y + point.Y);
+            anchorSize = Size.Zero;
+        }
         const double edge = 8;
         var safe = GetSafeInsets(layer);
         var minTop = safe.Top + edge;
@@ -637,11 +642,11 @@ public static class ShellPortal
 
         var x = options.Align switch
         {
-            ShellPopupAlign.Center => origin.X + (anchor.Width - size.Width) / 2,
-            ShellPopupAlign.End => origin.X + anchor.Width - size.Width,
+            ShellPopupAlign.Center => origin.X + (anchorSize.Width - size.Width) / 2,
+            ShellPopupAlign.End => origin.X + anchorSize.Width - size.Width,
             _ => origin.X
         };
-        var below = origin.Y + anchor.Height + options.Offset;
+        var below = origin.Y + anchorSize.Height + options.Offset;
         var above = origin.Y - size.Height - options.Offset;
         var fitsBelow = below + size.Height <= maxBottom;
         var fitsAbove = above >= minTop;
@@ -670,6 +675,8 @@ public sealed class ShellPopupOptions
     public ShellPopupAlign Align { get; init; } = ShellPopupAlign.Start;
     public double Offset { get; init; } = 4;
     public bool MatchAnchorWidth { get; init; }
+    // Position inside the anchor to open at instead of its edge (e.g. where the user right-clicked).
+    public Point? AnchorPoint { get; init; }
     // Modal popups get a click-outside catcher (menus, selects); tooltips and hover cards don't.
     public bool Modal { get; init; } = true;
     public Action? OnDismiss { get; init; }
@@ -850,6 +857,8 @@ public abstract class ShellPopoverHost : Grid, IShellPopup
     protected virtual bool Modal => true;
     protected virtual ShellPopupPlacement Placement => ShellPopupPlacement.Bottom;
     protected virtual ShellPopupAlign Align => ShellPopupAlign.Start;
+    protected virtual Point? AnchorPoint => null;
+    protected virtual double Offset => 4;
 
     protected View? PopupContent => _content;
 
@@ -878,6 +887,8 @@ public abstract class ShellPopoverHost : Grid, IShellPopup
             {
                 Placement = Placement,
                 Align = Align,
+                Offset = Offset,
+                AnchorPoint = AnchorPoint,
                 Modal = Modal,
                 Owner = this,
                 OnDismiss = Close

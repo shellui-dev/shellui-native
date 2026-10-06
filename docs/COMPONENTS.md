@@ -141,6 +141,32 @@ shellui-native add toggle
 
 ---
 
+### Toggle Group
+A row of toggles that work as one control: pick one (the default) or several (`Multiple`).
+
+```bash
+shellui-native add toggle-group
+```
+
+**Properties (ToggleGroup):** `Value` (two-way; the pressed item, `null` when none), `Multiple`,
+`Values` (two-way; the pressed items in `Multiple` mode), `Variant` (Default, Outline) ·
+**Events:** `ValueChanged`, `ValuesChanged`
+
+**Properties (ToggleGroupItem):** `Value`, `Text`, `Icon`
+
+```xml
+<ui:ToggleGroup Value="{Binding View}">
+    <ui:ToggleGroupItem Value="day" Text="Day" />
+    <ui:ToggleGroupItem Value="week" Text="Week" />
+    <ui:ToggleGroupItem Value="month" Text="Month" />
+</ui:ToggleGroup>
+```
+
+In single mode, tapping the pressed item clears the selection. To always keep one pressed, set
+`Value` back in `ValueChanged` when it arrives as `null`.
+
+---
+
 ### Input
 Single-line text field — 40px, one themed border (the platform control's own frame is removed),
 ring color + soft glow on focus, destructive border on error.
@@ -182,6 +208,41 @@ shellui-native add input-otp
 
 ```xml
 <ui:InputOtp Length="6" Value="{Binding Code}" Completed="OnCodeEntered" />
+```
+
+---
+
+### Number Input
+Number field with − and + buttons. The value is clamped to `Minimum` / `Maximum`, and the buttons
+dim at the limits. Typing is committed on Enter or when the field loses focus; text that isn't a
+number puts the last value back.
+
+```bash
+shellui-native add number-input
+```
+
+**Properties:** `Value` (`decimal?`, two-way; `null` when empty), `Minimum`, `Maximum`, `Step` (1),
+`Placeholder` · **Events:** `ValueChanged`
+
+```xml
+<ui:NumberInput Value="{Binding Quantity}" Minimum="1" Maximum="10" WidthRequest="160" />
+```
+
+---
+
+### Tag Input
+Text field that turns entries into removable chips. Enter, a comma or a semicolon commits what was
+typed (so pasting `a, b, c` adds three tags); the × on a chip removes it.
+
+```bash
+shellui-native add tag-input   # also installs wrap-layout
+```
+
+**Properties:** `Tags` (`IList<string>`, two-way), `Placeholder`, `MaxTags` (0 = no limit),
+`AllowDuplicates` · **Events:** `TagsChanged` · **Methods:** `Add(tag)`, `Remove(tag)`
+
+```xml
+<ui:TagInput Tags="{Binding Labels}" Placeholder="Add a label..." MaxTags="6" />
 ```
 
 ---
@@ -301,6 +362,32 @@ shellui-native add combobox
 
 ---
 
+### Multi Select
+Like Combobox, for several options: the trigger shows the picked options as removable chips, and
+the floating panel has a search field and a checked list. Picking toggles an option and leaves
+the panel open; click outside, press Escape or (on Android) go back to close it.
+
+```bash
+shellui-native add multi-select   # also installs wrap-layout
+```
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| ItemsSource | IList&lt;string&gt; | null | Options |
+| Values | IList&lt;string&gt; | null | Picked options (two-way) |
+| Placeholder | string | "Select..." | Shown when nothing is picked |
+| SearchPlaceholder | string | "Search..." | Placeholder of the filter field |
+| EmptyText | string | "No results found." | Shown when nothing matches |
+
+```xml
+<ui:MultiSelect Placeholder="Select frameworks..." ItemsSource="{Binding Frameworks}"
+                Values="{Binding Picked}" />
+```
+
+**Events:** `ValuesChanged` · **Methods:** `Toggle(option)`
+
+---
+
 ### Slider
 Platform slider tinted with the theme (primary range and thumb, secondary track).
 
@@ -385,6 +472,41 @@ shellui-native add theme-toggle
 ---
 
 ## Layout Components
+
+### Aspect Ratio
+Keeps its content at a fixed width / height ratio: the height follows the width.
+
+```bash
+shellui-native add aspect-ratio
+```
+
+**Properties:** `Ratio` (width divided by height; default 16:9 = 1.7778)
+
+```xml
+<ui:AspectRatio Ratio="1.7778">
+    <Image Source="cover.jpg" Aspect="AspectFill" />
+</ui:AspectRatio>
+```
+
+### Wrap Layout
+`flex flex-wrap gap-2`: children flow left to right and wrap onto new rows, centered vertically
+within their row. Use it for button rows, chips and tag lists.
+
+```bash
+shellui-native add wrap-layout
+```
+
+**Properties:** `Spacing` (8, between children), `LineSpacing` (8, between rows), `LastChildFill`
+(the last child takes the rest of its row), `MinimumLastChildWidth` (96)
+
+```xml
+<ui:WrapLayout>
+    <ui:Button Text="One" />
+    <ui:Button Text="Two" Variant="Outline" />
+</ui:WrapLayout>
+```
+
+Prefer it to `FlexLayout` for simple wrapping: it measures each child once per layout pass.
 
 ### Card
 `rounded-xl border bg-card shadow-sm` container.
@@ -517,6 +639,75 @@ Trail with chevron separators; links turn foreground on hover.
 
 ---
 
+### Tree View
+Tree of expandable rows with selection. Tapping a row selects it and, when it has children,
+expands or collapses it. Nested `TreeViewItem`s are the children.
+
+```bash
+shellui-native add tree-view
+```
+
+**Properties (TreeView):** `SelectedValue` (two-way) · **Events:** `SelectedValueChanged`
+
+**Properties (TreeViewItem):** `Text`, `Value` (defaults to `Text`), `Icon`, `IsExpanded` (two-way)
+
+```xml
+<ui:TreeView SelectedValue="{Binding Path}">
+    <ui:TreeViewItem Text="src" Icon="Folder" IsExpanded="True">
+        <ui:TreeViewItem Text="Components" Icon="Folder">
+            <ui:TreeViewItem Text="Button.cs" Icon="File" />
+        </ui:TreeViewItem>
+        <ui:TreeViewItem Text="App.xaml" Icon="FileText" />
+    </ui:TreeViewItem>
+</ui:TreeView>
+```
+
+---
+
+### Link Card
+Tappable card with an optional icon, a title, a description and an arrow. Tapping raises
+`Clicked` and opens `Url` in the system browser when one is set.
+
+```bash
+shellui-native add link-card
+```
+
+**Properties:** `Title`, `Description`, `Icon`, `Url` · **Events:** `Clicked`
+
+```xml
+<ui:LinkCard Title="Documentation" Description="Guides and the component reference."
+             Icon="FileText" Url="https://example.com/docs" />
+```
+
+---
+
+### Stepper
+Step-by-step flow: numbered circles joined by lines (the active one filled, completed ones
+checked), the active step's content, and Previous / Next / Confirm buttons. A step becomes
+clickable once it has been reached.
+
+```bash
+shellui-native add stepper
+```
+
+**Properties (Stepper):** `CurrentStep` (two-way, 0-based), `ShowNavigation` (true),
+`PreviousText`, `NextText`, `ConfirmText` · **Events:** `CurrentStepChanged`, `Confirmed` ·
+**Methods:** `Next()`, `Previous()`
+
+**Properties (StepperStep):** `Title`, `Description` · its child view is the step's content
+
+```xml
+<ui:Stepper Confirmed="OnDone">
+    <ui:StepperStep Title="Account" Description="Your details">
+        <ui:Input Placeholder="you@example.com" />
+    </ui:StepperStep>
+    <ui:StepperStep Title="Plan"> ... </ui:StepperStep>
+    <ui:StepperStep Title="Review"> ... </ui:StepperStep>
+</ui:Stepper>
+```
+
+---
+
 ### Pagination
 Previous / page numbers / Next, with ellipses for skipped ranges. The current page is outlined;
 Previous and Next disable at the ends.
@@ -543,6 +734,63 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 <ui:Badge Text="New" Variant="Success" />
 ```
 
+### Copy Button
+Ghost icon button that copies `Text` to the clipboard; the icon turns into a check for two
+seconds. `Label` adds text next to the icon.
+
+```bash
+shellui-native add copy-button
+```
+
+**Properties:** `Text` (what gets copied), `Label` · **Events:** `Copied` · **Methods:** `CopyAsync()`
+
+```xml
+<ui:CopyButton Text="shellui-native add button" />
+<ui:CopyButton Text="{Binding ShareUrl}" Label="Copy link" />
+```
+
+### Kbd
+Keyboard key hint. **Properties:** `Text`
+
+```xml
+<ui:Kbd Text="Ctrl" /> <ui:Kbd Text="K" />
+```
+
+### Stat Card
+Dashboard metric: a muted title with an optional icon, the value in large bold text, a change
+pill tinted by trend, and an optional description.
+
+```bash
+shellui-native add stat-card
+```
+
+**Properties:** `Title`, `Value`, `Change`, `Trend` (Neutral, Up, Down), `Description`, `Icon`
+
+```xml
+<ui:StatCard Title="Total revenue" Value="$45,231.89" Change="+20.1%" Trend="Up"
+             Icon="DollarSign" Description="from last month" />
+```
+
+### Timeline
+Vertical list of events joined by a hairline. Each item has a marker (a dot, or a circled icon),
+a title, a time and details.
+
+```bash
+shellui-native add timeline
+```
+
+**Properties (TimelineItem):** `Title`, `Time`, `Text`, `Icon`, `IsActive` · a child view becomes
+the item's body
+
+```xml
+<ui:Timeline>
+    <ui:TimelineItem Title="Order placed" Time="09:12" Text="We received your order." />
+    <ui:TimelineItem Title="Shipped" Time="14:40" Icon="Send" IsActive="True">
+        <ui:Badge Text="In transit" Variant="Info" HorizontalOptions="Start" />
+    </ui:TimelineItem>
+</ui:Timeline>
+```
+
 ### Progress
 8px bar; the track is the fill color at 20%. Animates to new values.
 **Properties:** `Value`, `Maximum`, `Variant` (Default, Success, Warning, Destructive), `ShowLabel`
@@ -550,6 +798,60 @@ Pill label. **Variants:** Default, Secondary, Outline, Destructive, Success, War
 ### Skeleton
 Pulsing placeholder in the `Muted` token (opacity 1 → 0.5 → 1 every 2s, only while on screen).
 **Properties:** `CornerRadius` (default 6) plus `WidthRequest` / `HeightRequest`
+
+### Table
+Rows inside a rounded border: a header row in the muted foreground, body rows divided by a
+hairline that tint on hover, and an optional caption.
+
+```bash
+shellui-native add table
+```
+
+**Properties (Table):** `Columns` (Grid column widths, e.g. `2*,*,*,100`), `Caption`, `Bordered`
+(true), `MinimumContentWidth` (below this width the table scrolls sideways instead of squeezing)
+
+**TableRow:** `IsSelected`, `Tapped` event · **TableHead:** `Text`, `HorizontalTextAlignment` ·
+**TableCell:** `Text`, `HorizontalTextAlignment`, `IsBold`, or any child view
+
+```xml
+<ui:Table Columns="*,*,1.4*,90" Caption="A list of your recent invoices.">
+    <ui:TableHeader>
+        <ui:TableHead Text="Invoice" />
+        <ui:TableHead Text="Status" />
+        <ui:TableHead Text="Method" />
+        <ui:TableHead Text="Amount" HorizontalTextAlignment="End" />
+    </ui:TableHeader>
+    <ui:TableRow Tapped="OnRowTapped">
+        <ui:TableCell Text="INV001" IsBold="True" />
+        <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalOptions="Start" /></ui:TableCell>
+        <ui:TableCell Text="Credit Card" />
+        <ui:TableCell Text="$250.00" HorizontalTextAlignment="End" />
+    </ui:TableRow>
+</ui:Table>
+```
+
+Use star and fixed widths in `Columns`: every row is its own grid, so an `Auto` column would size
+per row. For long lists, put a `TableHeader` above a `CollectionView` whose item template is a
+`TableRow` with the same `Columns` set on the row itself.
+
+### Carousel
+One slide at a time in a rounded frame. Swipe, use the round arrow buttons or tap a dot to move.
+Each child view is a slide.
+
+```bash
+shellui-native add carousel
+```
+
+**Properties:** `Position` (two-way), `Loop` (true), `ShowArrows`, `ShowDots`, `AutoPlay`,
+`AutoPlayInterval` (ms, default 3000), `AspectRatio` (width / height, default 16:9; `0` to size it
+with `HeightRequest` instead) · **Events:** `PositionChanged` · **Methods:** `Next()`, `Previous()`
+
+```xml
+<ui:Carousel AspectRatio="2" AutoPlay="True">
+    <Image Source="one.jpg" Aspect="AspectFill" />
+    <Image Source="two.jpg" Aspect="AspectFill" />
+</ui:Carousel>
+```
 
 ### Empty State
 Placeholder for an empty list or screen: icon in a muted tile, title, description and optional
@@ -739,6 +1041,33 @@ shellui-native add popover
 </ui:Popover>
 ```
 
+### Context Menu
+Right-click the trigger (long-press on touch) to open a menu at the pointer. Clicking outside,
+picking an item or pressing Escape closes it.
+
+```bash
+shellui-native add context-menu
+```
+
+**ContextMenuItem:** `Text`, `Icon`, `Shortcut` (hint text, display only), `IsDestructive`,
+`IsEnabled` · **Events:** `Clicked` · **ContextMenuSeparator** divides groups ·
+`ContextMenu.OpenAt(point)` opens it from code
+
+```xml
+<ui:ContextMenu>
+    <ui:ContextMenuTrigger>
+        <Border HeightRequest="120"> ... </Border>
+    </ui:ContextMenuTrigger>
+    <ui:ContextMenuContent>
+        <ui:ContextMenuItem Text="Copy" Icon="Copy" Shortcut="Ctrl+C" Clicked="OnCopy" />
+        <ui:ContextMenuSeparator />
+        <ui:ContextMenuItem Text="Delete" Icon="Trash2" IsDestructive="True" Clicked="OnDelete" />
+    </ui:ContextMenuContent>
+</ui:ContextMenu>
+```
+
+On touch devices the menu opens under the trigger rather than at the finger.
+
 ### Tooltip
 Small label shown above (or below) a view after the pointer rests on it. Pointer devices only.
 
@@ -782,9 +1111,8 @@ on Android close the one on top; an Alert Dialog treats that as Cancel. With not
 keeps its normal behavior. Call `ShellDismiss.DismissTop()` to do the same from your own code.
 
 ### How overlays float
-`ShellPortal` (in `Shell.cs`) keeps one layer above each page's content — set up as the page
-appears, as the last child of the page's root `Grid`; a page whose root isn't a Grid gets wrapped
-in one, once. Dialogs, drawers, sheets, menus, selects, tooltips, hover cards and toasts are all
+`ShellPortal` (in `Shell.cs`) keeps one layer above each page's content. As the page appears, its
+content is wrapped in a `Grid`, once, and the layer is that Grid's last child. Dialogs, drawers, sheets, menus, selects, tooltips, hover cards and toasts are all
 placed in that layer, so they are never clipped by a `ScrollView` and always draw on top. Content
 moved there keeps a link to its component, so bindings and lookups keep working.
 
@@ -792,6 +1120,20 @@ The layer is edge-to-edge: backdrops dim the whole window, drawers and sheets ru
 system bars, and their content (plus popups and toasts) is kept clear of the bars and notch with
 `ShellPortal.GetSafeInsets`. If you build your own overlay chrome, call
 `ShellPortal.EdgeToEdge(...)` on its layouts so MAUI doesn't inset them a second time.
+
+---
+
+## Long pages on Windows
+
+WinUI gives a window 250 layout passes to settle, and a very large page can run out and crash at
+startup with `Layout cycle detected`. The demo hit this when every component was on one page:
+WinUI's trace showed layout still reaching new elements when the passes ran out, with `Border`
+outline updates each asking for another pass. An ordinary screen is nowhere near the limit; a
+"kitchen sink" page is.
+
+If you hit it, lay out less at once: split the page, or keep sections collapsed
+(`IsVisible="False"`) until they are needed, since hidden content is not laid out. The demo does
+this, showing one category of components at a time.
 
 ---
 
@@ -827,6 +1169,19 @@ core helpers); components that draw icons also depend on `icon`.
 | dialog | shell, dialog-trigger, dialog-content, dialog-header, dialog-footer, dialog-title, dialog-description, dialog-close |
 | drawer / sheet | shell, *-trigger, *-content (content also installs icon for the close button) |
 | dropdown / popover | shell, *-trigger, *-content (+ dropdown-item) |
+| table | shell |
+| carousel | shell, icon |
+| context-menu | shell, icon, element-extensions |
+| stepper | shell, icon, button |
+| toggle-group | shell, icon, element-extensions |
+| number-input, stat-card, timeline | shell, icon |
+| tag-input | shell, icon, wrap-layout |
+| kbd | shell |
+| wrap-layout | — |
+| multi-select | shell, icon, wrap-layout |
+| tree-view | shell, icon, element-extensions |
+| copy-button, link-card | shell, icon |
+| aspect-ratio | — |
 | hover-card | shell, hover-card-trigger, hover-card-content |
 | date-picker | shell, icon, calendar |
 | tooltip | shell |

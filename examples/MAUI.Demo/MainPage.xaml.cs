@@ -10,6 +10,12 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany", "Japan" };
+        TagsInput.Tags = new List<string> { "maui", "design-system" };
+        FrameworkMultiSelect.ItemsSource = new List<string>
+        {
+            ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native"
+        };
+        FrameworkMultiSelect.Values = new List<string> { ".NET MAUI", "Blazor" };
         FrameworkCombobox.ItemsSource = new List<string>
         {
             ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native", "SwiftUI", "Jetpack Compose"
@@ -20,9 +26,28 @@ public partial class MainPage : ContentPage
             TagList.Children.Add(new Separator());
             TagList.Children.Add(new Label { Text = tag, FontSize = 14 }.Token(Label.TextColorProperty, ShellToken.Foreground));
         }
+
+        // Filling the samples above raised their change events; start with the hint instead.
+        Report("Interact with a component to see its events here.");
     }
 
     private void Report(string message) => StatusLabel.Text = message;
+
+    // One category at a time: hidden groups are not laid out.
+    private string _category = "buttons";
+    private void OnCategoryChanged(object? sender, string? value)
+    {
+        // A single-select toggle group can be cleared by tapping the pressed item; keep one on.
+        if (value is null) { CategoryPicker.Value = _category; return; }
+        _category = value;
+        GroupButtons.IsVisible = value == "buttons";
+        GroupForms.IsVisible = value == "forms";
+        GroupFeedback.IsVisible = value == "feedback";
+        GroupOverlays.IsVisible = value == "overlays";
+        GroupNavigation.IsVisible = value == "navigation";
+        GroupData.IsVisible = value == "data";
+        _ = PageScroll.ScrollToAsync(0, 0, false);
+    }
 
     private void OnButtonClicked(object? sender, EventArgs e)
     {
@@ -85,6 +110,33 @@ public partial class MainPage : ContentPage
     private void OnTogglePressed(object? sender, bool pressed) => Report($"Toggle: {(pressed ? "on" : "off")}");
     private void OnOtpCompleted(object? sender, string code) => Report($"OTP complete: {code}");
     private void OnPageChanged(object? sender, int page) => Report($"Page: {page}");
+
+    private void OnToggleGroupChanged(object? sender, string? value) => Report($"Toggle group: {value ?? "none"}");
+    private void OnToggleGroupValues(object? sender, IReadOnlyList<string> values) =>
+        Report($"Toggle group: {(values.Count == 0 ? "none" : string.Join(", ", values))}");
+    private void OnNumberChanged(object? sender, decimal? value) => Report($"Number: {(value.HasValue ? value.ToString() : "empty")}");
+    private void OnTagsChanged(object? sender, IReadOnlyList<string> tags) => Report($"Tags: {string.Join(", ", tags)}");
+
+    private void OnCopied(object? sender, EventArgs e) => Report($"Copied: {(sender as CopyButton)?.Text}");
+    private void OnMultiSelectChanged(object? sender, IReadOnlyList<string> values) =>
+        Report($"Multi select: {(values.Count == 0 ? "none" : string.Join(", ", values))}");
+    private void OnLinkCardClicked(object? sender, EventArgs e) => Report($"Link card: {(sender as LinkCard)?.Title}");
+    private void OnTreeSelected(object? sender, string? value) => Report($"Tree: {value}");
+
+    private void OnContextMenuItem(object? sender, EventArgs e) => Report($"Context menu: {(sender as ContextMenuItem)?.Text}");
+    private void OnStepChanged(object? sender, int step) => Report($"Stepper: step {step + 1}");
+    private void OnStepperConfirmed(object? sender, EventArgs e) => Toast.Success("Workspace created");
+    private void OnCarouselChanged(object? sender, int position) => Report($"Carousel: slide {position + 1}");
+
+    private TableRow? _selectedRow;
+    private void OnTableRowTapped(object? sender, EventArgs e)
+    {
+        if (sender is not TableRow row) return;
+        if (_selectedRow != null) _selectedRow.IsSelected = false;
+        _selectedRow = row;
+        row.IsSelected = true;
+        Report($"Table: {row.Children.OfType<TableCell>().FirstOrDefault()?.Text}");
+    }
 
     private void OnDropdownItem(object? sender, EventArgs e) => Report($"Dropdown: {(sender as DropdownItem)?.Text}");
     private void OnTabChanged(object? sender, (string Old, string New) e) => Report($"Tab: {e.New}");

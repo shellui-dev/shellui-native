@@ -179,7 +179,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **avatar** ✅ | P5.1 | shell, icon | Avatar | Done 2026-09-27 |
-| **table** | P5.2 | table-header, table-body, table-row, table-cell, table-head | Table | Data table |
+| **table** ✅ | P5.2 | shell | Table | Done 2026-10-05 — one template (Table, TableHeader, TableRow, TableHead, TableCell); hover, selection, caption, sideways scroll |
 | **empty-state** ✅ | P5.3 | shell, icon | EmptyState | Done 2026-10-04 — icon tile, title, description, action row, optional dashed border |
 | **callout** ✅ | P5.4 | shell, icon | Callout | Done 2026-10-04 — Info / Warning / Danger / Tip / Default, tinted background |
 | **pagination** ✅ | P5.5 | shell, icon | Pagination | Done 2026-10-04 — previous/next, sibling window, ellipses |
@@ -190,9 +190,9 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 ### P6 — Lower (Advanced)
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
-| **context-menu** | P6.1 | context-menu-trigger, context-menu-content, context-menu-option | ContextMenu | Right-click / long-press menu |
-| **carousel** | P6.2 | carousel-content, carousel-item, carousel-previous, carousel-next, carousel-dots | Carousel | Image/content carousel |
-| **stepper** | P6.3 | stepper-list, stepper-step, stepper-content | Stepper | Step wizard |
+| **context-menu** ✅ | P6.1 | shell, icon, element-extensions | ContextMenu | Done 2026-10-05 — one template; opens at the pointer on right-click, under the trigger on long-press |
+| **carousel** ✅ | P6.2 | shell, icon | Carousel | Done 2026-10-05 — one template; swipe, arrows, dots, loop, auto-play |
+| **stepper** ✅ | P6.3 | shell, icon, button | Stepper | Done 2026-10-05 — one template (Stepper + StepperStep) with built-in navigation |
 | **resizable** | P6.4 | — | Resizable | Resizable panels |
 | **navbar** | P6.5 | nav-trigger, nav-content, nav-list, nav-item | Navbar | Collapsible nav bar |
 | **sidebar** | P6.6 | — | Sidebar | App sidebar layout |
@@ -207,6 +207,18 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | file-upload | P7 | File picker |
 | input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
 | date-range-picker | P7 | Date range selection |
+| toggle-group ✅ | — | Done 2026-10-05 — single or multiple selection, Default / Outline |
+| number-input ✅ | — | Done 2026-10-05 — − / + buttons, min / max clamp, decimal value |
+| tag-input ✅ | — | Done 2026-10-05 — chips with remove, Enter / comma / semicolon to commit |
+| kbd ✅ | — | Done 2026-10-05 |
+| stat-card ✅ | — | Done 2026-10-05 — title, value, trend pill, description, icon |
+| timeline ✅ | — | Done 2026-10-05 — dot or icon markers joined by a line |
+| multi-select ✅ | — | Done 2026-10-05 — searchable, chips in the trigger, panel stays open while picking |
+| tree-view ✅ | — | Done 2026-10-05 — nested items, expand / collapse, selection |
+| copy-button ✅ | P7 | Done 2026-10-05 — clipboard copy with a check confirmation |
+| link-card ✅ | — | Done 2026-10-05 — tappable card that can open a URL |
+| aspect-ratio ✅ | — | Done 2026-10-05 |
+| wrap-layout ✅ | — | Done 2026-10-05 — wrapping layout used by tag-input and the demo's button rows |
 | theme-toggle | P7 | Already in demo; consider as component |
 | copy-button | P7 | Copy to clipboard |
 | toggle | P7 | Toggle button (vs Switch) |
