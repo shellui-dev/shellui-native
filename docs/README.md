@@ -86,6 +86,7 @@ They're separate rendering contexts with no conflict. Install what you need base
 - [Getting Started](./QUICKSTART.md)
 - [Component List](./COMPONENTS.md)
 - [Release Notes](./RELEASE_NOTES.md)
+- [Releasing](./RELEASING.md) — how a version is published
 - [Components Roadmap](./COMPONENTS_ROADMAP.md) — prioritized P0–P7 backlog
 - [Development Plan](./DEVELOPMENT_PLAN.md) — branch strategy & phase breakdown
 - [Architecture](./ARCHITECTURE.md)

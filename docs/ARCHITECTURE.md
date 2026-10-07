@@ -210,6 +210,6 @@ so `shellui-native.json` records the CLI version each component was installed wi
 
 **Releasing:** set the version in `Directory.Build.props`, add a `# ShellUI Native v<version>`
 section to [RELEASE_NOTES.md](./RELEASE_NOTES.md), merge to `main`, then push a `v<version>` tag.
-`.github/workflows/release.yml` checks that the tag matches the props version, runs the tests,
-publishes `ShellUI.Native.CLI` to NuGet and creates the GitHub release (a prerelease when the
-version has a `-`) with the notes as its body.
+`.github/workflows/release.yml` checks the tag, runs the tests, publishes `ShellUI.Native.CLI`
+through NuGet Trusted Publishing and creates the GitHub release. Setup and steps are in
+[RELEASING.md](./RELEASING.md).

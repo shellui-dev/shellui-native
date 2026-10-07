@@ -1,44 +1,59 @@
 name: Release
 
+# Fires on v*.*.* tags (with prerelease suffixes). Version comes from Directory.Build.props.
+# Publishes via NuGet Trusted Publishing (OIDC, no long-lived API key). Setup in docs/RELEASING.md.
 on:
   push:
     tags:
-      - 'v*'
-
-permissions:
-  contents: write
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Pack and validate only — skip nuget push"
+        type: boolean
+        default: true
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     if: github.event.repository.fork == false
+    environment: release
+    permissions:
+      contents: write   # for creating the GitHub Release
+      id-token: write   # required for the Trusted Publishing OIDC exchange
+    env:
+      PUBLISH: ${{ github.event_name == 'push' || inputs.dry_run == false }}
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Extract version from tag
-      id: version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-    - name: Extract release notes for this version
-      run: bash scripts/extract-release-notes.sh "${{ steps.version.outputs.VERSION }}" > "$RUNNER_TEMP/release-body.md"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
 
-    - name: Check package version matches tag
+    - name: Read version
+      id: version
       run: |
         v=$(dotnet msbuild src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj -getProperty:Version)
-        if [ "$v" != "${{ steps.version.outputs.VERSION }}" ]; then
-          echo "::error::The CLI builds version $v but the tag is v${{ steps.version.outputs.VERSION }}. Update Directory.Build.props."
+        echo "Directory.Build.props version: $v"
+        echo "VERSION=$v" >> "$GITHUB_OUTPUT"
+
+    - name: Check tag matches version
+      if: github.event_name == 'push'
+      run: |
+        tag="${GITHUB_REF#refs/tags/v}"
+        if [ "$tag" != "${{ steps.version.outputs.VERSION }}" ]; then
+          echo "::error::The CLI builds version ${{ steps.version.outputs.VERSION }} but the tag is v$tag. Update Directory.Build.props."
           exit 1
         fi
+
+    - name: Extract release notes for this version
+      run: bash scripts/extract-release-notes.sh "${{ steps.version.outputs.VERSION }}" > "$RUNNER_TEMP/release-body.md"
 
     - name: Restore dependencies (src + tests)
       run: |
@@ -57,17 +72,39 @@ jobs:
     - name: Pack CLI tool
       run: dotnet pack src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj --no-build --configuration Release -p:ContinuousIntegrationBuild=true -o ./nupkg
 
+    # nuget.org locks a version forever after first publish, and --skip-duplicate would skip it silently.
+    - name: Verify version is not already published
+      if: env.PUBLISH == 'true'
+      run: |
+        v="${{ steps.version.outputs.VERSION }}"
+        existing=$(curl -sf "https://api.nuget.org/v3-flatcontainer/shellui.native.cli/index.json" | grep -oE '"[^"]*"' | tr -d '"' || true)
+        if echo "$existing" | grep -Fxiq "$v"; then
+          echo "::error::ShellUI.Native.CLI $v is already on nuget.org. Bump Directory.Build.props and re-tag."
+          exit 1
+        fi
+
+    # Right before the push: the temporary API key is valid for one hour.
+    # `user` is the nuget.org profile name (not the email, not the GitHub org), kept as a secret.
+    - name: Login to NuGet via Trusted Publishing
+      if: env.PUBLISH == 'true'
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
     - name: Publish CLI to NuGet
-      run: dotnet nuget push ./nupkg/ShellUI.Native.CLI.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      if: env.PUBLISH == 'true'
+      env:
+        NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+      run: dotnet nuget push ./nupkg/ShellUI.Native.CLI.*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
     - name: Create GitHub Release
+      if: github.event_name == 'push'
       uses: softprops/action-gh-release@v2
       with:
         name: ShellUI Native v${{ steps.version.outputs.VERSION }}
         body_path: ${{ runner.temp }}/release-body.md
         draft: false
-        prerelease: ${{ contains(github.ref, '-') }}
+        prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
         files: |
           ./nupkg/*.nupkg
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

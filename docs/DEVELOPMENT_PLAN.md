@@ -426,7 +426,8 @@ First NuGet prerelease of `ShellUI.Native.CLI`, MAUI only.
 - [x] Component versions read from the assembly (an installed tool has no `Directory.Build.props`)
 - [x] `release.yml` builds the CLI and tests (not the bare `src/` folder), checks the tag against
   the props version, runs the tests and uses [RELEASE_NOTES.md](./RELEASE_NOTES.md) as the
-  GitHub release body (`scripts/extract-release-notes.sh`)
+  GitHub release body (`scripts/extract-release-notes.sh`); publishes through NuGet Trusted
+  Publishing like ShellDocs (setup in [RELEASING.md](./RELEASING.md))
 - [x] Install docs use `--prerelease`; roadmap and plan brought up to date
 - [x] Every CLI target added alone to a fresh MAUI library, plus all together in a fresh MAUI app
 
