@@ -132,10 +132,15 @@ YourProject/
 └── shellui-native.json
 ```
 
-## Related Projects
+## The Shell family
 
-- [ShellUI (Blazor)](https://github.com/shellui-dev/shellui) - Blazor component library
-- [shadcn/ui](https://ui.shadcn.com/) - The original inspiration
+| | Project | |
+|---|---|---|
+| <img src="../assets/brand/shellui.png" alt="" width="24"> | [ShellUI](https://github.com/shellui-dev/shellui) | The Blazor component library this one mirrors |
+| <img src="../assets/brand/shellicons.png" alt="" width="24"> | [ShellIcons](https://github.com/shellui-dev/shell-icons) | Lucide icons for Blazor, MAUI and Avalonia; the source of the `icon` component |
+| <img src="../assets/brand/shelldocs.png" alt="" width="24"> | [ShellDocs](https://github.com/shellui-dev/shelldocs) | The docs framework behind the ShellUI sites |
+
+Inspired by [shadcn/ui](https://ui.shadcn.com/).
 
 ## License
 
