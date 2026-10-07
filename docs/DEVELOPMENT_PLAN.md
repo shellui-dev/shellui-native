@@ -454,7 +454,9 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 - [x] CLI: `init` in an Avalonia project installs the Avalonia `Shell.cs` and prints Avalonia next
   steps; `list` shows only components with a template for the project's platform
 - [x] CI job that builds the Avalonia demo on `ubuntu-latest`, `windows-latest` and `macos-latest`
-- [ ] P0: button, input, label, checkbox, switch, card family, separator, badge, progress, alert
+- [x] P0: button (+ button-variants), input, label, checkbox, switch, card family, separator, badge,
+  progress, alert. Each installs alone into a fresh `dotnet new avalonia.app` and builds with 0
+  warnings; checked in the demo in light and dark, with the keyboard focus ring and loading state
 - [ ] P1: dialog, drawer, sheet, dropdown, popover (Avalonia's overlay layer and popups)
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
