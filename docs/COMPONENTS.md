@@ -1158,6 +1158,10 @@ shellui-native list --available
 Dependencies install automatically. Almost every component depends on `shell` (theme tokens and
 core helpers); components that draw icons also depend on `icon`.
 
+Parts of a compositional family (`dialog-trigger`, `accordion-item`, `card-header`, …) find their
+parent at runtime, so they only build next to it. Adding a part on its own installs the whole
+family: `shellui-native add dialog-trigger` installs `dialog` and all its parts.
+
 | Component | Auto-installs |
 |-----------|---------------|
 | button | shell, icon, button-variants |

@@ -172,4 +172,17 @@ public static class ComponentRegistry
     {
         return _templates.ContainsKey(componentName.ToLower());
     }
+
+    /* The family a compositional part belongs to (`dialog-trigger` → `dialog`), or null.
+       Parts find their parent type at runtime and parents depend on their parts, so a part
+       only builds when its family is installed. */
+    public static string? GetFamily(string componentName)
+    {
+        var name = componentName.ToLower();
+        return _templates
+            .Where(t => name.StartsWith(t.Key + "-") && t.Value.Meta.Dependencies.Contains(name))
+            .Select(t => t.Key)
+            .OrderByDescending(k => k.Length)
+            .FirstOrDefault();
+    }
 }
