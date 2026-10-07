@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -168,12 +169,26 @@ public static class ShellTheme
 
 public static class ShellThemeExtensions
 {
-    // Binds a Color or Brush property to a theme token. Returns the control for chaining.
+    // One binding per control and property. A resource binding outlives ClearValue and a later
+    // SetValue, and would repaint the property on the next theme change, so it is disposed instead.
+    private static readonly ConditionalWeakTable<StyledElement, Dictionary<AvaloniaProperty, IDisposable>> Bindings = new();
+
+    // Binds a Color or Brush property to a theme token, replacing any earlier token binding.
+    // Returns the control for chaining.
     public static T Token<T>(this T control, AvaloniaProperty property, ShellToken token) where T : StyledElement
     {
         ShellTheme.EnsureInitialized();
+        control.ClearToken(property);
         var key = typeof(IBrush).IsAssignableFrom(property.PropertyType) ? ShellTheme.BrushKey(token) : ShellTheme.ColorKey(token);
-        control.Bind(property, control.GetResourceObservable(key));
+        Bindings.GetOrCreateValue(control)[property] = control.Bind(property, control.GetResourceObservable(key));
+        return control;
+    }
+
+    // Removes the token binding, so a plain value (e.g. Brushes.Transparent) can be set.
+    public static T ClearToken<T>(this T control, AvaloniaProperty property) where T : StyledElement
+    {
+        if (Bindings.TryGetValue(control, out var bindings) && bindings.Remove(property, out var binding))
+            binding.Dispose();
         return control;
     }
 }
