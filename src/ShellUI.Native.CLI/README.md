@@ -1,4 +1,4 @@
-![ShellUI Native](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/icon-64.png)
+![ShellUI Native](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/icon.svg)
 
 # ShellUI Native CLI
 
@@ -47,6 +47,6 @@ Components are written to `Components/UI/` as plain C# files you own. Avalonia s
 
 | | Project | |
 |---|---|---|
-| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shellui.png) | [ShellUI](https://www.nuget.org/packages/ShellUI.CLI) | The Blazor component library this one mirrors |
-| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shellicons.png) | [ShellIcons](https://www.nuget.org/packages/ShellIcons.Blazor) | Lucide icons for Blazor, MAUI and Avalonia |
-| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shelldocs.png) | [ShellDocs](https://www.nuget.org/packages/ShellDocs.CLI) | The docs framework behind the ShellUI sites |
+| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shellui.svg) | [ShellUI](https://www.nuget.org/packages/ShellUI.CLI) | The Blazor component library this one mirrors |
+| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shellicons.svg) | [ShellIcons](https://www.nuget.org/packages/ShellIcons.Blazor) | Lucide icons for Blazor, MAUI and Avalonia |
+| ![](https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/brand/shelldocs.svg) | [ShellDocs](https://www.nuget.org/packages/ShellDocs.CLI) | The docs framework behind the ShellUI sites |
