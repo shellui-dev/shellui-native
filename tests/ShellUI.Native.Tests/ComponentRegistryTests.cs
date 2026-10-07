@@ -125,4 +125,21 @@ public class ComponentRegistryTests
         var supported = ComponentRegistry.GetSupportedPlatforms("nonexistent-xyz");
         Assert.Empty(supported);
     }
+
+    // The installed tool has no Directory.Build.props, so the version must reach it through the assembly.
+    [Fact]
+    public void Component_version_is_the_package_version_from_Directory_Build_props()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null && !File.Exists(Path.Combine(dir.FullName, "Directory.Build.props")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+
+        var props = File.ReadAllText(Path.Combine(dir!.FullName, "Directory.Build.props"));
+        var version = System.Text.RegularExpressions.Regex.Match(props, "<ShellUINativeVersion>([^<]+)<").Groups[1].Value;
+        var suffix = System.Text.RegularExpressions.Regex.Match(props, "<ShellUINativeVersionSuffix>([^<]*)<").Groups[1].Value;
+        var expected = suffix.Length == 0 ? version : $"{version}-{suffix}";
+
+        Assert.All(ComponentRegistry.Components.Values, m => Assert.Equal(expected, m.Version));
+    }
 }
