@@ -101,8 +101,17 @@ public static class InitService
 
         AnsiConsole.MarkupLine("\n[green]✓ ShellUI Native initialized successfully![/]");
         AnsiConsole.MarkupLine("\n[blue]Next steps:[/]");
-        AnsiConsole.MarkupLine("  [dim]1. Add components:[/] shellui-native add button");
-        AnsiConsole.MarkupLine("  [dim]2. Browse all:[/] shellui-native list");
+        if (projectInfo.Platform == NativePlatform.Avalonia)
+        {
+            AnsiConsole.MarkupLine("  [dim]1. Load the theme in App.Initialize, after AvaloniaXamlLoader.Load(this):[/] Components.UI.ShellTheme.EnsureInitialized();");
+            AnsiConsole.MarkupLine($"  [dim]2. Use the components in XAML:[/] xmlns:ui=\"using:{Markup.Escape(projectInfo.RootNamespace)}.Components.UI\"");
+            AnsiConsole.MarkupLine("  [dim]3. Add components:[/] shellui-native add theme-toggle");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("  [dim]1. Add components:[/] shellui-native add button");
+            AnsiConsole.MarkupLine("  [dim]2. Browse all:[/] shellui-native list");
+        }
     }
 
     private static async Task InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath)

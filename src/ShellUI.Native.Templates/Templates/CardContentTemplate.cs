@@ -29,6 +29,17 @@ public partial class CardContent : ContentView
         Padding = new Thickness(24, 0, 24, 24);
     }
 }
+",
+        [NativePlatform.Avalonia] = @"using Avalonia;
+using Avalonia.Controls;
+
+namespace YourProjectNamespace.Components.UI;
+
+// Card body — p-6 pt-0.
+public class CardContent : Border
+{
+    public CardContent() => Padding = new Thickness(24, 0, 24, 24);
+}
 "
     };
 }

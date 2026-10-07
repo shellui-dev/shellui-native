@@ -78,9 +78,20 @@ public static class ProjectDetector
         return NativePlatform.Unknown;
     }
 
-    private static string DetectRootNamespace(XDocument doc, string projectName)
+    internal static string DetectRootNamespace(XDocument doc, string projectName)
     {
         var rootNamespace = doc.Descendants("RootNamespace").FirstOrDefault()?.Value;
-        return rootNamespace ?? projectName;
+        return string.IsNullOrWhiteSpace(rootNamespace) ? SafeNamespace(projectName) : rootNamespace.Trim();
+    }
+
+    // What `dotnet new` does with a project name: "my-app" → "my_app", "2fa.app" → "_2fa.app".
+    internal static string SafeNamespace(string name)
+    {
+        var parts = name.Split('.').Select(part =>
+        {
+            var safe = new string(part.Select(c => char.IsLetterOrDigit(c) || c == '_' ? c : '_').ToArray());
+            return safe.Length == 0 || char.IsDigit(safe[0]) ? "_" + safe : safe;
+        });
+        return string.Join('.', parts);
     }
 }

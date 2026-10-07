@@ -1,11 +1,11 @@
-"""Sync the CLI's MAUI templates from the working demo copies.
+"""Sync the CLI's templates from the working demo copies.
 
     python scripts/sync-templates.py
 
-
-The demo (examples/MAUI.Demo/Components/UI) is where components are developed and run;
-this copies each file into its *Template.cs as the [NativePlatform.MAUI] verbatim string,
-restoring the YourProjectNamespace placeholder, and recomputes shared dependencies.
+The demos (examples/MAUI.Demo and examples/Avalonia.Demo, Components/UI) are where components
+are developed and run; this copies each file into its *Template.cs as the platform's verbatim
+string, restoring the YourProjectNamespace placeholder. Dependencies come from the MAUI file;
+an Avalonia file may only use dependencies the template already declares.
 """
 import os
 import re
@@ -13,11 +13,12 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEMO = os.path.join(ROOT, "examples", "MAUI.Demo", "Components", "UI")
+AVALONIA_DEMO = os.path.join(ROOT, "examples", "Avalonia.Demo", "Components", "UI")
 TPL = os.path.join(ROOT, "src", "ShellUI.Native.Templates", "Templates")
 
 # New templates that don't exist yet: name -> (registry key, display, description, category, tags)
 NEW = {
-    "Icon": ("icon", "Icon", "Lucide stroke icons drawn with MAUI shapes (no font or package)", "Utility",
+    "Icon": ("icon", "Icon", "Lucide stroke icons drawn as native shapes (no font or package)", "Utility",
              ["icon", "lucide", "svg", "utility"]),
     "ThemeToggle": ("theme-toggle", "Theme Toggle", "Light/dark mode toggle button", "Utility",
                     ["theme", "dark-mode", "toggle"]),
@@ -99,14 +100,16 @@ SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|
 ICON_API = re.compile(r"\bnew Icon\b|\bIconName\b")
 EXT_API = re.compile(r"\bFindParentOfType\b|\bFindDescendantsOfType\b|\bAnimateExpandAsync\b")
 
-MAUI_BLOCK = re.compile(r'(\[NativePlatform\.MAUI\] = @")(.*?)(\n"\n    \};)', re.S)
+# A block ends at the closing quote that is followed by the next entry or the end of the dictionary.
+MAUI_BLOCK = re.compile(r'(\[NativePlatform\.MAUI\] = @")(.*?)(\n"(?=,\n|\n    \};))', re.S)
+AVALONIA_BLOCK = re.compile(r'(\[NativePlatform\.Avalonia\] = @")(.*?)(\n"(?=,\n|\n    \};))', re.S)
 DEPS_LINE = re.compile(r'^(\s*)Dependencies = new List<string>(?:\s*\{([^}]*)\})?(?:\(\))?,\s*$', re.M)
 
 
-def to_template_content(source: str) -> str:
+def to_template_content(source: str, demo_namespace: str = "MAUI.Demo") -> str:
     source = source.replace("\r\n", "\n")
-    source = source.replace("MAUI.Demo.Components.UI", "YourProjectNamespace.Components.UI")
-    if "MAUI.Demo" in source:
+    source = source.replace(f"{demo_namespace}.Components.UI", "YourProjectNamespace.Components.UI")
+    if demo_namespace in source:
         raise SystemExit("demo-specific namespace left in source")
     # The closing quote sits on its own line after the block, so drop the trailing newline.
     return source.rstrip("\n").replace('"', '""')
@@ -200,8 +203,49 @@ def main() -> None:
                 open(tpl_path, "w", encoding="utf-8", newline="").write(text)
                 changed.append(f"UPD  {name} deps={deps}")
 
+    changed += sync_avalonia()
     print("\n".join(changed))
     print(f"{len(changed)} templates written")
+
+
+def sync_avalonia() -> list[str]:
+    changed = []
+    # Walks subfolders too (Variants/ButtonVariants.cs), like the MAUI pass.
+    files = sorted((d, f) for d, _, fs in os.walk(AVALONIA_DEMO) for f in fs if f.endswith(".cs"))
+    for dirpath, file in files:
+        name = file[:-3]
+        source = open(os.path.join(dirpath, file), encoding="utf-8-sig").read()
+        content = to_template_content(source, "AvaloniaDemo")
+        tpl_path = os.path.join(TPL, f"{name}Template.cs")
+        if not os.path.exists(tpl_path):
+            print(f"SKIP (Avalonia, no MAUI template yet): {name}")
+            continue
+
+        raw = open(tpl_path, encoding="utf-8-sig", newline="").read()
+        crlf = "\r\n" in raw
+        text = raw.replace("\r\n", "\n")
+
+        deps_match = DEPS_LINE.search(text)
+        declared = re.findall(r'"([^"]+)"', deps_match.group(2) or "") if deps_match else []
+        missing = [d for d in compute_deps(name, source, []) if d not in declared]
+        if missing:
+            raise SystemExit(f"Avalonia {name} uses {missing}, which the template doesn't declare")
+
+        match = AVALONIA_BLOCK.search(text)
+        if match:
+            text = text[:match.start(2)] + content + text[match.end(2):]
+        else:
+            maui = MAUI_BLOCK.search(text)
+            if not maui:
+                raise SystemExit(f"no MAUI block in {tpl_path}")
+            text = text[:maui.end()] + f',\n        [NativePlatform.Avalonia] = @"{content}\n"' + text[maui.end():]
+
+        if crlf:
+            text = text.replace("\n", "\r\n")
+        if text != raw:
+            open(tpl_path, "w", encoding="utf-8", newline="").write(text)
+            changed.append(f"AVA  {name}")
+    return changed
 
 
 if __name__ == "__main__":

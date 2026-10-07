@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="using:AvaloniaDemo.Components.UI"
+        x:Class="AvaloniaDemo.MainWindow"
+        Title="ShellUI Native (Avalonia)"
+        Width="1000" Height="760"
+        Background="{DynamicResource ShellUIBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource ShellUIForegroundBrush}" />
+            <Setter Property="Margin" Value="0,16,0,4" />
+        </Style>
+        <Style Selector="TextBlock.hint">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource ShellUIMutedForegroundBrush}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel>
+                    <TextBlock Text="ShellUI Native" FontSize="28" FontWeight="Bold"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                    <TextBlock Classes="hint" Text="Avalonia components with the same design tokens as ShellUI." />
+                </StackPanel>
+                <ui:ThemeToggle Grid.Column="1" />
+            </Grid>
+
+            <TextBlock Classes="title" Text="Buttons" />
+            <TextBlock Classes="hint" Text="Variants, sizes, icons, loading and disabled." />
+            <WrapPanel ItemSpacing="8" LineSpacing="8">
+                <ui:Button Text="Default" />
+                <ui:Button Text="Secondary" Variant="Secondary" />
+                <ui:Button Text="Outline" Variant="Outline" />
+                <ui:Button Text="Ghost" Variant="Ghost" />
+                <ui:Button Text="Destructive" Variant="Destructive" />
+                <ui:Button Text="Link" Variant="Link" />
+            </WrapPanel>
+            <WrapPanel ItemSpacing="8" LineSpacing="8" Margin="0,8,0,0">
+                <ui:Button Text="Small" Size="Sm" />
+                <ui:Button Text="Large" Size="Lg" />
+                <ui:Button Icon="Settings" Size="Icon" Variant="Outline" />
+                <ui:Button Text="New item" Icon="Plus" />
+                <ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" />
+                <ui:Button x:Name="LoadingButton" Text="Save" />
+                <ui:Button Text="Disabled" IsEnabled="False" />
+            </WrapPanel>
+            <TextBlock x:Name="ClickCount" Classes="hint" Margin="0,8,0,0" Text="Click Save to see the loading state." />
+
+            <TextBlock Classes="title" Text="Form controls" />
+            <TextBlock Classes="hint" Text="Input, checkbox, switch and label at the 40px form baseline." />
+            <StackPanel Spacing="12" Width="360" HorizontalAlignment="Left">
+                <ui:ShellLabel Text="Email" Size="Sm" Weight="Medium" />
+                <ui:Input Placeholder="you@example.com" />
+                <ui:Input Placeholder="Password" IsPassword="True" />
+                <ui:Input Text="Invalid value" HasError="True" />
+                <ui:Checkbox Label="Accept terms and conditions" />
+                <ui:Checkbox Label="Required" HasError="True" />
+                <ui:Switch Label="Airplane mode" />
+                <ui:Switch Label="Notifications" IsToggled="True" />
+            </StackPanel>
+
+            <TextBlock Classes="title" Text="Card" />
+            <TextBlock Classes="hint" Text="Header, content and footer parts." />
+            <WrapPanel ItemSpacing="16" LineSpacing="16">
+                <ui:Card Width="380">
+                    <ui:CardHeader Title="Create project" Description="Deploy your new project in one click." />
+                    <ui:CardContent>
+                        <ui:Input Placeholder="Name of your project" />
+                    </ui:CardContent>
+                    <ui:CardFooter>
+                        <ui:Button Text="Cancel" Variant="Outline" />
+                        <ui:Button Text="Deploy" />
+                    </ui:CardFooter>
+                </ui:Card>
+                <ui:Card Width="300" Variant="Elevated">
+                    <ui:CardHeader Title="Elevated" Description="A larger shadow for cards that float." />
+                    <ui:CardContent>
+                        <ui:ShellLabel Text="Body text in the card." Size="Sm" Variant="Muted" />
+                    </ui:CardContent>
+                </ui:Card>
+            </WrapPanel>
+
+            <TextBlock Classes="title" Text="Badges, separators and progress" />
+            <WrapPanel ItemSpacing="8" LineSpacing="8">
+                <ui:Badge Text="Default" />
+                <ui:Badge Text="Secondary" Variant="Secondary" />
+                <ui:Badge Text="Outline" Variant="Outline" />
+                <ui:Badge Text="Destructive" Variant="Destructive" />
+                <ui:Badge Text="Success" Variant="Success" />
+                <ui:Badge Text="Warning" Variant="Warning" />
+                <ui:Badge Text="Info" Variant="Info" />
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" Height="20" Spacing="12" Margin="0,12,0,0">
+                <ui:ShellLabel Text="Blog" Size="Sm" />
+                <ui:Separator Orientation="Vertical" />
+                <ui:ShellLabel Text="Docs" Size="Sm" />
+                <ui:Separator Orientation="Vertical" />
+                <ui:ShellLabel Text="Source" Size="Sm" />
+            </StackPanel>
+            <ui:Separator Margin="0,12" />
+            <StackPanel Spacing="12" Width="360" HorizontalAlignment="Left">
+                <ui:Progress x:Name="Progress" Value="40" ShowLabel="True" />
+                <ui:Progress Value="75" Variant="Success" />
+                <ui:Progress Value="25" Variant="Destructive" />
+            </StackPanel>
+
+            <TextBlock Classes="title" Text="Alerts" />
+            <StackPanel Spacing="12" Width="520" HorizontalAlignment="Left">
+                <ui:Alert Title="Heads up!" Message="You can add components to your app using the CLI." />
+                <ui:Alert Title="Error" Message="Your session has expired. Please log in again." Variant="Destructive" />
+                <ui:Alert Title="Saved" Message="Your changes have been saved." Variant="Success" />
+                <ui:Alert Title="Careful" Message="This action can't be undone." Variant="Warning" />
+                <ui:Alert Title="Tip" Message="Press Tab to see the focus ring." Variant="Info" />
+            </StackPanel>
+
+            <TextBlock Classes="title" Text="Theme tokens" />
+            <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
+            <WrapPanel x:Name="Swatches" />
+
+            <TextBlock Classes="title" Text="Icons" />
+            <TextBlock Classes="hint" Text="Lucide icons from ShellIcons, drawn as geometry." />
+            <WrapPanel x:Name="Icons" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>

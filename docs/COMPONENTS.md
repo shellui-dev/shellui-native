@@ -65,6 +65,29 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 ---
 
+## Avalonia (in progress)
+
+Ported so far: `shell`, `icon`, `theme-toggle` and P0 (`button`, `input`, `label`, `checkbox`,
+`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`). Not yet published to
+NuGet. In an Avalonia project, `shellui-native list` shows only these.
+
+Setup after `shellui-native init`: call `Components.UI.ShellTheme.EnsureInitialized();` in
+`App.Initialize` after `AvaloniaXamlLoader.Load(this);`, and add
+`xmlns:ui="using:YourApp.Components.UI"` to your XAML. Switch theme with
+`ShellTheme.SetTheme(ThemeVariant.Dark)` or `ShellTheme.ToggleTheme()`.
+
+Same names, properties and variants as MAUI, except:
+
+| | MAUI | Avalonia |
+|---|---|---|
+| Icon | `<ui:Icon Name="Search" />` | `<ui:Icon Kind="Search" />` (every Avalonia control already has a `Name`) |
+| Input length limit | `MaxLength`, default `int.MaxValue` | `MaxLength`, `0` (default) means no limit |
+| Card children | XAML children | XAML children, collected in `Card.Items` |
+| Block button | `HorizontalOptions="Fill"` | `HorizontalAlignment="Stretch"` |
+| Focus ring | Platform focus visuals | shadcn's ring, for keyboard focus only |
+
+---
+
 ## Icon
 
 Stroke icons from [ShellIcons](../../../icons/shell-icons) (Lucide 0.475.0 — the set ShellUI

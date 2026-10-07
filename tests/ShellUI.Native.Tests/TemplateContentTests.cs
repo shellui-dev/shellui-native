@@ -9,11 +9,73 @@ namespace ShellUI.Native.Tests;
 //
 // Post Template System v2 (2026-07-18): content is keyed by (name, NativePlatform).
 // The MAUI baseline invariants are unchanged — every component must have MAUI content
-// today. Avalonia support is opt-in per-template and NOT asserted here.
+// today. Avalonia is added per template; its invariants are checked for templates that have it.
 public class TemplateContentTests
 {
     public static IEnumerable<object[]> AllRegisteredComponents()
         => ComponentRegistry.Components.Keys.Select(name => new object[] { name });
+
+    public static IEnumerable<object[]> AvaloniaComponents()
+        => ComponentRegistry.Components.Keys
+            .Where(name => ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia))
+            .Select(name => new object[] { name });
+
+    // Ported so far: the Phase 2 foundation and P0. Grows as components are ported.
+    [Theory]
+    [InlineData("shell")]
+    [InlineData("icon")]
+    [InlineData("theme-toggle")]
+    [InlineData("button")]
+    [InlineData("button-variants")]
+    [InlineData("input")]
+    [InlineData("label")]
+    [InlineData("checkbox")]
+    [InlineData("switch")]
+    [InlineData("card")]
+    [InlineData("card-header")]
+    [InlineData("card-content")]
+    [InlineData("card-footer")]
+    [InlineData("separator")]
+    [InlineData("badge")]
+    [InlineData("progress")]
+    [InlineData("alert")]
+    public void Ported_components_have_Avalonia_content(string name)
+    {
+        Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
+    }
+
+    [Theory]
+    [MemberData(nameof(AvaloniaComponents))]
+    public void Avalonia_template_is_Avalonia_code_with_the_namespace_placeholder(string name)
+    {
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)!;
+        Assert.Contains("namespace YourProjectNamespace.Components.UI", content); // .Variants for button-variants
+        Assert.Contains("using Avalonia", content);
+        Assert.DoesNotContain("Microsoft.Maui", content);
+        Assert.DoesNotContain("AvaloniaDemo", content);
+    }
+
+    // An Avalonia install must never pull in a dependency that only has MAUI code.
+    [Theory]
+    [MemberData(nameof(AvaloniaComponents))]
+    public void Avalonia_template_dependencies_have_Avalonia_content(string name)
+    {
+        foreach (var dependency in ComponentRegistry.GetMetadata(name)!.Dependencies)
+            Assert.True(ComponentRegistry.SupportsPlatform(dependency, NativePlatform.Avalonia),
+                $"'{name}' has Avalonia content but its dependency '{dependency}' does not.");
+    }
+
+    [Theory]
+    [MemberData(nameof(AvaloniaComponents))]
+    public void Avalonia_components_use_theme_tokens_not_hardcoded_colors(string name)
+    {
+        if (name == "shell") return; // defines the palettes
+
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)!;
+        Assert.DoesNotContain("Color.Parse", content);
+        Assert.DoesNotContain("Color.FromRgb", content);
+        Assert.DoesNotContain("Color.FromArgb", content);
+    }
 
     [Theory]
     [MemberData(nameof(AllRegisteredComponents))]

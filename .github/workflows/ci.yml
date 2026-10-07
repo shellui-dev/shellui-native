@@ -66,3 +66,22 @@ jobs:
 
     - name: Build MAUI Demo (Windows)
       run: dotnet build examples/MAUI.Demo/MAUI.Demo.csproj --configuration Release --framework net10.0-windows10.0.19041.0
+
+  # Avalonia is the cross-desktop target, so its demo builds on all three desktop OSes
+  build-avalonia:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Build Avalonia Demo
+      run: dotnet build examples/Avalonia.Demo/AvaloniaDemo.csproj --configuration Release

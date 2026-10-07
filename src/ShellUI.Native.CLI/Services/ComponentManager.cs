@@ -22,8 +22,10 @@ public static class ComponentManager
         var installedNames = config?.InstalledComponents.Select(c => c.Name).ToHashSet() ?? new HashSet<string>();
 
         // Get available components (excluding non-available utility components)
+        // In an initialized project, list only components with a template for its platform
         var components = ComponentRegistry.Components.Values
             .Where(c => c.IsAvailable)
+            .Where(c => config == null || ComponentRegistry.SupportsPlatform(c.Name, config.TargetPlatform))
             .OrderBy(c => c.Category)
             .ThenBy(c => c.Name);
 

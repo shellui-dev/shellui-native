@@ -124,4 +124,24 @@ public class ProjectDetectorTests
             """);
         Assert.Equal(NativePlatform.MAUI, ProjectDetector.DetectPlatform(doc, "fake.csproj"));
     }
+
+    // dotnet new's rule, checked against `dotnet new classlib -n ...`.
+    [Theory]
+    [InlineData("MyApp", "MyApp")]
+    [InlineData("my-app", "my_app")]
+    [InlineData("my app", "my_app")]
+    [InlineData("2fa.app", "_2fa.app")]
+    [InlineData("Contoso.Mobile", "Contoso.Mobile")]
+    public void Root_namespace_without_RootNamespace_is_the_safe_project_name(string projectName, string expected)
+    {
+        var doc = XDocument.Parse("<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup /></Project>");
+        Assert.Equal(expected, ProjectDetector.DetectRootNamespace(doc, projectName));
+    }
+
+    [Fact]
+    public void Root_namespace_prefers_the_RootNamespace_property()
+    {
+        var doc = XDocument.Parse("<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><RootNamespace>my_app</RootNamespace></PropertyGroup></Project>");
+        Assert.Equal("my_app", ProjectDetector.DetectRootNamespace(doc, "my-app"));
+    }
 }

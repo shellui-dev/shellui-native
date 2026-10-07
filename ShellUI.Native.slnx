@@ -6,6 +6,7 @@
     <File Path="docs/README.md" />
   </Folder>
   <Folder Name="/examples/">
+    <Project Path="examples/Avalonia.Demo/AvaloniaDemo.csproj" />
     <File Path="examples/README.md" />
     <Project Path="examples/MAUI.Demo/MAUI.Demo.csproj">
       <Deploy />

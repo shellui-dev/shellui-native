@@ -441,13 +441,28 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
 ### Deliverables
 
-- [ ] New `src/ShellUI.Native.Avalonia/` reference project (Avalonia 12.x)
-- [ ] Avalonia design-token `ResourceDictionary` mirroring [`StyleTemplates.cs`](../src/ShellUI.Native.Templates/StyleTemplates.cs)
-- [ ] Add Avalonia content to each template (P0 + P1 first), using the
-  `TemplatedControl`/`StyledProperty` pattern documented in
+- [x] `examples/Avalonia.Demo/` (Avalonia 12.1.3, .NET 10, implicit usings off like the
+  Avalonia template); components are developed there, as in the MAUI demo. A separate
+  `src/ShellUI.Native.Avalonia/` project isn't needed
+- [x] Theme tokens: `ShellTheme` in the Avalonia `shell` publishes both palettes as theme
+  dictionaries (no XAML resource file to install)
+- [x] Foundation templates with Avalonia content: `shell`, `icon` (same 110 icons, `Kind`
+  instead of `Name`), `theme-toggle`; pattern in
   [ARCHITECTURE.md § Component Pattern (Avalonia)](./ARCHITECTURE.md)
-- [ ] `examples/Avalonia.Demo/` reference app mirroring the MAUI demo
-- [ ] CI job that builds the Avalonia demo on all three OSes (`ubuntu-latest`, `windows-latest`, `macos-latest`)
+- [x] `scripts/sync-templates.py` writes the `[NativePlatform.Avalonia]` entries;
+  `scripts/generate-icons.py` writes both `Icon.cs` files
+- [x] CLI: `init` in an Avalonia project installs the Avalonia `Shell.cs` and prints Avalonia next
+  steps; `list` shows only components with a template for the project's platform
+- [x] CI job that builds the Avalonia demo on `ubuntu-latest`, `windows-latest` and `macos-latest`
+- [x] P0: button (+ button-variants), input, label, checkbox, switch, card family, separator, badge,
+  progress, alert. Each installs alone into a fresh `dotnet new avalonia.app` and builds with 0
+  warnings; checked in the demo in light and dark, with the keyboard focus ring and loading state
+- [ ] P1: dialog, drawer, sheet, dropdown, popover (Avalonia's overlay layer and popups)
+- [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
+  once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
+  components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
+  (Avalonia). The CLI needs NuGet dependencies first (`add icon` runs `dotnet add package`), and
+  `scripts/generate-icons.py` goes away
 
 ### Order of implementation
 
