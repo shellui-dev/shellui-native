@@ -27,7 +27,7 @@ class Program
     static Command CreateInitCommand()
     {
         var command = new Command("init", "Initialize ShellUI Native in your project");
-        
+
         var forceOption = new Option<bool>("--force", "Reinitialize even if already initialized");
         var styleOption = new Option<string>("--style", () => "default", "Choose component style (default, minimal)");
         var nonInteractiveOption = new Option<bool>("--yes", "Run in non-interactive mode with default options");
@@ -70,7 +70,7 @@ class Program
     static Command CreateAddCommand()
     {
         var command = new Command("add", "Add component(s) to your project");
-        
+
         var componentsArg = new Argument<string[]>("components", "Component name(s) to add (space or comma-separated)")
         {
             Arity = ArgumentArity.OneOrMore
@@ -101,7 +101,7 @@ class Program
 
         var installedOption = new Option<bool>("--installed", "Show only installed components");
         var availableOption = new Option<bool>("--available", "Show only available components");
-        
+
         command.AddOption(installedOption);
         command.AddOption(availableOption);
 
@@ -123,7 +123,7 @@ class Program
     static Command CreateRemoveCommand()
     {
         var command = new Command("remove", "Remove component(s) from your project");
-        
+
         var componentsArg = new Argument<string[]>("components", "Component name(s) to remove")
         {
             Arity = ArgumentArity.OneOrMore
@@ -148,7 +148,7 @@ class Program
     static Command CreateUpdateCommand()
     {
         var command = new Command("update", "Update component(s) to latest version");
-        
+
         var componentsArg = new Argument<string[]>("components", "Component name(s) to update (empty = all)")
         {
             Arity = ArgumentArity.ZeroOrMore

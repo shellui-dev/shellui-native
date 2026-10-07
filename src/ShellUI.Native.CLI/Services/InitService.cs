@@ -31,7 +31,7 @@ public static class InitService
                     ctx.Status("Detecting project type...");
                     await Task.Delay(300);
                     projectInfo = ProjectDetector.DetectProject();
-                    
+
                     var platformName = projectInfo.Platform switch
                     {
                         NativePlatform.MAUI => ".NET MAUI",
@@ -40,7 +40,7 @@ public static class InitService
                         NativePlatform.WPF => "WPF",
                         _ => "Unknown"
                     };
-                    
+
                     AnsiConsole.MarkupLine($"[green]✓ Detected:[/] {platformName}");
                     AnsiConsole.MarkupLine($"[dim]Project: {projectInfo.ProjectName}[/]");
                     AnsiConsole.MarkupLine($"[dim]Namespace: {projectInfo.RootNamespace}[/]");
@@ -142,7 +142,7 @@ public static class InitService
         if (content == null) return;
 
         content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
-        
+
         var filePath = Path.Combine(componentsPath, "Shell.cs");
         await File.WriteAllTextAsync(filePath, content);
         AnsiConsole.MarkupLine($"[green]✓ Installed:[/] Shell.cs");

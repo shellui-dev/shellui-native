@@ -11,7 +11,7 @@ public static class ComponentInstaller
     public static async Task InstallComponents(string[] components, bool force)
     {
         var configPath = Path.Combine(Directory.GetCurrentDirectory(), "shellui-native.json");
-        
+
         if (!File.Exists(configPath))
         {
             AnsiConsole.MarkupLine("[red]ShellUI Native not initialized![/]");
@@ -21,7 +21,7 @@ public static class ComponentInstaller
 
         var configJson = await File.ReadAllTextAsync(configPath);
         var config = JsonSerializer.Deserialize<ShellUINativeConfig>(configJson);
-        
+
         if (config == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to read shellui-native.json[/]");
@@ -45,7 +45,7 @@ public static class ComponentInstaller
         var tally = new InstallTally();
         var failedComponents = new List<string>();
         var installedSet = new HashSet<string>();
-        
+
         // Show dependency information
         foreach (var componentName in componentList)
         {
@@ -55,9 +55,9 @@ public static class ComponentInstaller
                 AnsiConsole.MarkupLine($"[green]●[/] [bold]{componentName}[/] requires: [yellow]{string.Join(", ", metadata.Dependencies)}[/]");
             }
         }
-        
+
         AnsiConsole.MarkupLine("");
-        
+
         await AnsiConsole.Status()
             .Spinner(Spinner.Known.Dots)
             .SpinnerStyle(Style.Parse("green"))
@@ -87,9 +87,9 @@ public static class ComponentInstaller
     }
 
     private static async Task InstallComponentWithDependenciesAsync(
-        string componentName, 
-        ShellUINativeConfig config, 
-        ProjectInfo projectInfo, 
+        string componentName,
+        ShellUINativeConfig config,
+        ProjectInfo projectInfo,
         bool force,
         HashSet<string> installedSet,
         InstallTally tally,
@@ -97,7 +97,7 @@ public static class ComponentInstaller
     {
         if (installedSet.Contains(componentName))
             return;
-        
+
         if (!ComponentRegistry.Exists(componentName))
         {
             AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]");
@@ -128,7 +128,7 @@ public static class ComponentInstaller
 
         // Install the component
         var result = await InstallComponentInternalAsync(componentName, metadata, config, projectInfo, force);
-        
+
         if (result == InstallResult.Success)
         {
             tally.Success++;
@@ -153,7 +153,7 @@ public static class ComponentInstaller
         bool force)
     {
         var componentPath = Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, metadata.FilePath);
-        
+
         if (File.Exists(componentPath) && !force)
         {
             AnsiConsole.MarkupLine($"[yellow]Skipped '{componentName}' (already exists)[/]");
