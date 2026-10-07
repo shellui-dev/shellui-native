@@ -39,10 +39,10 @@ Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tai
 ## Quick Start
 
 ```bash
-# Install the CLI tool
-dotnet tool install -g ShellUI.Native.CLI
+# Install the CLI tool (prerelease)
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 
-# Initialize in your MAUI or Avalonia project
+# Initialize in your MAUI project
 shellui-native init --yes
 
 # Add components
@@ -56,8 +56,8 @@ shellui-native list
 
 | Platform | Status | .NET Version |
 |----------|--------|--------------|
-| .NET MAUI | Active (Phase 1) | .NET 10.0 |
-| Avalonia UI | Planned (Phase 2) | .NET 10.0 (Avalonia 11+) |
+| .NET MAUI | Available (`0.1.0-alpha.1`) — Android, iOS, Mac Catalyst, Windows | .NET 10.0 |
+| Avalonia UI | Planned (Phase 2) | .NET 10.0 (Avalonia 12) |
 | WinUI 3 | Conditional (Phase 3) | .NET 10.0 |
 
 WPF is intentionally not on this list — it's recognized for project detection only, not an
@@ -88,6 +88,7 @@ They're separate rendering contexts with no conflict. Install what you need base
 
 - [Getting Started](./QUICKSTART.md)
 - [Component List](./COMPONENTS.md)
+- [Release Notes](./RELEASE_NOTES.md)
 - [Components Roadmap](./COMPONENTS_ROADMAP.md) — prioritized P0–P7 backlog
 - [Development Plan](./DEVELOPMENT_PLAN.md) — branch strategy & phase breakdown
 - [Architecture](./ARCHITECTURE.md)
@@ -99,14 +100,10 @@ They're separate rendering contexts with no conflict. Install what you need base
 <!-- MAUI XAML -->
 <ContentPage xmlns:ui="clr-namespace:YourProject.Components.UI">
     <VerticalStackLayout>
-        <ui:Button Variant="Primary" Size="Lg" Clicked="OnButtonClicked">
-            <Label Text="Click me!" />
-        </ui:Button>
-        
+        <ui:Button Text="Click me!" Size="Lg" Clicked="OnButtonClicked" />
+
         <ui:Card>
-            <ui:CardHeader>
-                <ui:CardTitle Text="Welcome" />
-            </ui:CardHeader>
+            <ui:CardHeader Title="Welcome" Description="Tell us who you are." />
             <ui:CardContent>
                 <ui:Input Placeholder="Enter your name" />
             </ui:CardContent>
@@ -129,6 +126,9 @@ YourProject/
 │       ├── Variants/
 │       │   └── ButtonVariants.cs
 │       └── Shell.cs
+├── Resources/
+│   └── Styles/
+│       └── ShellUITheme.xaml
 └── shellui-native.json
 ```
 

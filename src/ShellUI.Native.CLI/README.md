@@ -5,13 +5,15 @@
 
 # ShellUI Native CLI
 
-Command-line interface for ShellUI Native component library.
+Command-line interface for ShellUI Native: shadcn-style, copy-and-own components for .NET MAUI, with the same design tokens as [ShellUI](https://shellui.dev/) for Blazor.
 
 ## Installation
 
 ```bash
-dotnet tool install -g ShellUI.Native.CLI
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 ```
+
+Requires the .NET 10 SDK.
 
 ## Commands
 
@@ -26,7 +28,7 @@ shellui-native update [--all]             # Update components
 ## Quick Start
 
 ```bash
-# Navigate to your MAUI/WinUI/WPF project
+# Navigate to your MAUI project
 cd YourProject
 
 # Initialize ShellUI Native
@@ -36,6 +38,10 @@ shellui-native init --yes
 shellui-native add button input card
 ```
 
+Components are written to `Components/UI/` as plain C# files you own. Avalonia support is the next phase.
+
 ## More Information
 
-See the full documentation at [native.shellui.dev](https://native.shellui.dev)
+- [Component reference](https://github.com/shellui-dev/shellui-native/blob/main/docs/COMPONENTS.md)
+- [Release notes](https://github.com/shellui-dev/shellui-native/blob/main/docs/RELEASE_NOTES.md)
+- Docs site: [native.shellui.dev](https://native.shellui.dev) (coming soon)

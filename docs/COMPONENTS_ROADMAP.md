@@ -2,9 +2,9 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
-Last revised: **2026-09-27** (theme tokens, icons and component polish on `feat/p3-navigation-layout`).
+Last revised: **2026-10-07** (first prerelease, `0.1.0-alpha.1`).
 
-**Status at a glance:** P0 ✅ done · P1 ✅ done · P2 ✅ done · **P3 ⏭️ next (`feat/p3-navigation-layout`)** · P4–P7 backlog · Avalonia (Phase 2) unblocked, sequenced after P3 to avoid a moving target.
+**Status at a glance:** P0–P5 ✅ done · P6 partly done (resizable, navbar, sidebar open) · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2) ⏭️ next**.
 
 ---
 
@@ -142,29 +142,29 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | Component | Status | Dependencies | ShellUI Ref | Notes |
 |-----------|--------|--------------|-------------|-------|
 | **textarea** | ✅ Done | — | Textarea | Multi-line text input |
-| **select** | ✅ Done | — | Select | Native `Picker` wrapper at 40px baseline. Trigger/Content split deferred until custom-dropdown variant is needed |
+| **select** | ✅ Done | — | Select | Custom-drawn trigger + floating list at the 40px baseline (native `Picker` dropped 2026-09-27) |
 | **slider** | ✅ Done | — | Slider | Range input |
 | **radio-group** | ✅ Done | radio-group-item | RadioGroup | Radio button group. Item checked-border fixed 2026-08-29 |
-| **date-picker** | ✅ Done | — | DatePicker | Date selection |
-| **time-picker** | ✅ Done | — | TimePicker | Time selection |
+| **date-picker** | ✅ Done | calendar | DatePicker | Custom trigger + floating `calendar` (2026-10-02) |
+| **time-picker** | ✅ Done | — | TimePicker | Custom trigger + hour / minute / AM-PM columns (2026-10-04) |
 
 ---
 
-### P3 — Medium (Navigation & Layout) ⏭️ Next — `feat/p3-navigation-layout`
+### P3 — Medium (Navigation & Layout) ✅ Done — merged in PR #3
 *See [DEVELOPMENT_PLAN.md § Phase 1c](./DEVELOPMENT_PLAN.md) for scope, order, and exit criteria.*
 
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
-| **collapsible** | P3.1 (build first — primitive) | collapsible-trigger, collapsible-content, element-extensions | Collapsible | Single expand/collapse — the `IsOpen` + animation primitive `accordion-item` composes on top of. |
-| **accordion** | P3.2 | accordion-item, accordion-trigger, accordion-content, element-extensions | Accordion | Multiple sections. `Type=Single` (radio-style) or `Multiple`. |
-| **tabs** | P3.3 | tabs-list, tabs-trigger, tabs-content, element-extensions | Tabs | Tab bar + one visible panel. Trigger MUST render at the 40px baseline (row-level control). |
-| **breadcrumb** | P3.4 | breadcrumb-item | Breadcrumb | Nav trail with separator between items. |
-| **skeleton** | P3.5 | — | Skeleton | Animated grey block, sized by parent — use for perceived-perf on lists. |
-| **scroll-area** | P3.6 | — | ScrollArea | `ScrollView` wrapper. Cross-platform scrollbar styling is thin — consider whether this is worth the wrapper vs documenting native `ScrollView`. |
+| **collapsible** ✅ | P3.1 (build first — primitive) | collapsible-trigger, collapsible-content, element-extensions | Collapsible | Single expand/collapse — the `IsOpen` + animation primitive `accordion-item` composes on top of. |
+| **accordion** ✅ | P3.2 | accordion-item, accordion-trigger, accordion-content, element-extensions | Accordion | Multiple sections. `Type=Single` (radio-style) or `Multiple`. |
+| **tabs** ✅ | P3.3 | tabs-list, tabs-trigger, tabs-content, element-extensions | Tabs | Tab bar + one visible panel. Trigger MUST render at the 40px baseline (row-level control). |
+| **breadcrumb** ✅ | P3.4 | breadcrumb-item | Breadcrumb | Nav trail with separator between items. |
+| **skeleton** ✅ | P3.5 | — | Skeleton | Animated grey block, sized by parent — use for perceived-perf on lists. |
+| **scroll-area** ✅ | P3.6 | — | ScrollArea | `ScrollView` wrapper. Cross-platform scrollbar styling is thin — consider whether this is worth the wrapper vs documenting native `ScrollView`. |
 
 ---
 
-### P4 — Medium (Feedback & Overlays)
+### P4 — Medium (Feedback & Overlays) ✅ Done
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **tooltip** ✅ | P4.1 | shell | Tooltip | Done 2026-10-02 (floats in the page layer) |
@@ -175,7 +175,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 
 ---
 
-### P5 — Lower (Data Display)
+### P5 — Lower (Data Display) ✅ Done
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **avatar** ✅ | P5.1 | shell, icon | Avatar | Done 2026-09-27 |
@@ -187,7 +187,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 
 ---
 
-### P6 — Lower (Advanced)
+### P6 — Lower (Advanced) — partly done
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **context-menu** ✅ | P6.1 | shell, icon, element-extensions | ContextMenu | Done 2026-10-05 — one template; opens at the pointer on right-click, under the trigger on long-press |
@@ -219,9 +219,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | link-card ✅ | — | Done 2026-10-05 — tappable card that can open a URL |
 | aspect-ratio ✅ | — | Done 2026-10-05 |
 | wrap-layout ✅ | — | Done 2026-10-05 — wrapping layout used by tag-input and the demo's button rows |
-| theme-toggle | P7 | Already in demo; consider as component |
-| copy-button | P7 | Copy to clipboard |
-| toggle | P7 | Toggle button (vs Switch) |
+| theme-toggle ✅ | P7 | Done — `ThemeToggle` component |
 
 ---
 
@@ -287,28 +285,14 @@ public static T? FindParentOfType<T>(this Element element) where T : Element
 
 ## Order of Implementation
 
-**Shipped on `main`** (Phase 1a + 1b — see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md)):
-P0 (15 components) → P1 (14 components across dialog / drawer / sheet / dropdown / popover
-families) → P2 (6 components including textarea, select, slider, radio-group, date-picker,
-time-picker). Total 44 templates, all platform-keyed via Template System v2.
+**Shipped in `0.1.0-alpha.1`** (see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) and
+[RELEASE_NOTES.md](./RELEASE_NOTES.md)): P0–P5, P6 context-menu / carousel / stepper, and the
+P7 items marked ✅ above — 58 families, 89 CLI targets, MAUI only.
 
-**Up next — `feat/p3-navigation-layout`** (Phase 1c). Build the primitive before the
-composite:
+**Next — Phase 2 (Avalonia).** Port in the same order as MAUI (P0 → P1 first), reusing the
+component APIs, tokens and sizing contract. MAUI is far ahead, so new MAUI components wait
+until Avalonia has P0 + P1.
 
-1. **collapsible** + collapsible-trigger, collapsible-content — establishes the `IsOpen` +
-   animation pattern the rest of the tier reuses
-2. **accordion** + accordion-item, accordion-trigger, accordion-content — accordion-item
-   is collapsible with sibling coordination via `FindParentOfType<Accordion>()`
-3. **tabs** + tabs-list, tabs-trigger, tabs-content — same show/hide pattern as accordion
-   but always exactly one visible
-4. **breadcrumb** + breadcrumb-item — standalone, no shared state
-5. **skeleton** — standalone, animation primitive worth locking early so P5 (avatar,
-   table, empty-state) can compose it
-6. **scroll-area** — decide during implementation whether it's worth the wrapper vs
-   documenting native `ScrollView`
-
-**After Phase 1c → Phase 2 (Avalonia).** Do not open Phase 2 until Phase 1c merges — the
-whole point of finishing P3 on MAUI first is to freeze the vocabulary before it doubles.
-
-**Then Phase 1d / P4+ (feedback, data display, advanced).** Sequenced after Avalonia has
-Avalonia-parity on P0/P1 at least, so new MAUI components don't get too far ahead again.
+**MAUI backlog after that:** resizable, navbar, sidebar (P6); chart, file-upload,
+date-range-picker (P7); and the ShellUI Blazor targets not yet ported (button-group,
+input-group, command / command-palette, menubar, navigation-menu, data-table, …).

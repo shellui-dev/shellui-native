@@ -4,7 +4,7 @@ Living document tracking **branches**, **phases**, and **feature implementations
 ShellUI Native. Companion to [PLAN.md](./PLAN.md) (long-term strategy) and
 [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md) (prioritized component backlog).
 
-Last revised: **2026-08-30** (Phase 1c in flight, P4 polish scoped).
+Last revised: **2026-10-07** (Phase 1e merged; `0.1.0-alpha.1` release prep).
 
 ---
 
@@ -16,9 +16,9 @@ Short-lived sub-branches (`feat/<phase>/<slice>`) cut off the phase branch and m
 into it, not directly into `main`.
 
 ```
-main   ← Phase 1a (2026-07-05), 1b (2026-08-29, PR #2), 1c + 1d (2026-10-05, PR #3) merged
- └─ feat/p5-p6-components             ← Phase 1e (active) — MAUI P5/P6 tier (table, context menu, carousel, stepper, …)
- └─ feat/avalonia-implementation      ← Phase 2 (planned) — Avalonia templates + reference impl
+main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand mark (PR #5) merged
+ └─ chore/release-v0.1.0-alpha.1      ← first prerelease (active)
+ └─ feat/avalonia-implementation      ← Phase 2 (next) — Avalonia templates + reference impl
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -35,8 +35,9 @@ main   ← Phase 1a (2026-07-05), 1b (2026-08-29, PR #2), 1c + 1d (2026-10-05, P
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1d merged | 76 platform-keyed components, theme tokens, overlay portal, xUnit 408/408 |
-| `feat/p5-p6-components` | `main` | **Active** | Phase 1e — MAUI P5/P6 (table, context-menu, carousel, stepper; 80 components, xUnit 428/428) |
+| `main` | — | Phase 1a–1e merged | 92 registry entries (89 CLI targets, 58 families), MAUI only |
+| `chore/release-v0.1.0-alpha.1` | `main` | **Active** | Version `0.1.0-alpha.1`, fixed release workflow, release notes, docs refresh, per-component CLI check |
+| `feat/avalonia-implementation` | `main` | Next | Phase 2 |
 
 ---
 
@@ -379,7 +380,7 @@ Date/Time pickers inside a themed border with the native frame stripped.
 
 ---
 
-## Phase 1e — `feat/p5-p6-components` (active)
+## Phase 1e — `feat/p5-p6-components` (**merged via [PR #4](https://github.com/shellui-dev/shellui-native/pull/4)**)
 
 The remaining MAUI data-display and advanced tiers, built demo-first like Phase 1d.
 
@@ -402,9 +403,9 @@ The remaining MAUI data-display and advanced tiers, built demo-first like Phase 
   and the tag-input keyboard / height
 - [x] `multi-select`, `tree-view`, `copy-button`, `link-card`, `aspect-ratio` — run on Windows and
   Android
-- [ ] iOS / Mac Catalyst pass for everything
-- [ ] Escape closes the overlay on top on Mac Catalyst
-- [ ] `resizable`, `navbar`, `sidebar` (P6.4–P6.6)
+- [ ] iOS / Mac Catalyst pass for everything (carried over)
+- [ ] Escape closes the overlay on top on Mac Catalyst (carried over)
+- [ ] `resizable`, `navbar`, `sidebar` (P6.4–P6.6) (moved to the MAUI backlog, after Phase 2 starts)
 
 Each family ships as one template (e.g. `table` holds Table, TableHeader, TableRow, TableHead
 and TableCell) rather than one template per part.
@@ -417,15 +418,31 @@ and TableCell) rather than one template per part.
 
 ---
 
-## Phase 2 — `feat/avalonia-implementation` (queued after Phase 1e)
+## Release `0.1.0-alpha.1` — `chore/release-v0.1.0-alpha.1` (active)
+
+First NuGet prerelease of `ShellUI.Native.CLI`, MAUI only.
+
+- [x] `Directory.Build.props` → `0.1.0` + `alpha.1`
+- [x] Component versions read from the assembly (an installed tool has no `Directory.Build.props`)
+- [x] `release.yml` builds the CLI and tests (not the bare `src/` folder), checks the tag against
+  the props version, runs the tests and uses [RELEASE_NOTES.md](./RELEASE_NOTES.md) as the
+  GitHub release body (`scripts/extract-release-notes.sh`)
+- [x] Install docs use `--prerelease`; roadmap and plan brought up to date
+- [x] Every CLI target added alone to a fresh MAUI library, plus all together in a fresh MAUI app
+
+After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
+
+---
+
+## Phase 2 — `feat/avalonia-implementation` (next, after `0.1.0-alpha.1`)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
 ### Deliverables
 
-- [ ] New `src/ShellUI.Native.Avalonia/` reference project (Avalonia 11.x)
+- [ ] New `src/ShellUI.Native.Avalonia/` reference project (Avalonia 12.x)
 - [ ] Avalonia design-token `ResourceDictionary` mirroring [`StyleTemplates.cs`](../src/ShellUI.Native.Templates/StyleTemplates.cs)
-- [ ] Add `AvaloniaContent` to each of the ~40 templates, using the
+- [ ] Add Avalonia content to each template (P0 + P1 first), using the
   `TemplatedControl`/`StyledProperty` pattern documented in
   [ARCHITECTURE.md § Component Pattern (Avalonia)](./ARCHITECTURE.md)
 - [ ] `examples/Avalonia.Demo/` reference app mirroring the MAUI demo

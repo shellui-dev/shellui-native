@@ -65,7 +65,7 @@ shellui init --yes
 shellui add button input card
 
 # Install ShellUI Native (for native MAUI controls)
-dotnet tool install -g ShellUI.Native.CLI
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 shellui-native init --yes
 shellui-native add button dialog
 ```

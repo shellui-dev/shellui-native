@@ -5,14 +5,16 @@ Get started with ShellUI Native in under 5 minutes.
 ## Prerequisites
 
 - .NET 10.0 SDK (see [global.json](../global.json))
-- A MAUI project today; Avalonia support is landing in Phase 2 (see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md))
+- A .NET MAUI project (`dotnet new maui`); Avalonia support is the next phase (see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md))
 
 ## Installation
 
 ### 1. Install the CLI Tool
 
+ShellUI Native is in prerelease, so include `--prerelease`:
+
 ```bash
-dotnet tool install -g ShellUI.Native.CLI
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 ```
 
 ### 2. Navigate to Your Project
@@ -34,8 +36,8 @@ This will:
 - Create `shellui-native.json` configuration
 - Generate theme resources (MAUI)
 
-> If the CLI detects Avalonia/WinUI/WPF, `shellui-native add` will print a warning and still
-> install MAUI-flavored code, since per-platform templates are the Phase 1b / Phase 2 workstream.
+> Templates exist for MAUI only so far. In an Avalonia, WinUI or WPF project, `init` skips the
+> `Shell.cs` utility and `add` reports that the component has no template for that platform.
 
 ### 4. Add Components
 
@@ -50,18 +52,34 @@ shellui-native add button input card
 shellui-native add button,input,card
 ```
 
-### 5. Use Components in Your App
+### 5. Load the Theme
+
+Publish the theme tokens before the first page loads, in `App.xaml.cs`:
+
+```csharp
+public App()
+{
+    InitializeComponent();
+    Components.UI.ShellTheme.EnsureInitialized();
+}
+```
+
+Components also do this on first use, but calling it early lets your own
+`{DynamicResource ShellUI*}` references resolve on the first page. See
+[COMPONENTS.md § Theming](./COMPONENTS.md#theming) for switching and customizing the theme.
+
+### 6. Use Components in Your App
 
 ```xml
 <!-- Add namespace to your XAML -->
-<ContentPage xmlns:ui="clr-namespace:YourProject.Components.UI">
-    
+<ContentPage xmlns:ui="clr-namespace:YourProject.Components.UI"
+             BackgroundColor="{DynamicResource ShellUIBackground}">
+
     <!-- Use the Button component -->
-    <ui:Button Variant="Primary" 
-               Size="Lg" 
-               Text="Click me!" 
+    <ui:Button Text="Click me!"
+               Size="Lg"
                Clicked="OnButtonClicked" />
-    
+
 </ContentPage>
 ```
 

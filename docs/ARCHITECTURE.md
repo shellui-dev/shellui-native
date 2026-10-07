@@ -201,7 +201,15 @@ Not implemented yet — this illustrates the target shape once Template System v
 All packages share a single version defined in `Directory.Build.props`:
 
 ```xml
-<ShellUINativeVersion>0.0.1</ShellUINativeVersion>
+<ShellUINativeVersion>0.1.0</ShellUINativeVersion>
+<ShellUINativeVersionSuffix>alpha.1</ShellUINativeVersionSuffix>
 ```
 
-Component metadata reads this version at runtime, ensuring consistency across all installed components.
+The build stamps it into the assemblies, and component metadata reads it from there at runtime,
+so `shellui-native.json` records the CLI version each component was installed with.
+
+**Releasing:** set the version in `Directory.Build.props`, add a `# ShellUI Native v<version>`
+section to [RELEASE_NOTES.md](./RELEASE_NOTES.md), merge to `main`, then push a `v<version>` tag.
+`.github/workflows/release.yml` checks that the tag matches the props version, runs the tests,
+publishes `ShellUI.Native.CLI` to NuGet and creates the GitHub release (a prerelease when the
+version has a `-`) with the notes as its body.
