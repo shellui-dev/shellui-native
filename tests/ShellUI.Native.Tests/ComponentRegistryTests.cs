@@ -89,17 +89,15 @@ public class ComponentRegistryTests
     }
 
     [Fact]
-    public void SupportsPlatform_reports_MAUI_for_all_components_and_no_others_yet()
+    public void SupportsPlatform_reports_MAUI_for_all_components_and_no_WinUI_or_WPF()
     {
         foreach (var name in ComponentRegistry.Components.Keys)
         {
             Assert.True(ComponentRegistry.SupportsPlatform(name, NativePlatform.MAUI),
                 $"'{name}' must support MAUI (baseline platform).");
 
-            // Until the Phase 2 branch (feat/avalonia-implementation) lands, no component
-            // reports Avalonia/WinUI/WPF support. This test will need updating when
-            // Avalonia content is added to templates — that's the intended trigger.
-            Assert.False(ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia));
+            // Avalonia is being added component by component (see TemplateContentTests);
+            // WinUI and WPF have no templates.
             Assert.False(ComponentRegistry.SupportsPlatform(name, NativePlatform.WinUI));
             Assert.False(ComponentRegistry.SupportsPlatform(name, NativePlatform.WPF));
         }
