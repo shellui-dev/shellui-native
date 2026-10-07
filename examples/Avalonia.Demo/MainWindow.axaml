@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="using:AvaloniaDemo.Components.UI"
+        x:Class="AvaloniaDemo.MainWindow"
+        Title="ShellUI Native (Avalonia)"
+        Width="1000" Height="760"
+        Background="{DynamicResource ShellUIBackgroundBrush}">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource ShellUIForegroundBrush}" />
+            <Setter Property="Margin" Value="0,16,0,4" />
+        </Style>
+        <Style Selector="TextBlock.hint">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource ShellUIMutedForegroundBrush}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel>
+                    <TextBlock Text="ShellUI Native" FontSize="28" FontWeight="Bold"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                    <TextBlock Classes="hint" Text="Avalonia components with the same design tokens as ShellUI." />
+                </StackPanel>
+                <ui:ThemeToggle Grid.Column="1" />
+            </Grid>
+
+            <TextBlock Classes="title" Text="Theme tokens" />
+            <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
+            <WrapPanel x:Name="Swatches" />
+
+            <TextBlock Classes="title" Text="Icons" />
+            <TextBlock Classes="hint" Text="Lucide icons from ShellIcons, drawn as geometry." />
+            <WrapPanel x:Name="Icons" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>
