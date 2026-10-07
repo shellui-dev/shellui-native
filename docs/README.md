@@ -1,25 +1,22 @@
-<div align="center">
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="../assets/logo-light.png">
+    <img alt="ShellUI Native logo" src="../assets/logo-light.png" width="120">
+  </picture>
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/icon-dark.png" />
-  <img src="https://raw.githubusercontent.com/shellui-dev/shellui-native/main/assets/icon.png" alt="" width="64" />
-</picture>
+<h1 align="center">ShellUI Native</h1>
 
-```
-███████╗██╗  ██╗███████╗██╗     ██╗     ██╗   ██╗██╗         ███╗   ██╗ █████╗ ████████╗██╗██╗   ██╗███████╗
-██╔════╝██║  ██║██╔════╝██║     ██║     ██║   ██║██║         ████╗  ██║██╔══██╗╚══██╔══╝██║██║   ██║██╔════╝
-███████╗███████║█████╗  ██║     ██║     ██║   ██║██║ ██████╗ ██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗  
-╚════██║██╔══██║██╔══╝  ██║     ██║     ██║   ██║██║ ╚═════╝ ██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝  
-███████║██║  ██║███████╗███████╗███████╗╚██████╔╝██║         ██║ ╚████║██║  ██║   ██║   ██║ ╚████╔╝ ███████╗
-╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═╝         ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
-```
+<p align="center">
+  One design system, every platform.<br/>
+  Copy-and-own native components for .NET MAUI, inspired by <a href="https://ui.shadcn.com/">shadcn/ui</a>.
+</p>
 
-**One design system, every platform**
-
-[![NuGet](https://img.shields.io/nuget/v/ShellUI.Native.CLI.svg)](https://www.nuget.org/packages/ShellUI.Native.CLI)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
-
-</div>
+<p align="center">
+  <a href="https://www.nuget.org/packages/ShellUI.Native.CLI"><img src="https://img.shields.io/nuget/vpre/ShellUI.Native.CLI?style=flat-square&logo=nuget&label=CLI&color=004880" alt="ShellUI.Native.CLI on NuGet"></a>
+  <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT license"></a>
+</p>
 
 ShellUI Native is the native cross-platform extension of [ShellUI](https://shellui.dev/), bringing the same design system and component philosophy to MAUI, Avalonia, and other native platforms. Inspired by [shadcn/ui](https://ui.shadcn.com/)'s approach, ShellUI Native provides copy-and-own components for native desktop and mobile development.
 
