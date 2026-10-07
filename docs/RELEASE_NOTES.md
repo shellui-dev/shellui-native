@@ -47,7 +47,7 @@ Compositional families (`dialog`, `drawer`, `sheet`, `dropdown`, `popover`, `hov
 
 ## 🧰 CLI
 
-`shellui-native init`, `add`, `list`, `remove` and `update`. `init` writes the `shell` utility, `shellui-native.json` and a theme resource dictionary; `add` resolves dependencies and replaces the namespace with your project's.
+`shellui-native init`, `add`, `list`, `remove` and `update`. `init` writes the `shell` utility, `shellui-native.json` and a theme resource dictionary; `add` resolves dependencies and replaces the namespace with your project's. In a terminal, `init` and `list` show the ShellUI Native mark, and work in progress uses ShellUI's logo and snake loaders.
 
 ## ⚠️ Known limitations
 

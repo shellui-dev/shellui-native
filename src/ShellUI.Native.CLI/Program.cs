@@ -10,6 +10,9 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        // The loaders draw Unicode dots and Braille.
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         var rootCommand = new RootCommand("ShellUI Native - CLI-first cross-platform component library")
         {
             Description = "Add beautiful, accessible components to your MAUI or Avalonia app. Inspired by shadcn/ui."
@@ -40,22 +43,7 @@ class Program
         {
             try
             {
-                Console.OutputEncoding = System.Text.Encoding.UTF8;
-                var logo = @"
-  ███████╗██╗  ██╗███████╗██╗     ██╗     ██╗   ██╗██╗
-  ██╔════╝██║  ██║██╔════╝██║     ██║     ██║   ██║██║
-  ███████╗███████║█████╗  ██║     ██║     ██║   ██║██║
-  ╚════██║██╔══██║██╔══╝  ██║     ██║     ██║   ██║██║
-  ███████║██║  ██║███████╗███████╗███████╗╚██████╔╝██║
-  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═╝
-    ███╗   ██╗ █████╗ ████████╗██╗██╗   ██╗███████╗
-    ████╗  ██║██╔══██╗╚══██╔══╝██║██║   ██║██╔════╝
-    ██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗
-    ██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝
-    ██║ ╚████║██║  ██║   ██║   ██║ ╚████╔╝ ███████╗
-    ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
-";
-                AnsiConsole.MarkupLine($"[blue]{logo}[/]");
+                LogoLoader.WriteHeader("Setting up your MAUI project");
                 await InitService.InitializeAsync(style, force, nonInteractive);
             }
             catch (Exception ex)

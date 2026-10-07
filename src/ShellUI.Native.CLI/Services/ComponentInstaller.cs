@@ -58,9 +58,7 @@ public static class ComponentInstaller
 
         AnsiConsole.MarkupLine("");
 
-        await AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("green"))
+        await Loaders.SnakeStatus()
             .StartAsync("Installing components...", async ctx =>
             {
                 foreach (var componentName in componentList)

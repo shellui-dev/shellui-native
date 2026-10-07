@@ -36,6 +36,8 @@ public static class ComponentManager
             components = components.Where(c => !installedNames.Contains(c.Name)).OrderBy(c => c.Category).ThenBy(c => c.Name);
         }
 
+        LogoLoader.WriteHeader("Components");
+
         var table = new Table();
         table.AddColumn("Component");
         table.AddColumn("Category");
