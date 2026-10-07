@@ -26,7 +26,12 @@
     <PackageTags>maui;avalonia;winui;ui;components;shadcn;native;cross-platform</PackageTags>
     <RepositoryUrl>https://github.com/shellui-dev/shellui-native</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)assets\icon.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
 
   <!-- Common build settings (TargetFramework should be set per-project) -->
   <PropertyGroup>
