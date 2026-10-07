@@ -13,6 +13,16 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        var clicks = 0;
+        LoadingButton.Clicked += async (_, _) =>
+        {
+            LoadingButton.IsLoading = true;
+            Progress.Value = (Progress.Value + 20) % 120;
+            await System.Threading.Tasks.Task.Delay(1500);
+            LoadingButton.IsLoading = false;
+            ClickCount.Text = $"Saved {++clicks} time(s).";
+        };
+
         foreach (var token in Enum.GetValues<ShellToken>())
         {
             var chip = new Border { Width = 40, Height = 40, CornerRadius = new CornerRadius(ShellTheme.RadiusMd), BorderThickness = new Thickness(1) };

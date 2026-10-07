@@ -1066,6 +1066,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Styling;
 
@@ -1187,6 +1188,16 @@ public static class ShellTheme
     // Current value of a token, for code that can't bind.
     public static Color Get(ShellToken token) => (IsDarkMode ? Dark : Light)[token];
 
+    // A token at an opacity, for glows and focus rings (Tailwind's ring/35).
+    public static Color Get(ShellToken token, double opacity)
+    {
+        var color = Get(token);
+        return new Color((byte)Math.Round(color.A * opacity), color.R, color.G, color.B);
+    }
+
+    // Black at an opacity, for drop shadows (shadow-sm is black at 5%).
+    public static Color Shadow(double opacity) => new((byte)Math.Round(255 * opacity), 0, 0, 0);
+
     public static void EnsureInitialized()
     {
         if (_initialized) return;
@@ -1253,6 +1264,40 @@ public static class ShellThemeExtensions
             binding.Dispose();
         return control;
     }
+}
+
+/* shadcn's focus-visible ring (ring-2 ring-ring ring-offset-2): a 2px Background gap, then a 2px
+   Ring band. Shown for keyboard focus only, so a click doesn't leave a ring behind. Replaces
+   Fluent's focus adorner. */
+public static class ShellFocus
+{
+    private static readonly HashSet<Border> Shown = new();
+
+    static ShellFocus() => ShellTheme.ThemeChanged += (_, _) =>
+    {
+        foreach (var border in Shown) Paint(border);
+    };
+
+    public static void Ring(Control control, Border target)
+    {
+        control.Focusable = true;
+        control.FocusAdorner = null;
+        control.GotFocus += (_, e) =>
+        {
+            if (e.NavigationMethod is not (NavigationMethod.Tab or NavigationMethod.Directional)) return;
+            Shown.Add(target);
+            Paint(target);
+        };
+        control.LostFocus += (_, _) =>
+        {
+            Shown.Remove(target);
+            target.BoxShadow = default;
+        };
+    }
+
+    private static void Paint(Border border) => border.BoxShadow = new BoxShadows(
+        new BoxShadow { Spread = 2, Color = ShellTheme.Get(ShellToken.Background) },
+        new[] { new BoxShadow { Spread = 4, Color = ShellTheme.Get(ShellToken.Ring) } });
 }
 "
     };

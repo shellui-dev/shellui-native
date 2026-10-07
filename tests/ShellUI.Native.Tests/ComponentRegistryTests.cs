@@ -82,10 +82,10 @@ public class ComponentRegistryTests
     [Fact]
     public void GetComponentContent_returns_null_for_known_component_but_unsupported_platform()
     {
-        // 'button' exists and supports MAUI, but no Avalonia template has been added yet.
-        // The registry must return null (not throw) so callers can distinguish the failure mode.
+        // 'button' exists, but no component has a WinUI template. The registry must return null
+        // (not throw) so callers can distinguish the failure mode.
         Assert.NotNull(ComponentRegistry.GetComponentContent("button", NativePlatform.MAUI));
-        Assert.Null(ComponentRegistry.GetComponentContent("button", NativePlatform.Avalonia));
+        Assert.Null(ComponentRegistry.GetComponentContent("button", NativePlatform.WinUI));
     }
 
     [Fact]
@@ -110,11 +110,10 @@ public class ComponentRegistryTests
     }
 
     [Fact]
-    public void GetSupportedPlatforms_returns_MAUI_only_for_registered_components()
+    public void GetSupportedPlatforms_lists_the_platforms_with_a_template()
     {
         var supported = ComponentRegistry.GetSupportedPlatforms("button");
-        Assert.Contains(NativePlatform.MAUI, supported);
-        Assert.Single(supported); // Until Avalonia lands
+        Assert.Equal(new[] { NativePlatform.MAUI, NativePlatform.Avalonia }.ToHashSet(), supported);
     }
 
     [Fact]

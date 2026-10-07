@@ -20,12 +20,26 @@ public class TemplateContentTests
             .Where(name => ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia))
             .Select(name => new object[] { name });
 
-    // Phase 2 foundation; grows as components are ported.
+    // Ported so far: the Phase 2 foundation and P0. Grows as components are ported.
     [Theory]
     [InlineData("shell")]
     [InlineData("icon")]
     [InlineData("theme-toggle")]
-    public void Foundation_components_have_Avalonia_content(string name)
+    [InlineData("button")]
+    [InlineData("button-variants")]
+    [InlineData("input")]
+    [InlineData("label")]
+    [InlineData("checkbox")]
+    [InlineData("switch")]
+    [InlineData("card")]
+    [InlineData("card-header")]
+    [InlineData("card-content")]
+    [InlineData("card-footer")]
+    [InlineData("separator")]
+    [InlineData("badge")]
+    [InlineData("progress")]
+    [InlineData("alert")]
+    public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
     }
@@ -35,7 +49,7 @@ public class TemplateContentTests
     public void Avalonia_template_is_Avalonia_code_with_the_namespace_placeholder(string name)
     {
         var content = ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)!;
-        Assert.Contains("namespace YourProjectNamespace.Components.UI;", content);
+        Assert.Contains("namespace YourProjectNamespace.Components.UI", content); // .Variants for button-variants
         Assert.Contains("using Avalonia", content);
         Assert.DoesNotContain("Microsoft.Maui", content);
         Assert.DoesNotContain("AvaloniaDemo", content);

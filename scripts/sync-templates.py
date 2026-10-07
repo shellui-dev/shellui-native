@@ -210,11 +210,11 @@ def main() -> None:
 
 def sync_avalonia() -> list[str]:
     changed = []
-    for file in sorted(os.listdir(AVALONIA_DEMO)):
-        if not file.endswith(".cs"):
-            continue
+    # Walks subfolders too (Variants/ButtonVariants.cs), like the MAUI pass.
+    files = sorted((d, f) for d, _, fs in os.walk(AVALONIA_DEMO) for f in fs if f.endswith(".cs"))
+    for dirpath, file in files:
         name = file[:-3]
-        source = open(os.path.join(AVALONIA_DEMO, file), encoding="utf-8-sig").read()
+        source = open(os.path.join(dirpath, file), encoding="utf-8-sig").read()
         content = to_template_content(source, "AvaloniaDemo")
         tpl_path = os.path.join(TPL, f"{name}Template.cs")
         if not os.path.exists(tpl_path):
