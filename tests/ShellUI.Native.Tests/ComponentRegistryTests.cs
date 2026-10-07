@@ -125,4 +125,52 @@ public class ComponentRegistryTests
         var supported = ComponentRegistry.GetSupportedPlatforms("nonexistent-xyz");
         Assert.Empty(supported);
     }
+
+    [Theory]
+    [InlineData("dialog-trigger", "dialog")]
+    [InlineData("dialog-close", "dialog")]
+    [InlineData("drawer-content", "drawer")]
+    [InlineData("sheet-trigger", "sheet")]
+    [InlineData("dropdown-item", "dropdown")]
+    [InlineData("popover-trigger", "popover")]
+    [InlineData("hover-card-trigger", "hover-card")]
+    [InlineData("radio-group-item", "radio-group")]
+    [InlineData("collapsible-trigger", "collapsible")]
+    [InlineData("accordion-item", "accordion")]
+    [InlineData("tabs-list", "tabs")]
+    [InlineData("card-header", "card")]
+    public void GetFamily_maps_a_part_to_its_parent(string part, string family)
+    {
+        Assert.Equal(family, ComponentRegistry.GetFamily(part));
+    }
+
+    [Theory]
+    [InlineData("dialog")]
+    [InlineData("alert-dialog")]
+    [InlineData("toggle-group")]
+    [InlineData("tag-input")]
+    [InlineData("date-picker")]
+    [InlineData("hover-card")]
+    [InlineData("nonexistent-xyz")]
+    public void GetFamily_is_null_for_standalone_components(string name)
+    {
+        Assert.Null(ComponentRegistry.GetFamily(name));
+    }
+
+    // The installed tool has no Directory.Build.props, so the version must reach it through the assembly.
+    [Fact]
+    public void Component_version_is_the_package_version_from_Directory_Build_props()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null && !File.Exists(Path.Combine(dir.FullName, "Directory.Build.props")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+
+        var props = File.ReadAllText(Path.Combine(dir!.FullName, "Directory.Build.props"));
+        var version = System.Text.RegularExpressions.Regex.Match(props, "<ShellUINativeVersion>([^<]+)<").Groups[1].Value;
+        var suffix = System.Text.RegularExpressions.Regex.Match(props, "<ShellUINativeVersionSuffix>([^<]*)<").Groups[1].Value;
+        var expected = suffix.Length == 0 ? version : $"{version}-{suffix}";
+
+        Assert.All(ComponentRegistry.Components.Values, m => Assert.Equal(expected, m.Version));
+    }
 }

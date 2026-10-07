@@ -19,40 +19,18 @@ public static class InitService
             return;
         }
 
-        ProjectInfo projectInfo = null!;
-
-        try
+        var projectInfo = ProjectDetector.DetectProject();
+        var platformName = projectInfo.Platform switch
         {
-            await AnsiConsole.Status()
-                .Spinner(Spinner.Known.Dots)
-                .SpinnerStyle(Style.Parse("green"))
-                .StartAsync("Initializing ShellUI Native...", async ctx =>
-                {
-                    ctx.Status("Detecting project type...");
-                    await Task.Delay(300);
-                    projectInfo = ProjectDetector.DetectProject();
-                    
-                    var platformName = projectInfo.Platform switch
-                    {
-                        NativePlatform.MAUI => ".NET MAUI",
-                        NativePlatform.Avalonia => "Avalonia UI",
-                        NativePlatform.WinUI => "WinUI 3",
-                        NativePlatform.WPF => "WPF",
-                        _ => "Unknown"
-                    };
-                    
-                    AnsiConsole.MarkupLine($"[green]✓ Detected:[/] {platformName}");
-                    AnsiConsole.MarkupLine($"[dim]Project: {projectInfo.ProjectName}[/]");
-                    AnsiConsole.MarkupLine($"[dim]Namespace: {projectInfo.RootNamespace}[/]");
-                });
-        }
-        catch
-        {
-            projectInfo = ProjectDetector.DetectProject();
-            AnsiConsole.MarkupLine($"[green]✓ Detected:[/] {projectInfo.Platform}");
-            AnsiConsole.MarkupLine($"[dim]Project: {projectInfo.ProjectName}[/]");
-            AnsiConsole.MarkupLine($"[dim]Namespace: {projectInfo.RootNamespace}[/]");
-        }
+            NativePlatform.MAUI => ".NET MAUI",
+            NativePlatform.Avalonia => "Avalonia UI",
+            NativePlatform.WinUI => "WinUI 3",
+            NativePlatform.WPF => "WPF",
+            _ => "Unknown"
+        };
+        AnsiConsole.MarkupLine($"[green]✓ Detected:[/] {platformName}");
+        AnsiConsole.MarkupLine($"[dim]Project: {Markup.Escape(projectInfo.ProjectName)}[/]");
+        AnsiConsole.MarkupLine($"[dim]Namespace: {Markup.Escape(projectInfo.RootNamespace)}[/]");
 
         if (projectInfo.Platform == NativePlatform.Unknown && !nonInteractive)
         {
@@ -77,11 +55,10 @@ public static class InitService
             AnsiConsole.MarkupLine("[yellow]Platform not detected, defaulting to MAUI[/]");
         }
 
-        await AnsiConsole.Status()
-            .StartAsync("Setting up ShellUI Native...", async ctx =>
+        await LogoLoader.RunAsync("Setting up ShellUI Native...", async status =>
             {
                 // Create Components/UI folder
-                ctx.Status("Creating component folders...");
+                status("Creating component folders...");
                 var componentsPath = Path.Combine(Directory.GetCurrentDirectory(), "Components", "UI");
                 var variantsPath = Path.Combine(componentsPath, "Variants");
                 Directory.CreateDirectory(componentsPath);
@@ -89,11 +66,11 @@ public static class InitService
                 AnsiConsole.MarkupLine($"[green]✓ Created:[/] Components/UI/");
 
                 // Install Shell utilities
-                ctx.Status("Installing Shell utilities...");
+                status("Installing Shell utilities...");
                 await InstallShellUtilityAsync(projectInfo, componentsPath);
 
                 // Create configuration file
-                ctx.Status("Creating configuration...");
+                status("Creating configuration...");
                 var config = new ShellUINativeConfig
                 {
                     Style = style,
@@ -117,7 +94,7 @@ public static class InitService
                 // Create theme resources (MAUI only for now)
                 if (projectInfo.Platform == NativePlatform.MAUI)
                 {
-                    ctx.Status("Creating theme resources...");
+                    status("Creating theme resources...");
                     await CreateThemeResourcesAsync();
                 }
             });
@@ -142,7 +119,7 @@ public static class InitService
         if (content == null) return;
 
         content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
-        
+
         var filePath = Path.Combine(componentsPath, "Shell.cs");
         await File.WriteAllTextAsync(filePath, content);
         AnsiConsole.MarkupLine($"[green]✓ Installed:[/] Shell.cs");

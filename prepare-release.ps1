@@ -22,40 +22,30 @@ $content = $content -replace '<ShellUINativeVersionSuffix>[^<]*</ShellUINativeVe
 Set-Content $propsPath $content
 Write-Host "Updated Directory.Build.props to version $Version" -ForegroundColor Green
 
-# Build all projects
-Write-Host "Building solution..." -ForegroundColor Cyan
-dotnet build -c Release
+# Build and test (the MAUI demo is left out; it needs the MAUI workload)
+Write-Host "Building and testing..." -ForegroundColor Cyan
+dotnet test (Join-Path $PSScriptRoot "tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj") -c Release
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Build failed!" -ForegroundColor Red
+    Write-Host "Build or tests failed!" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "Build successful!" -ForegroundColor Green
+# Only the CLI is published; Core and Templates ship inside the tool package
+Write-Host "Packing the CLI..." -ForegroundColor Cyan
+dotnet pack (Join-Path $PSScriptRoot "src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj") -c Release -o (Join-Path $PSScriptRoot "nupkg")
 
-# Pack NuGet packages
-Write-Host "Creating NuGet packages..." -ForegroundColor Cyan
-
-$projects = @(
-    "src/ShellUI.Native.Core/ShellUI.Native.Core.csproj",
-    "src/ShellUI.Native.Templates/ShellUI.Native.Templates.csproj",
-    "src/ShellUI.Native.CLI/ShellUI.Native.CLI.csproj"
-)
-
-foreach ($project in $projects) {
-    $projectPath = Join-Path $PSScriptRoot $project
-    Write-Host "Packing $project..." -ForegroundColor Yellow
-    dotnet pack $projectPath -c Release -o ./nupkg
-    
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Pack failed for $project!" -ForegroundColor Red
-        exit 1
-    }
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Pack failed!" -ForegroundColor Red
+    exit 1
 }
 
+$fullVersion = if ($Suffix) { "$Version-$Suffix" } else { $Version }
 Write-Host ""
-Write-Host "Release preparation complete!" -ForegroundColor Green
-Write-Host "NuGet packages are in ./nupkg" -ForegroundColor Cyan
+Write-Host "Release preparation complete! Package: ./nupkg" -ForegroundColor Green
 Write-Host ""
-Write-Host "To publish:" -ForegroundColor Yellow
-Write-Host "  dotnet nuget push ./nupkg/*.nupkg -s https://api.nuget.org/v3/index.json -k YOUR_API_KEY"
+Write-Host "Next:" -ForegroundColor Yellow
+Write-Host "  1. Add a '# ShellUI Native v$fullVersion' section to docs/RELEASE_NOTES.md"
+Write-Host "  2. Merge to main, then tag it; the Release workflow publishes to NuGet:"
+Write-Host "     git tag -a v$fullVersion -m `"ShellUI Native v$fullVersion`""
+Write-Host "     git push origin v$fullVersion"

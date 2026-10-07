@@ -9,7 +9,7 @@ public static class ProjectDetector
     public static ProjectInfo DetectProject()
     {
         var csprojFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.csproj");
-        
+
         if (csprojFiles.Length == 0)
         {
             throw new Exception("No .csproj file found in current directory. Please run this command from your project root.");
@@ -17,9 +17,9 @@ public static class ProjectDetector
 
         var csprojPath = csprojFiles[0];
         var projectName = Path.GetFileNameWithoutExtension(csprojPath);
-        
+
         var doc = XDocument.Load(csprojPath);
-        
+
         var platform = DetectPlatform(doc, csprojPath);
         var rootNamespace = DetectRootNamespace(doc, projectName);
 
@@ -35,11 +35,11 @@ public static class ProjectDetector
     internal static NativePlatform DetectPlatform(XDocument doc, string csprojPath)
     {
         var sdk = doc.Root?.Attribute("Sdk")?.Value ?? "";
-        
+
         // Check for MAUI workload
         if (sdk.Contains("Maui", StringComparison.OrdinalIgnoreCase))
             return NativePlatform.MAUI;
-            
+
         var useMaui = doc.Descendants("UseMaui").FirstOrDefault()?.Value;
         if (useMaui?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
             return NativePlatform.MAUI;
@@ -62,7 +62,7 @@ public static class ProjectDetector
         // Check for WPF
         if (sdk.Contains("Wpf", StringComparison.OrdinalIgnoreCase))
             return NativePlatform.WPF;
-            
+
         var useWpf = doc.Descendants("UseWPF").FirstOrDefault()?.Value;
         if (useWpf?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
             return NativePlatform.WPF;
@@ -70,7 +70,7 @@ public static class ProjectDetector
         // Try to detect from output type and target framework
         var targetFramework = doc.Descendants("TargetFramework").FirstOrDefault()?.Value ?? "";
         var targetFrameworks = doc.Descendants("TargetFrameworks").FirstOrDefault()?.Value ?? "";
-        
+
         // MAUI typically targets multiple platforms
         if (targetFrameworks.Contains("android") || targetFrameworks.Contains("ios"))
             return NativePlatform.MAUI;

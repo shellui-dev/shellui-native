@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace ShellUI.Native.Core.Models;
 
@@ -28,40 +28,11 @@ public class ComponentMetadata
     // Searchable tags for the component
     public List<string> Tags { get; set; } = new();
 
+    // Directory.Build.props stamps the package version into the assembly; an installed tool has no props file to read.
     private static string GetCurrentVersion()
     {
-        // Try to read version from Directory.Build.props
-        try
-        {
-            var currentDir = AppDomain.CurrentDomain.BaseDirectory;
-            var dir = new DirectoryInfo(currentDir);
-
-            while (dir != null)
-            {
-                var propsFile = Path.Combine(dir.FullName, "Directory.Build.props");
-                if (File.Exists(propsFile))
-                {
-                    var content = File.ReadAllText(propsFile);
-                    var match = Regex.Match(content, @"<ShellUINativeVersion>([^<]+)</ShellUINativeVersion>");
-                    if (match.Success)
-                    {
-                        var version = match.Groups[1].Value.Trim();
-                        var suffixMatch = Regex.Match(content, @"<ShellUINativeVersionSuffix>([^<]*)</ShellUINativeVersionSuffix>");
-                        if (suffixMatch.Success && !string.IsNullOrEmpty(suffixMatch.Groups[1].Value.Trim()))
-                        {
-                            version += "-" + suffixMatch.Groups[1].Value.Trim();
-                        }
-                        return version;
-                    }
-                }
-                dir = dir.Parent;
-            }
-        }
-        catch
-        {
-            // Ignore errors, return fallback
-        }
-
-        return "0.1.0";
+        var informational = typeof(ComponentMetadata).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        return string.IsNullOrEmpty(informational) ? "0.0.0" : informational.Split('+')[0];
     }
 }

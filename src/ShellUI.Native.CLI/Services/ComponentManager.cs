@@ -36,6 +36,8 @@ public static class ComponentManager
             components = components.Where(c => !installedNames.Contains(c.Name)).OrderBy(c => c.Category).ThenBy(c => c.Name);
         }
 
+        LogoLoader.WriteHeader("Components");
+
         var table = new Table();
         table.AddColumn("Component");
         table.AddColumn("Category");
@@ -44,15 +46,15 @@ public static class ComponentManager
 
         foreach (var component in components)
         {
-            var status = installedNames.Contains(component.Name) 
-                ? "[green]installed[/]" 
+            var status = installedNames.Contains(component.Name)
+                ? "[green]installed[/]"
                 : "[dim]available[/]";
 
             table.AddRow(
                 $"[bold]{component.Name}[/]",
                 component.Category.ToString(),
-                component.Description.Length > 40 
-                    ? component.Description[..37] + "..." 
+                component.Description.Length > 40
+                    ? component.Description[..37] + "..."
                     : component.Description,
                 status
             );
@@ -65,7 +67,7 @@ public static class ComponentManager
     public static void RemoveComponents(string[] components)
     {
         var configPath = Path.Combine(Directory.GetCurrentDirectory(), "shellui-native.json");
-        
+
         if (!File.Exists(configPath))
         {
             AnsiConsole.MarkupLine("[red]ShellUI Native not initialized![/]");
@@ -74,7 +76,7 @@ public static class ComponentManager
 
         var json = File.ReadAllText(configPath);
         var config = JsonSerializer.Deserialize<ShellUINativeConfig>(json);
-        
+
         if (config == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to read shellui-native.json[/]");
@@ -82,7 +84,7 @@ public static class ComponentManager
         }
 
         var removedCount = 0;
-        
+
         foreach (var componentName in components)
         {
             var metadata = ComponentRegistry.GetMetadata(componentName);
@@ -93,7 +95,7 @@ public static class ComponentManager
             }
 
             var componentPath = Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, metadata.FilePath);
-            
+
             if (File.Exists(componentPath))
             {
                 File.Delete(componentPath);
@@ -117,7 +119,7 @@ public static class ComponentManager
     public static void UpdateComponents(string[] components, bool all)
     {
         var configPath = Path.Combine(Directory.GetCurrentDirectory(), "shellui-native.json");
-        
+
         if (!File.Exists(configPath))
         {
             AnsiConsole.MarkupLine("[red]ShellUI Native not initialized![/]");
@@ -126,7 +128,7 @@ public static class ComponentManager
 
         var json = File.ReadAllText(configPath);
         var config = JsonSerializer.Deserialize<ShellUINativeConfig>(json);
-        
+
         if (config == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to read shellui-native.json[/]");
@@ -136,7 +138,7 @@ public static class ComponentManager
         var projectInfo = ProjectDetector.DetectProject();
 
         IEnumerable<string> componentsToUpdate;
-        
+
         if (all || components.Length == 0)
         {
             componentsToUpdate = config.InstalledComponents.Select(c => c.Name);

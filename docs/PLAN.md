@@ -25,8 +25,8 @@ ShellUI Native brings the same beautiful, accessible, and customizable component
 ### Phase 1: MAUI (Primary Focus)
 - **Target:** .NET MAUI (iOS, Android, Windows, macOS) on .NET 10
 - **Components:** 50+ native controls
-- **Status:** In Development — foundational set (~40 components) landed on
-  `feat/initial-foundation`; overlay + form completeness tracked in
+- **Status:** First prerelease `0.1.0-alpha.1` — 58 component families (89 CLI targets),
+  P0–P5 complete, P6 partly; remaining work tracked in
   [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).
 
 ### Phase 2: Avalonia UI
@@ -140,14 +140,14 @@ regardless of detected platform (see
 
 ### Installation
 ```bash
-dotnet tool install -g ShellUI.Native.CLI
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 ```
 
 ### Commands
 ```bash
 shellui-native init     # Initialize project (creates shellui-native.json)
 shellui-native add      # Add components (copies to Components/UI/)
-shellui-native list     # List available components (70+ components)
+shellui-native list     # List available components (89 targets)
 shellui-native remove   # Remove components
 shellui-native update   # Update components to latest version
 ```
@@ -162,7 +162,7 @@ shellui-native update   # Update components to latest version
   "installedComponents": [
     {
       "name": "button",
-      "version": "0.1.0",
+      "version": "0.1.0-alpha.1",
       "platform": "MAUI",
       "installedAt": "2026-01-11T...",
       "isCustomized": false
@@ -176,7 +176,7 @@ shellui-native update   # Update components to latest version
 ### For MAUI Projects
 ```bash
 # Install CLI
-dotnet tool install -g ShellUI.Native.CLI
+dotnet tool install -g ShellUI.Native.CLI --prerelease
 
 # Create new MAUI project
 dotnet new maui -n MyApp
@@ -219,7 +219,7 @@ dotnet run
 
 ### .NET Version Support
 - **MAUI:** .NET 10.0 (unified across all libraries — see [global.json](../global.json))
-- **Avalonia:** .NET 10.0 (Avalonia 11+)
+- **Avalonia:** .NET 10.0 (Avalonia 12)
 - **WinUI:** .NET 10.0 (WinUI 3) — conditional phase
 
 ### Platform Requirements

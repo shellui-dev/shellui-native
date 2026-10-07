@@ -11,7 +11,7 @@ public static class ComponentInstaller
     public static async Task InstallComponents(string[] components, bool force)
     {
         var configPath = Path.Combine(Directory.GetCurrentDirectory(), "shellui-native.json");
-        
+
         if (!File.Exists(configPath))
         {
             AnsiConsole.MarkupLine("[red]ShellUI Native not initialized![/]");
@@ -21,7 +21,7 @@ public static class ComponentInstaller
 
         var configJson = await File.ReadAllTextAsync(configPath);
         var config = JsonSerializer.Deserialize<ShellUINativeConfig>(configJson);
-        
+
         if (config == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to read shellui-native.json[/]");
@@ -30,18 +30,22 @@ public static class ComponentInstaller
 
         var projectInfo = ProjectDetector.DetectProject();
 
-        // Parse comma-separated components
+        // Parse comma-separated components; a part installs its whole family
         var componentList = new List<string>();
-        foreach (var comp in components)
+        foreach (var comp in components.SelectMany(c => c.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
         {
-            componentList.AddRange(comp.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            var family = ComponentRegistry.GetFamily(comp);
+            if (family != null)
+                AnsiConsole.MarkupLine($"[dim]'{comp}' is part of '{family}', installing '{family}'[/]");
+            var name = family ?? comp;
+            if (!componentList.Contains(name))
+                componentList.Add(name);
         }
 
-        var successCount = 0;
-        var skippedCount = 0;
+        var tally = new InstallTally();
         var failedComponents = new List<string>();
         var installedSet = new HashSet<string>();
-        
+
         // Show dependency information
         foreach (var componentName in componentList)
         {
@@ -51,20 +55,18 @@ public static class ComponentInstaller
                 AnsiConsole.MarkupLine($"[green]●[/] [bold]{componentName}[/] requires: [yellow]{string.Join(", ", metadata.Dependencies)}[/]");
             }
         }
-        
+
         AnsiConsole.MarkupLine("");
-        
-        await AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
-            .SpinnerStyle(Style.Parse("green"))
+
+        await Loaders.SnakeStatus()
             .StartAsync("Installing components...", async ctx =>
             {
                 foreach (var componentName in componentList)
                 {
                     ctx.Status($"Installing {componentName}...");
                     await InstallComponentWithDependenciesAsync(
-                        componentName, config, projectInfo, force, 
-                        installedSet, successCount, skippedCount, failedComponents);
+                        componentName, config, projectInfo, force,
+                        installedSet, tally, failedComponents);
                 }
             });
 
@@ -74,27 +76,26 @@ public static class ComponentInstaller
 
         // Summary
         AnsiConsole.MarkupLine("");
-        if (successCount > 0)
-            AnsiConsole.MarkupLine($"[green]Installed {successCount} component(s) successfully![/]");
-        if (skippedCount > 0)
-            AnsiConsole.MarkupLine($"[yellow]Skipped {skippedCount} component(s) (already exists, use --force to overwrite)[/]");
+        if (tally.Success > 0)
+            AnsiConsole.MarkupLine($"[green]Installed {tally.Success} component(s) successfully![/]");
+        if (tally.Skipped > 0)
+            AnsiConsole.MarkupLine($"[yellow]Skipped {tally.Skipped} component(s) (already exists, use --force to overwrite)[/]");
         if (failedComponents.Count > 0)
             AnsiConsole.MarkupLine($"[red]Failed: {string.Join(", ", failedComponents)}[/]");
     }
 
     private static async Task InstallComponentWithDependenciesAsync(
-        string componentName, 
-        ShellUINativeConfig config, 
-        ProjectInfo projectInfo, 
+        string componentName,
+        ShellUINativeConfig config,
+        ProjectInfo projectInfo,
         bool force,
         HashSet<string> installedSet,
-        int successCount,
-        int skippedCount,
+        InstallTally tally,
         List<string> failedComponents)
     {
         if (installedSet.Contains(componentName))
             return;
-        
+
         if (!ComponentRegistry.Exists(componentName))
         {
             AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]");
@@ -118,22 +119,22 @@ public static class ComponentInstaller
             {
                 if (!installedSet.Contains(dep))
                 {
-                    await InstallComponentWithDependenciesAsync(dep, config, projectInfo, force, installedSet, successCount, skippedCount, failedComponents);
+                    await InstallComponentWithDependenciesAsync(dep, config, projectInfo, force, installedSet, tally, failedComponents);
                 }
             }
         }
 
         // Install the component
         var result = await InstallComponentInternalAsync(componentName, metadata, config, projectInfo, force);
-        
+
         if (result == InstallResult.Success)
         {
-            successCount++;
+            tally.Success++;
             installedSet.Add(componentName);
         }
         else if (result == InstallResult.Skipped)
         {
-            skippedCount++;
+            tally.Skipped++;
             installedSet.Add(componentName);
         }
         else
@@ -150,7 +151,7 @@ public static class ComponentInstaller
         bool force)
     {
         var componentPath = Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, metadata.FilePath);
-        
+
         if (File.Exists(componentPath) && !force)
         {
             AnsiConsole.MarkupLine($"[yellow]Skipped '{componentName}' (already exists)[/]");
@@ -215,5 +216,11 @@ public static class ComponentInstaller
         Success,
         Skipped,
         Failed
+    }
+
+    private sealed class InstallTally
+    {
+        public int Success;
+        public int Skipped;
     }
 }
