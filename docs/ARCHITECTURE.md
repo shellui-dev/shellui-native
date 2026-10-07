@@ -168,33 +168,41 @@ public partial class Button : ContentView
 }
 ```
 
-## Component Pattern (Avalonia, planned)
+## Component Pattern (Avalonia)
 
-Avalonia components will follow the `StyledProperty`/`TemplatedControl` pattern instead of
-MAUI's `BindableProperty`/`ContentView` — the same property-driven visual-state approach, just
-Avalonia's equivalent APIs:
+Same model as MAUI: one C# file per component, built in code from Avalonia primitives
+(`Border`, `Panel`, `TextBlock`, a custom `Render` for icons), with no `.axaml`. The CLI keeps
+installing one file per component, and nothing has to be registered in `App.axaml`.
+
+- **Properties** are `StyledProperty`s; class handlers or `AffectsRender` react to changes.
+- **Colors** bind to the same tokens with `control.Token(property, ShellToken.X)`, a
+  resource-observable binding. `ShellTheme` publishes the light and dark palettes as theme
+  dictionaries, so Avalonia swaps them when `RequestedThemeVariant` changes.
+- **Names match MAUI** where Avalonia allows it. The one difference so far: `Icon` uses `Kind`
+  for the icon, because every Avalonia control already has a `Name`.
+- **Usings are explicit.** `dotnet new avalonia.app` has implicit usings off, so each component
+  carries `using System;` and the rest; the demo turns them off too, so it catches a missing one.
 
 ```csharp
-public partial class Button : TemplatedControl
+public class Badge : Border
 {
-    public static readonly StyledProperty<ButtonVariant> VariantProperty =
-        AvaloniaProperty.Register<Button, ButtonVariant>(nameof(Variant), ButtonVariant.Default);
+    public static readonly StyledProperty<string?> TextProperty =
+        AvaloniaProperty.Register<Badge, string?>(nameof(Text));
 
-    public ButtonVariant Variant
-    {
-        get => GetValue(VariantProperty);
-        set => SetValue(VariantProperty, value);
-    }
+    private readonly TextBlock _label = new() { FontSize = 12 };
 
-    static Button()
+    public Badge()
     {
-        VariantProperty.Changed.AddClassHandler<Button>((button, _) => button.UpdateVisualState());
+        this.Token(BackgroundProperty, ShellToken.Primary);
+        Child = _label.Token(TextBlock.ForegroundProperty, ShellToken.PrimaryForeground);
     }
 }
 ```
 
-Not implemented yet — this illustrates the target shape once Template System v2 lands and
-`ShellUI.Native.Avalonia` is scaffolded.
+Components are developed in `examples/Avalonia.Demo/Components/UI/` and copied into the
+templates' `[NativePlatform.Avalonia]` entries by `scripts/sync-templates.py`. A component gets
+an Avalonia entry only after its MAUI one exists, and only if every dependency has one too
+(checked by `TemplateContentTests`).
 
 ## Versioning Strategy
 
