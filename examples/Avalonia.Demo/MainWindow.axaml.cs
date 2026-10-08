@@ -16,6 +16,9 @@ public partial class MainWindow : Window
         foreach (var item in DemoDropdown.FindDescendantsOfType<DropdownItem>())
             item.Clicked += (_, _) => MenuChoice.Text = $"Picked {item.Text}.";
 
+        CountrySelect.ItemsSource = new[] { "Argentina", "Brazil", "Japan", "Kenya", "Norway", "South Africa", "Zimbabwe" };
+        VolumeSlider.ValueChanged += (_, value) => VolumeText.Text = $"Volume {value:0}";
+
         var clicks = 0;
         LoadingButton.Clicked += async (_, _) =>
         {
