@@ -243,7 +243,7 @@ namespace YourProjectNamespace.Components.UI;
 // Button with ShellUI variants, sizes, optional icon and loading state.
 // Sizes to its content like an inline-flex button; set HorizontalAlignment=""Stretch"" for a block button.
 // Usage: <ui:Button Text=""Save"" Icon=""Check"" Variant=""Outline"" Clicked=""OnSave"" />
-public class Button : Border
+public class Button : Border, IShellFocusable
 {
     public static readonly StyledProperty<ButtonVariant> VariantProperty =
         AvaloniaProperty.Register<Button, ButtonVariant>(nameof(Variant));
@@ -353,7 +353,10 @@ public class Button : Border
     // Clicks in code, as a pointer click or Enter/Space would.
     public void Press()
     {
-        if (CanClick) Clicked?.Invoke(this, EventArgs.Empty);
+        if (!CanClick) return;
+        Clicked?.Invoke(this, EventArgs.Empty);
+        // Inside a DialogTrigger, DropdownTrigger, ... the click also activates the trigger.
+        ShellTriggerView.ActivateAncestor(this);
     }
 
     protected override void OnPointerEntered(PointerEventArgs e)

@@ -28,6 +28,22 @@ public partial class DialogDescription : Label
         this.Token(TextColorProperty, ShellToken.MutedForeground);
     }
 }
+",
+        [NativePlatform.Avalonia] = @"using Avalonia.Controls;
+using Avalonia.Media;
+
+namespace YourProjectNamespace.Components.UI;
+
+// text-sm text-muted-foreground
+public class DialogDescription : TextBlock
+{
+    public DialogDescription()
+    {
+        FontSize = 14;
+        TextWrapping = TextWrapping.Wrap;
+        this.Token(ForegroundProperty, ShellToken.MutedForeground);
+    }
+}
 "
     };
 }

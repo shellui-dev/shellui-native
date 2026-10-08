@@ -67,9 +67,16 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 ## Avalonia (in progress)
 
-Ported so far: `shell`, `icon`, `theme-toggle` and P0 (`button`, `input`, `label`, `checkbox`,
-`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`). Not yet published to
-NuGet. In an Avalonia project, `shellui-native list` shows only these.
+Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, `checkbox`,
+`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`) and P1 (`dialog`,
+`drawer`, `sheet`, `dropdown`, `popover` and their parts). Not yet published to NuGet. In an
+Avalonia project, `shellui-native list` shows only these.
+
+Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
+tree (theme, DataContext and `FindParentOfType` work as declared), dropdowns and popovers get
+Avalonia's placement and flip above the trigger when there is no room below, and a click outside
+closes them. Escape closes the overlay on top. Keyboard focus is not trapped inside an open
+dialog yet: Tab can still reach controls behind it.
 
 Setup after `shellui-native init`: call `Components.UI.ShellTheme.EnsureInitialized();` in
 `App.Initialize` after `AvaloniaXamlLoader.Load(this);`, and add
@@ -85,6 +92,9 @@ Same names, properties and variants as MAUI, except:
 | Card children | XAML children | XAML children, collected in `Card.Items` |
 | Block button | `HorizontalOptions="Fill"` | `HorizontalAlignment="Stretch"` |
 | Focus ring | Platform focus visuals | shadcn's ring, for keyboard focus only |
+| Overlay children | XAML children | XAML children, collected in `Items` (`Dialog`, `DialogContent`, `Dropdown`, …) |
+| Dropdown / Popover | `ToggleAsync()` / `CloseAsync()` kept for older code | `Toggle()` / `Close()` only |
+| Flipped popup gap | 4px above the trigger | Flush with the trigger (Avalonia doesn't mirror the offset) |
 
 ---
 

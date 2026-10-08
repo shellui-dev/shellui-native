@@ -43,7 +43,7 @@ class Program
         {
             try
             {
-                LogoLoader.WriteHeader("Setting up your MAUI project");
+                LogoLoader.WriteHeader("Setting up your project");
                 await InitService.InitializeAsync(style, force, nonInteractive);
             }
             catch (Exception ex)
