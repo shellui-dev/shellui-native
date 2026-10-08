@@ -1443,11 +1443,71 @@ public abstract class ShellFloatingHost : Border
     }
 }
 
+/* A panel floating under an anchor in the window's overlay layer (Dropdown, Popover, Select,
+   DatePicker, TimePicker). A click outside or Escape closes it, and only one is open at a time.
+   The owner puts Popup in its tree, so the panel inherits the owner's theme and DataContext. */
+public sealed class ShellAnchoredPopup : IShellPopup
+{
+    private bool _open;
+
+    public Popup Popup { get; }
+
+    public bool IsOpen => _open;
+
+    // Raised when it closes for any reason: Close(), a click outside, Escape or another menu opening.
+    public event EventHandler? Closed;
+
+    public ShellAnchoredPopup(Control anchor, Popup? popup = null)
+    {
+        Popup = popup ?? new Popup { ShouldUseOverlayLayer = true };
+        Popup.PlacementTarget = anchor;
+        Popup.Placement = PlacementMode.BottomEdgeAlignedLeft;
+        Popup.VerticalOffset = 4;
+        Popup.IsLightDismissEnabled = true;
+        // The click that dismisses (even on the trigger) does nothing else, so it can't reopen.
+        Popup.OverlayDismissEventPassThrough = false;
+        Popup.Closed += (_, _) =>
+        {
+            if (_open) Finish();
+        };
+    }
+
+    public async void Open()
+    {
+        if (_open || Popup.Child is not Control panel || Popup.PlacementTarget is not { } anchor) return;
+        _open = true;
+        ShellPopups.Opened(this);
+        ShellDismiss.Push(this, Close, anchor);
+        panel.RenderTransformOrigin = new RelativePoint(0.5, 0, RelativeUnit.Relative);
+        ShellMotion.Set(panel, 0, ""scale(0.95)"");
+        Popup.IsOpen = true;
+        await ShellMotion.To(panel, 1, ""scale(1)"", 120, new CubicEaseOut());
+    }
+
+    public async void Close()
+    {
+        if (!_open) return;
+        Finish();
+        if (Popup.Child is Control panel) await ShellMotion.To(panel, 0, ""scale(0.95)"", 90, new CubicEaseIn());
+        if (!_open) Popup.IsOpen = false;
+    }
+
+    private void Finish()
+    {
+        _open = false;
+        ShellPopups.Closed(this);
+        ShellDismiss.Remove(this);
+        Closed?.Invoke(this, EventArgs.Empty);
+    }
+}
+
 // Shared host for trigger + floating panel (Dropdown, Popover). Clicking outside closes it.
-public abstract class ShellPopoverHost : ShellFloatingHost, IShellPopup
+public abstract class ShellPopoverHost : ShellFloatingHost
 {
     public static readonly StyledProperty<bool> IsOpenProperty =
         AvaloniaProperty.Register<ShellPopoverHost, bool>(nameof(IsOpen), defaultBindingMode: BindingMode.TwoWay);
+
+    private readonly ShellAnchoredPopup _anchored;
 
     static ShellPopoverHost()
     {
@@ -1464,11 +1524,8 @@ public abstract class ShellPopoverHost : ShellFloatingHost, IShellPopup
 
     protected ShellPopoverHost()
     {
-        Popup.PlacementTarget = this;
-        Popup.IsLightDismissEnabled = true;
-        // The click that dismisses (even on the trigger) does nothing else, so it can't reopen.
-        Popup.OverlayDismissEventPassThrough = false;
-        Popup.Closed += (_, _) => IsOpen = false;
+        _anchored = new ShellAnchoredPopup(this, Popup);
+        _anchored.Closed += (_, _) => IsOpen = false;
     }
 
     protected virtual PlacementMode Placement => PlacementMode.BottomEdgeAlignedLeft;
@@ -1478,29 +1535,18 @@ public abstract class ShellPopoverHost : ShellFloatingHost, IShellPopup
     public void Toggle() => IsOpen = !IsOpen;
     public void Close() => IsOpen = false;
 
-    private async void OnOpenChanged()
+    private void OnOpenChanged()
     {
         IsOpenChanged?.Invoke(this, IsOpen);
-        if (FloatingContent is not { } content) return;
-        if (IsOpen)
+        if (!IsOpen)
         {
-            ShellPopups.Opened(this);
-            ShellDismiss.Push(this, Close, this);
-            Popup.Placement = Placement;
-            Popup.VerticalOffset = Offset;
-            content.RenderTransformOrigin = new RelativePoint(0.5, 0, RelativeUnit.Relative);
-            ShellMotion.Set(content, 0, ""scale(0.95)"");
-            Popup.IsOpen = true;
-            await ShellMotion.To(content, 1, ""scale(1)"", 120, new CubicEaseOut());
+            _anchored.Close();
+            return;
         }
-        else
-        {
-            ShellPopups.Closed(this);
-            ShellDismiss.Remove(this);
-            if (!Popup.IsOpen) return; // already closed by a click outside
-            await ShellMotion.To(content, 0, ""scale(0.95)"", 90, new CubicEaseIn());
-            if (!IsOpen) Popup.IsOpen = false;
-        }
+        if (FloatingContent is null) return;
+        Popup.Placement = Placement;
+        Popup.VerticalOffset = Offset;
+        _anchored.Open();
     }
 }
 
@@ -1648,6 +1694,34 @@ public abstract class ShellTriggerView : Border, IShellTrigger
             trigger.Activate();
             return;
         }
+    }
+}
+
+// Native-control helpers: Fluent draws its own chrome inside the controls a ShellUI Border wraps.
+public static class ShellPlatform
+{
+    // Fluent's TextBox template takes its background and border brushes from these resources in
+    // every state (hover, focus, disabled); overriding them on the TextBox clears that chrome.
+    private static readonly string[] TextBoxBrushes =
+    {
+        ""TextControlBackground"", ""TextControlBackgroundPointerOver"", ""TextControlBackgroundFocused"", ""TextControlBackgroundDisabled"",
+        ""TextControlBorderBrush"", ""TextControlBorderBrushPointerOver"", ""TextControlBorderBrushFocused"", ""TextControlBorderBrushDisabled"",
+    };
+
+    // Leaves the wrapping Border as the only frame, with text, caret and placeholder in the theme tokens.
+    public static void StripNativeChrome(TextBox textBox)
+    {
+        foreach (var key in TextBoxBrushes)
+            textBox.Resources[key] = Brushes.Transparent;
+        textBox.Resources[""TextControlBorderThemeThickness""] = new Thickness(0);
+        textBox.Resources[""TextControlBorderThemeThicknessFocused""] = new Thickness(0);
+        textBox.Resources[""TextControlThemePadding""] = new Thickness(0);
+        textBox.BorderThickness = new Thickness(0);
+        textBox.Padding = new Thickness(0);
+        textBox.MinHeight = 0;
+        textBox.Token(TextBox.ForegroundProperty, ShellToken.Foreground)
+            .Token(TextBox.CaretBrushProperty, ShellToken.Foreground)
+            .Token(TextBox.PlaceholderForegroundProperty, ShellToken.MutedForeground);
     }
 }
 "
