@@ -457,7 +457,11 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 - [x] P0: button (+ button-variants), input, label, checkbox, switch, card family, separator, badge,
   progress, alert. Each installs alone into a fresh `dotnet new avalonia.app` and builds with 0
   warnings; checked in the demo in light and dark, with the keyboard focus ring and loading state
-- [ ] P1: dialog, drawer, sheet, dropdown, popover (Avalonia's overlay layer and popups)
+- [x] P1: dialog, drawer, sheet, dropdown, popover and their parts, on Avalonia's `Popup` in the
+  overlay layer (shared hosts in `shell`: `ShellOverlayHost`, `ShellPopoverHost`,
+  `ShellTriggerView`, `ShellDismiss` for Escape). Each installs alone into a fresh
+  `dotnet new avalonia.app`; checked in the demo: opening from triggers, placement and flip,
+  Escape, picking an item, `DialogClose`, light and dark. Open: focus trapping in dialogs
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
