@@ -462,6 +462,9 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   `ShellTriggerView`, `ShellDismiss` for Escape). Each installs alone into a fresh
   `dotnet new avalonia.app`; checked in the demo: opening from triggers, placement and flip,
   Escape, picking an item, `DialogClose`, light and dark. Open: focus trapping in dialogs
+- [x] P2: textarea, select, slider (custom-drawn), radio-group, calendar, date-picker, time-picker.
+  Pickers float their panel with `ShellAnchoredPopup` (shared with Dropdown and Popover);
+  `ShellPlatform.StripNativeChrome` clears Fluent's TextBox chrome for Input and Textarea
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`

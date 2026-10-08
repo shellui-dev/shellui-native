@@ -54,7 +54,7 @@ shellui-native list
 | Platform | Status | .NET Version |
 |----------|--------|--------------|
 | .NET MAUI | Available (`0.1.0-alpha.1`) — Android, iOS, Mac Catalyst, Windows | .NET 10.0 |
-| Avalonia UI | In progress (Phase 2): theme, icons, P0 and P1 components; not on NuGet yet | .NET 10.0 (Avalonia 12) |
+| Avalonia UI | In progress (Phase 2): theme, icons, P0–P2 components; not on NuGet yet | .NET 10.0 (Avalonia 12) |
 | WinUI 3 | Conditional (Phase 3) | .NET 10.0 |
 
 WPF is intentionally not on this list — it's recognized for project detection only, not an

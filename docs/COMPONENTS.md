@@ -68,8 +68,9 @@ your background so the splash-to-app transition doesn't flash the template's pur
 ## Avalonia (in progress)
 
 Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, `checkbox`,
-`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`) and P1 (`dialog`,
-`drawer`, `sheet`, `dropdown`, `popover` and their parts). Not yet published to NuGet. In an
+`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`), P1 (`dialog`,
+`drawer`, `sheet`, `dropdown`, `popover` and their parts) and P2 (`textarea`, `select`, `slider`,
+`radio-group`, `calendar`, `date-picker`, `time-picker`). Not yet published to NuGet. In an
 Avalonia project, `shellui-native list` shows only these.
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
@@ -95,6 +96,8 @@ Same names, properties and variants as MAUI, except:
 | Overlay children | XAML children | XAML children, collected in `Items` (`Dialog`, `DialogContent`, `Dropdown`, …) |
 | Dropdown / Popover | `ToggleAsync()` / `CloseAsync()` kept for older code | `Toggle()` / `Close()` only |
 | Flipped popup gap | 4px above the trigger | Flush with the trigger (Avalonia doesn't mirror the offset) |
+| Slider | Platform slider tinted with tokens | Custom-drawn shadcn slider; adds `Step` for the arrow keys; `ValueChanged` passes the new `double` |
+| DatePicker `DateChanged` | `DateChangedEventArgs` | The new `DateTime` |
 
 ---
 
