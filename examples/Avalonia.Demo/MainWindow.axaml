@@ -119,6 +119,64 @@
                 <ui:Alert Title="Tip" Message="Press Tab to see the focus ring." Variant="Info" />
             </StackPanel>
 
+            <TextBlock Classes="title" Text="Overlays" />
+            <TextBlock Classes="hint" Text="Dialog, drawer, sheet, dropdown and popover. Escape closes the one on top." />
+            <WrapPanel ItemSpacing="8" LineSpacing="8">
+                <ui:Dialog x:Name="DemoDialog">
+                    <ui:DialogTrigger><ui:Button x:Name="OpenDialog" Text="Open dialog" Variant="Outline" /></ui:DialogTrigger>
+                    <ui:DialogContent>
+                        <ui:DialogHeader>
+                            <ui:DialogTitle Text="Edit profile" />
+                            <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
+                        </ui:DialogHeader>
+                        <ui:ShellLabel Text="Name" Size="Sm" Weight="Medium" />
+                        <ui:Input Text="Pedro Duarte" />
+                        <ui:DialogFooter>
+                            <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+                            <ui:DialogClose><ui:Button Text="Save changes" /></ui:DialogClose>
+                        </ui:DialogFooter>
+                    </ui:DialogContent>
+                </ui:Dialog>
+
+                <ui:Drawer x:Name="DemoDrawer">
+                    <ui:DrawerTrigger><ui:Button x:Name="OpenDrawer" Text="Open drawer" Variant="Outline" /></ui:DrawerTrigger>
+                    <ui:DrawerContent>
+                        <ui:DialogTitle Text="Move goal" />
+                        <ui:DialogDescription Text="Set your daily activity goal." />
+                        <ui:Progress Value="60" ShowLabel="True" />
+                    </ui:DrawerContent>
+                </ui:Drawer>
+
+                <ui:Sheet x:Name="DemoSheet">
+                    <ui:SheetTrigger><ui:Button x:Name="OpenSheet" Text="Open sheet" Variant="Outline" /></ui:SheetTrigger>
+                    <ui:SheetContent>
+                        <ui:DialogTitle Text="Settings" />
+                        <ui:DialogDescription Text="Adjust your preferences." />
+                        <ui:Switch Label="Notifications" IsToggled="True" />
+                        <ui:Switch Label="Airplane mode" />
+                    </ui:SheetContent>
+                </ui:Sheet>
+
+                <ui:Dropdown x:Name="DemoDropdown">
+                    <ui:DropdownTrigger><ui:Button x:Name="OpenDropdown" Text="Options" Icon="ChevronDown" IconPosition="Right" Variant="Outline" /></ui:DropdownTrigger>
+                    <ui:DropdownContent>
+                        <ui:DropdownItem Text="Profile" Icon="User" />
+                        <ui:DropdownItem Text="Settings" Icon="Settings" />
+                        <ui:DropdownItem Text="Log out" Icon="LogOut" />
+                    </ui:DropdownContent>
+                </ui:Dropdown>
+
+                <ui:Popover x:Name="DemoPopover">
+                    <ui:PopoverTrigger><ui:Button x:Name="OpenPopover" Text="Open popover" Variant="Outline" /></ui:PopoverTrigger>
+                    <ui:PopoverContent>
+                        <ui:ShellLabel Text="Dimensions" Weight="Semibold" Size="Sm" />
+                        <ui:ShellLabel Text="Set the dimensions for the layer." Size="Sm" Variant="Muted" />
+                        <ui:Input Text="100%" />
+                    </ui:PopoverContent>
+                </ui:Popover>
+            </WrapPanel>
+            <TextBlock x:Name="MenuChoice" Classes="hint" Margin="0,8,0,0" Text="Pick a menu item." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

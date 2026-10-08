@@ -13,6 +13,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        foreach (var item in DemoDropdown.FindDescendantsOfType<DropdownItem>())
+            item.Clicked += (_, _) => MenuChoice.Text = $"Picked {item.Text}.";
+
         var clicks = 0;
         LoadingButton.Clicked += async (_, _) =>
         {

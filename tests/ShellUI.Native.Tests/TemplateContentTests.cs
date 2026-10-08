@@ -20,7 +20,7 @@ public class TemplateContentTests
             .Where(name => ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia))
             .Select(name => new object[] { name });
 
-    // Ported so far: the Phase 2 foundation and P0. Grows as components are ported.
+    // Ported so far: the Phase 2 foundation, P0 and P1. Grows as components are ported.
     [Theory]
     [InlineData("shell")]
     [InlineData("icon")]
@@ -39,6 +39,28 @@ public class TemplateContentTests
     [InlineData("badge")]
     [InlineData("progress")]
     [InlineData("alert")]
+    [InlineData("element-extensions")]
+    [InlineData("dialog")]
+    [InlineData("dialog-trigger")]
+    [InlineData("dialog-content")]
+    [InlineData("dialog-header")]
+    [InlineData("dialog-footer")]
+    [InlineData("dialog-title")]
+    [InlineData("dialog-description")]
+    [InlineData("dialog-close")]
+    [InlineData("drawer")]
+    [InlineData("drawer-trigger")]
+    [InlineData("drawer-content")]
+    [InlineData("sheet")]
+    [InlineData("sheet-trigger")]
+    [InlineData("sheet-content")]
+    [InlineData("dropdown")]
+    [InlineData("dropdown-trigger")]
+    [InlineData("dropdown-content")]
+    [InlineData("dropdown-item")]
+    [InlineData("popover")]
+    [InlineData("popover-trigger")]
+    [InlineData("popover-content")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
@@ -50,8 +72,10 @@ public class TemplateContentTests
     {
         var content = ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)!;
         Assert.Contains("namespace YourProjectNamespace.Components.UI", content); // .Variants for button-variants
-        Assert.Contains("using Avalonia", content);
+        // Small parts (Dialog, triggers) need no Avalonia using, so check for MAUI types instead.
         Assert.DoesNotContain("Microsoft.Maui", content);
+        Assert.DoesNotContain("BindableProperty", content);
+        Assert.DoesNotContain("ContentView", content);
         Assert.DoesNotContain("AvaloniaDemo", content);
     }
 

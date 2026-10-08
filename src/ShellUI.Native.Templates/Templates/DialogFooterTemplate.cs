@@ -38,6 +38,24 @@ public partial class DialogFooter : ContentView
         Content = _stack;
     }
 }
+",
+        [NativePlatform.Avalonia] = @"using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+
+namespace YourProjectNamespace.Components.UI;
+
+// Actions row — flex justify-end gap-2.
+public class DialogFooter : StackPanel
+{
+    public DialogFooter()
+    {
+        Orientation = Orientation.Horizontal;
+        Spacing = 8;
+        HorizontalAlignment = HorizontalAlignment.Right;
+        Margin = new Thickness(0, 8, 0, 0);
+    }
+}
 "
     };
 }

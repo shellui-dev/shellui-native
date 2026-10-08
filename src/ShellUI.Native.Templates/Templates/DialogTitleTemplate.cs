@@ -29,6 +29,23 @@ public partial class DialogTitle : Label
         this.Token(TextColorProperty, ShellToken.Foreground);
     }
 }
+",
+        [NativePlatform.Avalonia] = @"using Avalonia.Controls;
+using Avalonia.Media;
+
+namespace YourProjectNamespace.Components.UI;
+
+// text-lg font-semibold leading-none
+public class DialogTitle : TextBlock
+{
+    public DialogTitle()
+    {
+        FontSize = 18;
+        FontWeight = FontWeight.SemiBold;
+        TextWrapping = TextWrapping.Wrap;
+        this.Token(ForegroundProperty, ShellToken.Foreground);
+    }
+}
 "
     };
 }
