@@ -1,11 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
+using Avalonia.Metadata;
 using Avalonia.Styling;
 
 namespace AvaloniaDemo.Components.UI;
@@ -236,4 +246,345 @@ public static class ShellFocus
     private static void Paint(Border border) => border.BoxShadow = new BoxShadows(
         new BoxShadow { Spread = 2, Color = ShellTheme.Get(ShellToken.Background) },
         new[] { new BoxShadow { Spread = 4, Color = ShellTheme.Get(ShellToken.Ring) } });
+}
+
+// Fade + transform transitions for overlays opening and closing.
+public static class ShellMotion
+{
+    // Jumps to the values without animating (the starting point of an entrance).
+    public static void Set(Visual visual, double opacity, string transform)
+    {
+        visual.Transitions = null;
+        visual.Opacity = opacity;
+        visual.RenderTransform = TransformOperations.Parse(transform);
+    }
+
+    // Animates from the current values; completes when the transition has run.
+    public static Task To(Visual visual, double opacity, string transform, int milliseconds, Easing easing)
+    {
+        var duration = TimeSpan.FromMilliseconds(milliseconds);
+        visual.Transitions = new Transitions
+        {
+            new DoubleTransition { Property = Visual.OpacityProperty, Duration = duration, Easing = easing },
+            new TransformOperationsTransition { Property = Visual.RenderTransformProperty, Duration = duration, Easing = easing }
+        };
+        visual.Opacity = opacity;
+        visual.RenderTransform = TransformOperations.Parse(transform);
+        return Task.Delay(duration);
+    }
+
+    // Waits until a freshly shown control has a size (slide-ins start one size away).
+    public static async Task WaitForLayoutAsync(Control control)
+    {
+        for (var i = 0; i < 20 && (control.Bounds.Width <= 0 || control.Bounds.Height <= 0); i++)
+            await Task.Delay(16);
+    }
+}
+
+// Open overlays and popups, newest last. Escape closes the top one; with nothing open the key
+// keeps its normal behavior.
+public static class ShellDismiss
+{
+    private static readonly List<(object Key, Action Close)> Open = new();
+    private static readonly ConditionalWeakTable<TopLevel, object> Hooked = new();
+
+    public static void Push(object key, Action close, Visual from)
+    {
+        Open.RemoveAll(entry => ReferenceEquals(entry.Key, key));
+        Open.Add((key, close));
+        if (TopLevel.GetTopLevel(from) is not { } top || Hooked.TryGetValue(top, out _)) return;
+        Hooked.Add(top, new object());
+        // Tunnel, so Escape reaches us before a focused control (e.g. a TextBox) handles it.
+        top.AddHandler(InputElement.KeyDownEvent, (_, e) =>
+        {
+            if (e.Key == Key.Escape && DismissTop()) e.Handled = true;
+        }, RoutingStrategies.Tunnel);
+    }
+
+    public static void Remove(object key) => Open.RemoveAll(entry => ReferenceEquals(entry.Key, key));
+
+    // Closes the most recently opened overlay. False when nothing is open.
+    public static bool DismissTop()
+    {
+        if (Open.Count == 0) return false;
+        var top = Open[^1];
+        Open.RemoveAt(Open.Count - 1);
+        top.Close();
+        return true;
+    }
+}
+
+// Floating panels that close on a click outside (Dropdown, Popover). Only one is open at a time:
+// opening another closes the previous one.
+public interface IShellPopup
+{
+    void Close();
+}
+
+public static class ShellPopups
+{
+    private static WeakReference<IShellPopup>? _open;
+
+    public static void Opened(IShellPopup popup)
+    {
+        if (_open != null && _open.TryGetTarget(out var previous) && !ReferenceEquals(previous, popup))
+            previous.Close();
+        _open = new WeakReference<IShellPopup>(popup);
+    }
+
+    public static void Closed(IShellPopup popup)
+    {
+        if (_open != null && _open.TryGetTarget(out var current) && ReferenceEquals(current, popup))
+            _open = null;
+    }
+
+    // shadow-md
+    public static BoxShadows PanelShadow() => new(new BoxShadow { OffsetY = 4, Blur = 12, Color = ShellTheme.Shadow(0.12) });
+}
+
+/* Base for a component with a trigger and floating content. XAML children go to Items: the
+   content part is shown in a Popup in the window's overlay layer, everything else (the trigger)
+   renders in place. The Popup keeps the content in the logical tree, so it inherits the theme
+   and DataContext, and its parts find the component with FindParentOfType. */
+public abstract class ShellFloatingHost : Border
+{
+    private readonly Panel _inline = new();
+    protected readonly Popup Popup = new() { ShouldUseOverlayLayer = true };
+
+    protected Control? FloatingContent { get; private set; }
+
+    [Content]
+    public Controls Items { get; } = new();
+
+    protected ShellFloatingHost()
+    {
+        _inline.Children.Add(Popup);
+        Child = _inline;
+        HorizontalAlignment = HorizontalAlignment.Left;
+        VerticalAlignment = VerticalAlignment.Top;
+        Items.CollectionChanged += OnItemsChanged;
+    }
+
+    protected abstract bool IsContent(Control child);
+
+    // Rebuilt from Items on every change; Clear reports no old items, so diffing isn't worth it.
+    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Popup.Child = null;
+        FloatingContent = null;
+        _inline.Children.RemoveAll(_inline.Children.Where(c => c != Popup).ToList());
+        foreach (var child in Items)
+        {
+            if (IsContent(child)) Popup.Child = FloatingContent = child;
+            else _inline.Children.Insert(_inline.Children.Count - 1, child);
+        }
+    }
+}
+
+// Shared host for trigger + floating panel (Dropdown, Popover). Clicking outside closes it.
+public abstract class ShellPopoverHost : ShellFloatingHost, IShellPopup
+{
+    public static readonly StyledProperty<bool> IsOpenProperty =
+        AvaloniaProperty.Register<ShellPopoverHost, bool>(nameof(IsOpen), defaultBindingMode: BindingMode.TwoWay);
+
+    static ShellPopoverHost()
+    {
+        IsOpenProperty.Changed.AddClassHandler<ShellPopoverHost>((h, _) => h.OnOpenChanged());
+    }
+
+    public bool IsOpen
+    {
+        get => GetValue(IsOpenProperty);
+        set => SetValue(IsOpenProperty, value);
+    }
+
+    public event EventHandler<bool>? IsOpenChanged;
+
+    protected ShellPopoverHost()
+    {
+        Popup.PlacementTarget = this;
+        Popup.IsLightDismissEnabled = true;
+        // The click that dismisses (even on the trigger) does nothing else, so it can't reopen.
+        Popup.OverlayDismissEventPassThrough = false;
+        Popup.Closed += (_, _) => IsOpen = false;
+    }
+
+    protected virtual PlacementMode Placement => PlacementMode.BottomEdgeAlignedLeft;
+    protected virtual double Offset => 4;
+
+    public void SetOpen(bool value) => IsOpen = value;
+    public void Toggle() => IsOpen = !IsOpen;
+    public void Close() => IsOpen = false;
+
+    private async void OnOpenChanged()
+    {
+        IsOpenChanged?.Invoke(this, IsOpen);
+        if (FloatingContent is not { } content) return;
+        if (IsOpen)
+        {
+            ShellPopups.Opened(this);
+            ShellDismiss.Push(this, Close, this);
+            Popup.Placement = Placement;
+            Popup.VerticalOffset = Offset;
+            content.RenderTransformOrigin = new RelativePoint(0.5, 0, RelativeUnit.Relative);
+            ShellMotion.Set(content, 0, "scale(0.95)");
+            Popup.IsOpen = true;
+            await ShellMotion.To(content, 1, "scale(1)", 120, new CubicEaseOut());
+        }
+        else
+        {
+            ShellPopups.Closed(this);
+            ShellDismiss.Remove(this);
+            if (!Popup.IsOpen) return; // already closed by a click outside
+            await ShellMotion.To(content, 0, "scale(0.95)", 90, new CubicEaseIn());
+            if (!IsOpen) Popup.IsOpen = false;
+        }
+    }
+}
+
+// Content of a modal overlay (DialogContent, DrawerContent, SheetContent): animates itself in and out.
+public interface IShellOverlayContent
+{
+    Task AnimateAsync(bool open);
+}
+
+/* Shared host for Dialog / Drawer / Sheet. Children: an optional *Trigger (rendered in place) and
+   the *Content, which covers the window while Open, so the host can sit next to the button that
+   opens it. */
+public abstract class ShellOverlayHost : ShellFloatingHost
+{
+    public static readonly StyledProperty<bool> OpenProperty =
+        AvaloniaProperty.Register<ShellOverlayHost, bool>(nameof(Open), defaultBindingMode: BindingMode.TwoWay);
+
+    private TopLevel? _top;
+    private int _version;
+
+    static ShellOverlayHost()
+    {
+        OpenProperty.Changed.AddClassHandler<ShellOverlayHost>((h, _) => h.OnOpenChanged());
+    }
+
+    public bool Open
+    {
+        get => GetValue(OpenProperty);
+        set => SetValue(OpenProperty, value);
+    }
+
+    public event EventHandler<bool>? OpenChanged;
+
+    protected ShellOverlayHost()
+    {
+        Popup.IsLightDismissEnabled = false;
+        Popup.Placement = PlacementMode.Center;
+    }
+
+    protected override bool IsContent(Control child) => child is IShellOverlayContent;
+
+    public void SetOpen(bool value) => Open = value;
+
+    // What Escape does while this overlay is on top.
+    protected virtual void Dismiss() => Open = false;
+
+    private async void OnOpenChanged()
+    {
+        var version = ++_version;
+        if (Open) ShellDismiss.Push(this, Dismiss, this);
+        else ShellDismiss.Remove(this);
+        OpenChanged?.Invoke(this, Open);
+        if (FloatingContent is not { } content) return;
+
+        if (Open)
+        {
+            if (TopLevel.GetTopLevel(this) is not { } top) return;
+            if (_top is null)
+            {
+                _top = top;
+                _top.SizeChanged += OnWindowSizeChanged;
+            }
+            Fit(content);
+            Popup.PlacementTarget = top;
+            Popup.IsOpen = true;
+            if (content is IShellOverlayContent animated) await animated.AnimateAsync(true);
+        }
+        else
+        {
+            if (content is IShellOverlayContent animated) await animated.AnimateAsync(false);
+            if (version != _version) return; // reopened while closing
+            Popup.IsOpen = false;
+            if (_top != null) _top.SizeChanged -= OnWindowSizeChanged;
+            _top = null;
+        }
+    }
+
+    private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if (FloatingContent is { } content) Fit(content);
+    }
+
+    // The content (backdrop + panel) covers the whole window.
+    private void Fit(Control content)
+    {
+        if (_top is null) return;
+        content.Width = _top.ClientSize.Width;
+        content.Height = _top.ClientSize.Height;
+    }
+}
+
+// Implemented by compositional triggers (DialogTrigger, DropdownTrigger, ...).
+public interface IShellTrigger
+{
+    void Activate();
+}
+
+// Marks a control that is itself a tab stop (Button), so a trigger wrapping it doesn't add a second one.
+public interface IShellFocusable { }
+
+/* Wraps the control that opens a component: <ui:DialogTrigger><ui:Button Text="Open" /></ui:DialogTrigger>.
+   A ShellUI Button inside handles its own click and then activates the trigger, the Avalonia
+   take on shadcn's asChild; any other content activates it through the trigger itself. */
+public abstract class ShellTriggerView : Border, IShellTrigger
+{
+    static ShellTriggerView()
+    {
+        ChildProperty.Changed.AddClassHandler<ShellTriggerView>((t, _) => t.Focusable = t.Child is not IShellFocusable);
+    }
+
+    protected ShellTriggerView()
+    {
+        Background = Brushes.Transparent;
+        HorizontalAlignment = HorizontalAlignment.Left;
+        Cursor = new Cursor(StandardCursorType.Hand);
+        ShellFocus.Ring(this, this);
+    }
+
+    public void Activate() => OnActivated();
+
+    protected abstract void OnActivated();
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        if (e.InitialPressMouseButton != MouseButton.Left || !new Rect(Bounds.Size).Contains(e.GetPosition(this))) return;
+        Activate();
+        e.Handled = true;
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key is not (Key.Enter or Key.Space)) return;
+        Activate();
+        e.Handled = true;
+    }
+
+    // Called by interactive children (Button) after they handle a click.
+    public static void ActivateAncestor(StyledElement from)
+    {
+        for (var p = from.Parent; p != null; p = p.Parent)
+        {
+            if (p is not IShellTrigger trigger) continue;
+            trigger.Activate();
+            return;
+        }
+    }
 }
