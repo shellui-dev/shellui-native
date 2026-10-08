@@ -63,7 +63,25 @@
                 <ui:Checkbox Label="Required" HasError="True" />
                 <ui:Switch Label="Airplane mode" />
                 <ui:Switch Label="Notifications" IsToggled="True" />
+                <ui:Textarea Placeholder="Type your message here." />
+                <ui:Select x:Name="CountrySelect" Placeholder="Select a country" />
+                <ui:Slider x:Name="VolumeSlider" Value="40" />
+                <TextBlock x:Name="VolumeText" Classes="hint" Text="Volume 40" />
+                <ui:RadioGroup Value="comfortable">
+                    <ui:RadioGroupItem Value="default" Text="Default" />
+                    <ui:RadioGroupItem Value="comfortable" Text="Comfortable" />
+                    <ui:RadioGroupItem Value="compact" Text="Compact" />
+                </ui:RadioGroup>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ui:DatePicker x:Name="DueDate" />
+                    <ui:TimePicker x:Name="StartTime" MinuteStep="15" />
+                </StackPanel>
             </StackPanel>
+            <ui:Card HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:CardContent Padding="12">
+                    <ui:Calendar />
+                </ui:CardContent>
+            </ui:Card>
 
             <TextBlock Classes="title" Text="Card" />
             <TextBlock Classes="hint" Text="Header, content and footer parts." />

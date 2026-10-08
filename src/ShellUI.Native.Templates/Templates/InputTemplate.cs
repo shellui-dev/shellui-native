@@ -197,7 +197,7 @@ namespace YourProjectNamespace.Components.UI;
 
 // Text input — h-10 rounded-md border border-input px-3 text-sm.
 // Focus: border-ring + soft ring glow. Error: border-destructive.
-// The inner TextBox's Fluent chrome is cleared so this Border is the only frame.
+// The inner TextBox's Fluent chrome is stripped so this Border is the only frame.
 public class Input : Border
 {
     public static readonly StyledProperty<string?> TextProperty =
@@ -217,14 +217,6 @@ public class Input : Border
 
     public static readonly StyledProperty<int> MaxLengthProperty =
         AvaloniaProperty.Register<Input, int>(nameof(MaxLength));
-
-    // Fluent's TextBox template takes its background and border brushes from these resources in
-    // every state (hover, focus, disabled); overriding them on the TextBox clears that chrome.
-    private static readonly string[] ClearedBrushes =
-    {
-        ""TextControlBackground"", ""TextControlBackgroundPointerOver"", ""TextControlBackgroundFocused"", ""TextControlBackgroundDisabled"",
-        ""TextControlBorderBrush"", ""TextControlBorderBrushPointerOver"", ""TextControlBorderBrushFocused"", ""TextControlBorderBrushDisabled"",
-    };
 
     private readonly TextBox _textBox;
     private bool _isFocused;
@@ -290,20 +282,10 @@ public class Input : Border
         _textBox = new TextBox
         {
             FontSize = 14,
-            BorderThickness = new Thickness(0),
-            Padding = new Thickness(0),
-            MinHeight = 0,
             VerticalAlignment = VerticalAlignment.Center,
             VerticalContentAlignment = VerticalAlignment.Center
         };
-        foreach (var key in ClearedBrushes)
-            _textBox.Resources[key] = Brushes.Transparent;
-        _textBox.Resources[""TextControlBorderThemeThickness""] = new Thickness(0);
-        _textBox.Resources[""TextControlBorderThemeThicknessFocused""] = new Thickness(0);
-        _textBox.Resources[""TextControlThemePadding""] = new Thickness(0);
-        _textBox.Token(TextBox.ForegroundProperty, ShellToken.Foreground)
-            .Token(TextBox.CaretBrushProperty, ShellToken.Foreground)
-            .Token(TextBox.PlaceholderForegroundProperty, ShellToken.MutedForeground);
+        ShellPlatform.StripNativeChrome(_textBox);
 
         _textBox.TextChanged += (_, e) =>
         {

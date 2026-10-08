@@ -20,7 +20,7 @@ public class TemplateContentTests
             .Where(name => ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia))
             .Select(name => new object[] { name });
 
-    // Ported so far: the Phase 2 foundation, P0 and P1. Grows as components are ported.
+    // Ported so far: the Phase 2 foundation, P0, P1 and P2. Grows as components are ported.
     [Theory]
     [InlineData("shell")]
     [InlineData("icon")]
@@ -61,6 +61,14 @@ public class TemplateContentTests
     [InlineData("popover")]
     [InlineData("popover-trigger")]
     [InlineData("popover-content")]
+    [InlineData("textarea")]
+    [InlineData("select")]
+    [InlineData("slider")]
+    [InlineData("radio-group")]
+    [InlineData("radio-group-item")]
+    [InlineData("calendar")]
+    [InlineData("date-picker")]
+    [InlineData("time-picker")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
