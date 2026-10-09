@@ -149,7 +149,7 @@
                             <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
                         </ui:DialogHeader>
                         <ui:ShellLabel Text="Name" Size="Sm" Weight="Medium" />
-                        <ui:Input Text="Pedro Duarte" />
+                        <ui:Input Text="Shewart Shepherd" />
                         <ui:DialogFooter>
                             <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
                             <ui:DialogClose><ui:Button Text="Save changes" /></ui:DialogClose>
@@ -212,7 +212,7 @@
                 <ui:TabsContent Value="account">
                     <ui:Card>
                         <ui:CardHeader Title="Account" Description="Make changes to your account here." />
-                        <ui:CardContent><ui:Input Text="Pedro Duarte" /></ui:CardContent>
+                        <ui:CardContent><ui:Input Text="Shewart Shepherd" /></ui:CardContent>
                     </ui:Card>
                 </ui:TabsContent>
                 <ui:TabsContent Value="password">
@@ -240,9 +240,9 @@
                 <ui:CollapsibleTrigger><ui:Button x:Name="ToggleCollapsible" Text="Show starred repositories" Icon="ChevronsUpDown" IconPosition="Right" Variant="Outline" /></ui:CollapsibleTrigger>
                 <ui:CollapsibleContent>
                     <StackPanel Spacing="8">
-                        <ui:ShellLabel Text="@radix-ui/primitives" Size="Sm" />
-                        <ui:ShellLabel Text="@radix-ui/colors" Size="Sm" />
-                        <ui:ShellLabel Text="@stitches/react" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shellui" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shellui-native" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shell-icons" Size="Sm" />
                     </StackPanel>
                 </ui:CollapsibleContent>
             </ui:Collapsible>
