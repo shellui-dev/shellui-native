@@ -200,6 +200,14 @@ public class SheetContent : Border, IShellOverlayContent
             this.FindParentOfType<Sheet>()?.SetOpen(false);
             e.Handled = true;
         };
+        // A tab stop inside the focus trap, as in shadcn; Enter or Space closes.
+        ShellFocus.Ring(close, close);
+        close.KeyDown += (_, e) =>
+        {
+            if (e.Key is not (Key.Enter or Key.Space)) return;
+            this.FindParentOfType<Sheet>()?.SetOpen(false);
+            e.Handled = true;
+        };
 
         _panel = new Border
         {

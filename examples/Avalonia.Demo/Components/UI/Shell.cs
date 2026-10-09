@@ -17,6 +17,7 @@ using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Metadata;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
 
 namespace AvaloniaDemo.Components.UI;
 
@@ -496,13 +497,15 @@ public interface IShellOverlayContent
 
 /* Shared host for Dialog / Drawer / Sheet. Children: an optional *Trigger (rendered in place) and
    the *Content, which covers the window while Open, so the host can sit next to the button that
-   opens it. */
+   opens it. While open, keyboard focus stays inside the content (Tab cycles through it); on close
+   it returns to the control that had it, usually the trigger. */
 public abstract class ShellOverlayHost : ShellFloatingHost
 {
     public static readonly StyledProperty<bool> OpenProperty =
         AvaloniaProperty.Register<ShellOverlayHost, bool>(nameof(Open), defaultBindingMode: BindingMode.TwoWay);
 
     private TopLevel? _top;
+    private IInputElement? _returnFocus;
     private int _version;
 
     static ShellOverlayHost()
@@ -549,17 +552,37 @@ public abstract class ShellOverlayHost : ShellFloatingHost
             }
             Fit(content);
             Popup.PlacementTarget = top;
+            _returnFocus = top.FocusManager?.GetFocusedElement();
             Popup.IsOpen = true;
+            TrapFocus(content);
             if (content is IShellOverlayContent animated) await animated.AnimateAsync(true);
         }
         else
         {
+            if (_returnFocus is InputElement previous && TopLevel.GetTopLevel(previous) != null) previous.Focus();
+            _returnFocus = null;
             if (content is IShellOverlayContent animated) await animated.AnimateAsync(false);
             if (version != _version) return; // reopened while closing
             Popup.IsOpen = false;
             if (_top != null) _top.SizeChanged -= OnWindowSizeChanged;
             _top = null;
         }
+    }
+
+    // Tab and Shift+Tab wrap inside the content, and focus starts on its first tab stop (the
+    // content itself when it has none), so nothing behind the backdrop can be reached.
+    private static void TrapFocus(Control content)
+    {
+        KeyboardNavigation.SetTabNavigation(content, KeyboardNavigationMode.Cycle);
+        var first = content.GetVisualDescendants().OfType<InputElement>().FirstOrDefault(e =>
+            e.Focusable && e.IsEffectivelyEnabled && e.IsEffectivelyVisible && KeyboardNavigation.GetIsTabStop(e));
+        if (first is null)
+        {
+            content.Focusable = true;
+            content.FocusAdorner = null;
+            first = content;
+        }
+        first.Focus();
     }
 
     private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)
