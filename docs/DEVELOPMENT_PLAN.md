@@ -35,8 +35,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P3 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P3 |
-| `feat/avalonia-p4-feedback` | `main` | **Active** | Phase 2 P4: Avalonia feedback and overlays |
+| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P4 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P4 |
+| `feat/avalonia-p5-data-display` | `main` | **Active** | Phase 2 P5: Avalonia data display |
 
 ---
 
@@ -434,7 +434,7 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p4-feedback` now)
+## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p5-data-display` now)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
@@ -477,6 +477,11 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   `ShellFloatingHost.ClaimsChild` lets a host place XAML children itself. `ShellLabel` now wraps
   like MAUI's Label. Each installs alone into a fresh `dotnet new avalonia.app` and builds with 0
   warnings; checked in the demo in light and dark
+- [x] P5: avatar, toggle, callout, table (one template: Table, TableHeader, TableRow, TableHead,
+  TableCell), empty-state, pagination. Each installs alone into a fresh `dotnet new avalonia.app`
+  and builds with 0 warnings; checked in the demo in light and dark. Both demos now use ShellUI
+  content: Shewart Shepherd / @shewart, shellui-dev repositories, and the Shell family marks as
+  avatar images
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
