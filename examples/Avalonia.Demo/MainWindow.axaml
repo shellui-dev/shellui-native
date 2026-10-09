@@ -3,6 +3,7 @@
         xmlns:ui="using:AvaloniaDemo.Components.UI"
         x:Class="AvaloniaDemo.MainWindow"
         Title="ShellUI Native (Avalonia)"
+        Icon="/Assets/icon.ico"
         Width="1000" Height="760"
         Background="{DynamicResource ShellUIBackgroundBrush}">
 
@@ -194,6 +195,72 @@
                 </ui:Popover>
             </WrapPanel>
             <TextBlock x:Name="MenuChoice" Classes="hint" Margin="0,8,0,0" Text="Pick a menu item." />
+
+            <TextBlock Classes="title" Text="Navigation and layout" />
+            <TextBlock Classes="hint" Text="Tabs, accordion, collapsible, breadcrumb, scroll area and skeleton." />
+            <ui:Breadcrumb x:Name="DemoBreadcrumb" Margin="0,0,0,12">
+                <ui:BreadcrumbItem Text="Home" />
+                <ui:BreadcrumbItem Text="Components" />
+                <ui:BreadcrumbItem Text="Breadcrumb" IsCurrent="True" />
+            </ui:Breadcrumb>
+            <ui:Tabs x:Name="DemoTabs" Value="account" Width="400" HorizontalAlignment="Left">
+                <ui:TabsList>
+                    <ui:TabsTrigger Value="account" Text="Account" />
+                    <ui:TabsTrigger Value="password" Text="Password" />
+                    <ui:TabsTrigger Value="billing" Text="Billing" IsEnabled="False" />
+                </ui:TabsList>
+                <ui:TabsContent Value="account">
+                    <ui:Card>
+                        <ui:CardHeader Title="Account" Description="Make changes to your account here." />
+                        <ui:CardContent><ui:Input Text="Pedro Duarte" /></ui:CardContent>
+                    </ui:Card>
+                </ui:TabsContent>
+                <ui:TabsContent Value="password">
+                    <ui:Card>
+                        <ui:CardHeader Title="Password" Description="Change your password here." />
+                        <ui:CardContent><ui:Input Placeholder="New password" IsPassword="True" /></ui:CardContent>
+                    </ui:Card>
+                </ui:TabsContent>
+            </ui:Tabs>
+            <ui:Accordion x:Name="DemoAccordion" Value="a" Width="480" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:AccordionItem Value="a">
+                    <ui:AccordionTrigger Text="Is it accessible?" />
+                    <ui:AccordionContent><ui:ShellLabel Text="Yes. Every trigger is a tab stop and opens with Enter or Space." Size="Sm" /></ui:AccordionContent>
+                </ui:AccordionItem>
+                <ui:AccordionItem Value="b">
+                    <ui:AccordionTrigger Text="Is it styled?" />
+                    <ui:AccordionContent><ui:ShellLabel Text="Yes. It uses the same tokens as the other components." Size="Sm" /></ui:AccordionContent>
+                </ui:AccordionItem>
+                <ui:AccordionItem Value="c">
+                    <ui:AccordionTrigger Text="Is it animated?" />
+                    <ui:AccordionContent><ui:ShellLabel Text="Yes. Content grows to its height and the chevron turns." Size="Sm" /></ui:AccordionContent>
+                </ui:AccordionItem>
+            </ui:Accordion>
+            <ui:Collapsible x:Name="DemoCollapsible" Width="360" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:CollapsibleTrigger><ui:Button x:Name="ToggleCollapsible" Text="Show starred repositories" Icon="ChevronsUpDown" IconPosition="Right" Variant="Outline" /></ui:CollapsibleTrigger>
+                <ui:CollapsibleContent>
+                    <StackPanel Spacing="8">
+                        <ui:ShellLabel Text="@radix-ui/primitives" Size="Sm" />
+                        <ui:ShellLabel Text="@radix-ui/colors" Size="Sm" />
+                        <ui:ShellLabel Text="@stitches/react" Size="Sm" />
+                    </StackPanel>
+                </ui:CollapsibleContent>
+            </ui:Collapsible>
+            <WrapPanel ItemSpacing="16" LineSpacing="16" Margin="0,12,0,0">
+                <Border Width="200" BorderThickness="1" CornerRadius="6" BorderBrush="{DynamicResource ShellUIBorderBrush}">
+                    <ui:ScrollArea x:Name="DemoScrollArea" Height="160">
+                        <StackPanel x:Name="Tags" Margin="16,12" Spacing="8" />
+                    </ui:ScrollArea>
+                </Border>
+                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Top">
+                    <ui:Skeleton Width="48" Height="48" CornerRadius="24" />
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <ui:Skeleton Width="250" Height="16" />
+                        <ui:Skeleton Width="200" Height="16" />
+                    </StackPanel>
+                </StackPanel>
+            </WrapPanel>
+            <TextBlock x:Name="NavChoice" Classes="hint" Margin="0,8,0,0" Text="Click a breadcrumb or open a section." />
 
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />

@@ -19,6 +19,17 @@ public partial class MainWindow : Window
         CountrySelect.ItemsSource = new[] { "Argentina", "Brazil", "Japan", "Kenya", "Norway", "South Africa", "Zimbabwe" };
         VolumeSlider.ValueChanged += (_, value) => VolumeText.Text = $"Volume {value:0}";
 
+        foreach (var crumb in DemoBreadcrumb.Children.OfType<BreadcrumbItem>())
+            crumb.Clicked += (_, _) => NavChoice.Text = $"Went to {crumb.Text}.";
+        DemoAccordion.ItemToggled += (_, e) => NavChoice.Text = $"Section {e.Value} {(e.IsOpen ? "opened" : "closed")}.";
+        DemoTabs.ValueChanged += (_, e) => NavChoice.Text = $"Tab {e.Old} → {e.New}.";
+        for (var i = 1; i <= 30; i++)
+        {
+            var tag = new TextBlock { Text = $"v1.2.0-beta.{31 - i}", FontSize = 14 };
+            tag.Token(TextBlock.ForegroundProperty, ShellToken.Foreground);
+            Tags.Children.Add(tag);
+        }
+
         var clicks = 0;
         LoadingButton.Clicked += async (_, _) =>
         {

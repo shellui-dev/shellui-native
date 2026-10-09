@@ -1079,6 +1079,8 @@ using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Metadata;
 using Avalonia.Styling;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace YourProjectNamespace.Components.UI;
 
@@ -1454,6 +1456,9 @@ public sealed class ShellAnchoredPopup : IShellPopup
 
     public bool IsOpen => _open;
 
+    // Space between the anchor and the panel, on whichever side the panel opens.
+    public double Gap { get; set; } = 4;
+
     // Raised when it closes for any reason: Close(), a click outside, Escape or another menu opening.
     public event EventHandler? Closed;
 
@@ -1462,7 +1467,6 @@ public sealed class ShellAnchoredPopup : IShellPopup
         Popup = popup ?? new Popup { ShouldUseOverlayLayer = true };
         Popup.PlacementTarget = anchor;
         Popup.Placement = PlacementMode.BottomEdgeAlignedLeft;
-        Popup.VerticalOffset = 4;
         Popup.IsLightDismissEnabled = true;
         // The click that dismisses (even on the trigger) does nothing else, so it can't reopen.
         Popup.OverlayDismissEventPassThrough = false;
@@ -1480,7 +1484,14 @@ public sealed class ShellAnchoredPopup : IShellPopup
         ShellDismiss.Push(this, Close, anchor);
         panel.RenderTransformOrigin = new RelativePoint(0.5, 0, RelativeUnit.Relative);
         ShellMotion.Set(panel, 0, ""scale(0.95)"");
+        Popup.VerticalOffset = Gap;
         Popup.IsOpen = true;
+        // Avalonia flips a panel that doesn't fit below to above the anchor but keeps the offset's
+        // sign, which pushes it onto the anchor; mirror the offset once the flip is known.
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_open && panel.TranslatePoint(default, anchor) is { Y: < 0 }) Popup.VerticalOffset = -Gap;
+        }, DispatcherPriority.Loaded);
         await ShellMotion.To(panel, 1, ""scale(1)"", 120, new CubicEaseOut());
     }
 
@@ -1545,7 +1556,7 @@ public abstract class ShellPopoverHost : ShellFloatingHost
         }
         if (FloatingContent is null) return;
         Popup.Placement = Placement;
-        Popup.VerticalOffset = Offset;
+        _anchored.Gap = Offset;
         _anchored.Open();
     }
 }
@@ -1558,13 +1569,15 @@ public interface IShellOverlayContent
 
 /* Shared host for Dialog / Drawer / Sheet. Children: an optional *Trigger (rendered in place) and
    the *Content, which covers the window while Open, so the host can sit next to the button that
-   opens it. */
+   opens it. While open, keyboard focus stays inside the content (Tab cycles through it); on close
+   it returns to the control that had it, usually the trigger. */
 public abstract class ShellOverlayHost : ShellFloatingHost
 {
     public static readonly StyledProperty<bool> OpenProperty =
         AvaloniaProperty.Register<ShellOverlayHost, bool>(nameof(Open), defaultBindingMode: BindingMode.TwoWay);
 
     private TopLevel? _top;
+    private IInputElement? _returnFocus;
     private int _version;
 
     static ShellOverlayHost()
@@ -1611,17 +1624,37 @@ public abstract class ShellOverlayHost : ShellFloatingHost
             }
             Fit(content);
             Popup.PlacementTarget = top;
+            _returnFocus = top.FocusManager?.GetFocusedElement();
             Popup.IsOpen = true;
+            TrapFocus(content);
             if (content is IShellOverlayContent animated) await animated.AnimateAsync(true);
         }
         else
         {
+            if (_returnFocus is InputElement previous && TopLevel.GetTopLevel(previous) != null) previous.Focus();
+            _returnFocus = null;
             if (content is IShellOverlayContent animated) await animated.AnimateAsync(false);
             if (version != _version) return; // reopened while closing
             Popup.IsOpen = false;
             if (_top != null) _top.SizeChanged -= OnWindowSizeChanged;
             _top = null;
         }
+    }
+
+    // Tab and Shift+Tab wrap inside the content, and focus starts on its first tab stop (the
+    // content itself when it has none), so nothing behind the backdrop can be reached.
+    private static void TrapFocus(Control content)
+    {
+        KeyboardNavigation.SetTabNavigation(content, KeyboardNavigationMode.Cycle);
+        var first = content.GetVisualDescendants().OfType<InputElement>().FirstOrDefault(e =>
+            e.Focusable && e.IsEffectivelyEnabled && e.IsEffectivelyVisible && KeyboardNavigation.GetIsTabStop(e));
+        if (first is null)
+        {
+            content.Focusable = true;
+            content.FocusAdorner = null;
+            first = content;
+        }
+        first.Focus();
     }
 
     private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)

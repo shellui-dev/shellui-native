@@ -69,15 +69,17 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, `checkbox`,
 `switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`), P1 (`dialog`,
-`drawer`, `sheet`, `dropdown`, `popover` and their parts) and P2 (`textarea`, `select`, `slider`,
-`radio-group`, `calendar`, `date-picker`, `time-picker`). Not yet published to NuGet. In an
+`drawer`, `sheet`, `dropdown`, `popover` and their parts), P2 (`textarea`, `select`, `slider`,
+`radio-group`, `calendar`, `date-picker`, `time-picker`) and P3 (`collapsible`, `accordion`,
+`tabs`, `breadcrumb` and their parts, `skeleton`, `scroll-area`). Not yet published to NuGet. In an
 Avalonia project, `shellui-native list` shows only these.
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
 tree (theme, DataContext and `FindParentOfType` work as declared), dropdowns and popovers get
 Avalonia's placement and flip above the trigger when there is no room below, and a click outside
-closes them. Escape closes the overlay on top. Keyboard focus is not trapped inside an open
-dialog yet: Tab can still reach controls behind it.
+closes them. Escape closes the overlay on top. An open dialog, drawer or sheet keeps keyboard
+focus inside it: focus moves to its first control, Tab and Shift+Tab wrap around, and on close
+focus returns to the control that opened it.
 
 Setup after `shellui-native init`: call `Components.UI.ShellTheme.EnsureInitialized();` in
 `App.Initialize` after `AvaloniaXamlLoader.Load(this);`, and add
@@ -93,11 +95,13 @@ Same names, properties and variants as MAUI, except:
 | Card children | XAML children | XAML children, collected in `Card.Items` |
 | Block button | `HorizontalOptions="Fill"` | `HorizontalAlignment="Stretch"` |
 | Focus ring | Platform focus visuals | shadcn's ring, for keyboard focus only |
-| Overlay children | XAML children | XAML children, collected in `Items` (`Dialog`, `DialogContent`, `Dropdown`, …) |
+| Part children | XAML children | XAML children, collected in `Items` (`Dialog`, `DialogContent`, `Dropdown`, `AccordionItem`, `TabsList`, …) |
 | Dropdown / Popover | `ToggleAsync()` / `CloseAsync()` kept for older code | `Toggle()` / `Close()` only |
-| Flipped popup gap | 4px above the trigger | Flush with the trigger (Avalonia doesn't mirror the offset) |
 | Slider | Platform slider tinted with tokens | Custom-drawn shadcn slider; adds `Step` for the arrow keys; `ValueChanged` passes the new `double` |
 | DatePicker `DateChanged` | `DateChangedEventArgs` | The new `DateTime` |
+| Tabs keyboard | Tab and Enter | Also Left / Right to select the neighbouring tab |
+| Skeleton `CornerRadius` | `double` | Border's `CornerRadius` (`CornerRadius="24"` still works) |
+| ScrollArea scrollbar | Platform scrollbar | Fluent's thin scrollbar, hidden while idle |
 
 ---
 

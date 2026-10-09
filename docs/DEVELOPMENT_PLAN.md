@@ -35,9 +35,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1e merged | 92 registry entries (89 CLI targets, 58 families), MAUI only |
-| `chore/release-v0.1.0-alpha.1` | `main` | **Active** | Version `0.1.0-alpha.1`, fixed release workflow, release notes, docs refresh, per-component CLI check |
-| `feat/avalonia-implementation` | `main` | Next | Phase 2 |
+| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P2 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P2 |
+| `feat/avalonia-p3-navigation` | `main` | **Active** | Phase 2 P3: Avalonia navigation and layout |
 
 ---
 
@@ -418,7 +417,7 @@ and TableCell) rather than one template per part.
 
 ---
 
-## Release `0.1.0-alpha.1` — `chore/release-v0.1.0-alpha.1` (active)
+## Release `0.1.0-alpha.1` — `chore/release-v0.1.0-alpha.1` (**released**; tag `v0.1.0-alpha.1`)
 
 First NuGet prerelease of `ShellUI.Native.CLI`, MAUI only.
 
@@ -435,7 +434,7 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Phase 2 — `feat/avalonia-implementation` (next, after `0.1.0-alpha.1`)
+## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p3-navigation` now)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
@@ -461,10 +460,18 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   overlay layer (shared hosts in `shell`: `ShellOverlayHost`, `ShellPopoverHost`,
   `ShellTriggerView`, `ShellDismiss` for Escape). Each installs alone into a fresh
   `dotnet new avalonia.app`; checked in the demo: opening from triggers, placement and flip,
-  Escape, picking an item, `DialogClose`, light and dark. Open: focus trapping in dialogs
+  Escape, picking an item, `DialogClose`, light and dark. Focus trap added on the P3 branch: focus
+  moves into the content, Tab cycles inside it and returns to the trigger on close (checked with
+  real key presses); the Dialog and Sheet close buttons are tab stops
 - [x] P2: textarea, select, slider (custom-drawn), radio-group, calendar, date-picker, time-picker.
   Pickers float their panel with `ShellAnchoredPopup` (shared with Dropdown and Popover);
   `ShellPlatform.StripNativeChrome` clears Fluent's TextBox chrome for Input and Textarea
+- [x] P3: collapsible, accordion, tabs, breadcrumb (and their parts), skeleton, scroll-area.
+  Collapsible and accordion content animate their height with `AnimateExpandAsync` in
+  `element-extensions`, as on MAUI. Each installs alone into a fresh `dotnet new avalonia.app` and
+  builds with 0 warnings; checked in the demo in light and dark, including keyboard tab switching.
+  Also on this branch: floating panels keep their 4px gap when they flip above the trigger, and
+  both demos use the ShellUI Native tile as their app icon (Android: adaptive, grid in the safe zone)
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`

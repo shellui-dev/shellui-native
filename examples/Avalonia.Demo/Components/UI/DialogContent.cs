@@ -67,6 +67,14 @@ public class DialogContent : Border, IShellOverlayContent
             this.FindParentOfType<Dialog>()?.SetOpen(false);
             e.Handled = true;
         };
+        // A tab stop inside the focus trap, as in shadcn; Enter or Space closes.
+        ShellFocus.Ring(_close, _close);
+        _close.KeyDown += (_, e) =>
+        {
+            if (e.Key is not (Key.Enter or Key.Space)) return;
+            this.FindParentOfType<Dialog>()?.SetOpen(false);
+            e.Handled = true;
+        };
 
         _box = new Border
         {
