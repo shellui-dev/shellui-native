@@ -98,7 +98,7 @@ SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|
                        r"\bShellTriggerView\b|\bShellOverlayHost\b|\bShellPopoverHost\b|\bShellPortal\b|"
                        r"\bShellPopup\w+\b|\bIShellFocusable\b|\bIShellPopup\b|\bIShellOverlayContent\b")
 ICON_API = re.compile(r"\bnew Icon\b|\bIconName\b")
-EXT_API = re.compile(r"\bFindParentOfType\b|\bFindDescendantsOfType\b|\bAnimateExpandAsync\b")
+EXT_API = re.compile(r"\bFindParentOfType\b|\bFindDescendantsOfType\b|\bAnimateExpandAsync\b|\bSetExpanded\b")
 
 # A block ends at the closing quote that is followed by the next entry or the end of the dictionary.
 MAUI_BLOCK = re.compile(r'(\[NativePlatform\.MAUI\] = @")(.*?)(\n"(?=,\n|\n    \};))', re.S)
