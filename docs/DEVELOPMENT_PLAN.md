@@ -460,14 +460,18 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   overlay layer (shared hosts in `shell`: `ShellOverlayHost`, `ShellPopoverHost`,
   `ShellTriggerView`, `ShellDismiss` for Escape). Each installs alone into a fresh
   `dotnet new avalonia.app`; checked in the demo: opening from triggers, placement and flip,
-  Escape, picking an item, `DialogClose`, light and dark. Open: focus trapping in dialogs
+  Escape, picking an item, `DialogClose`, light and dark. Focus trap added on the P3 branch: focus
+  moves into the content, Tab cycles inside it and returns to the trigger on close (checked with
+  real key presses); the Dialog and Sheet close buttons are tab stops
 - [x] P2: textarea, select, slider (custom-drawn), radio-group, calendar, date-picker, time-picker.
   Pickers float their panel with `ShellAnchoredPopup` (shared with Dropdown and Popover);
   `ShellPlatform.StripNativeChrome` clears Fluent's TextBox chrome for Input and Textarea
 - [x] P3: collapsible, accordion, tabs, breadcrumb (and their parts), skeleton, scroll-area.
   Collapsible and accordion content animate their height with `AnimateExpandAsync` in
   `element-extensions`, as on MAUI. Each installs alone into a fresh `dotnet new avalonia.app` and
-  builds with 0 warnings; checked in the demo in light and dark, including keyboard tab switching
+  builds with 0 warnings; checked in the demo in light and dark, including keyboard tab switching.
+  Also on this branch: floating panels keep their 4px gap when they flip above the trigger, and
+  both demos use the ShellUI Native tile as their app icon (Android: adaptive, grid in the safe zone)
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
