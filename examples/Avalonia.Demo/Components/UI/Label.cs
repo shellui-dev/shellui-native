@@ -42,7 +42,12 @@ public class ShellLabel : TextBlock
         set => SetValue(VariantProperty, value);
     }
 
-    public ShellLabel() => UpdateVisualState();
+    // Wraps like MAUI's Label; TextWrapping="NoWrap" keeps it on one line.
+    public ShellLabel()
+    {
+        TextWrapping = TextWrapping.Wrap;
+        UpdateVisualState();
+    }
 
     private void UpdateVisualState()
     {
