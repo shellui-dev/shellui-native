@@ -3,6 +3,7 @@
         xmlns:ui="using:AvaloniaDemo.Components.UI"
         x:Class="AvaloniaDemo.MainWindow"
         Title="ShellUI Native (Avalonia)"
+        Icon="/Assets/icon.ico"
         Width="1000" Height="760"
         Background="{DynamicResource ShellUIBackgroundBrush}">
 
