@@ -23,6 +23,19 @@ public partial class MainWindow : Window
             crumb.Clicked += (_, _) => NavChoice.Text = $"Went to {crumb.Text}.";
         DemoAccordion.ItemToggled += (_, e) => NavChoice.Text = $"Section {e.Value} {(e.IsOpen ? "opened" : "closed")}.";
         DemoTabs.ValueChanged += (_, e) => NavChoice.Text = $"Tab {e.Old} → {e.New}.";
+        ToastDefault.Clicked += (_, _) => Toast.Show("Event has been created", "Sunday, December 03, 2023 at 9:00 AM");
+        ToastSuccess.Clicked += (_, _) => Toast.Success("Profile saved");
+        ToastError.Clicked += (_, _) => Toast.Error("Upload failed", "The file is larger than 10 MB.");
+        ToastWarning.Clicked += (_, _) => Toast.Warning("Storage almost full", "92% of your quota used.");
+        ToastInfo.Clicked += (_, _) => Toast.Info("New version available");
+        ToastAction.Clicked += (_, _) => Toast.Show("Message archived", actionText: "Undo", action: () => FeedbackChoice.Text = "Undo clicked.");
+        DeleteAccount.Clicked += async (_, _) =>
+        {
+            var confirmed = await DeleteDialog.ShowAsync();
+            FeedbackChoice.Text = confirmed ? "Account deleted (demo only)." : "Kept the account.";
+            if (confirmed) Toast.Success("Account deleted", "This was only a demo.");
+        };
+
         for (var i = 1; i <= 30; i++)
         {
             var tag = new TextBlock { Text = $"v1.2.0-beta.{31 - i}", FontSize = 14 };

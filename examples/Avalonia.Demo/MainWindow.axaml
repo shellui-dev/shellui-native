@@ -262,6 +262,43 @@
             </WrapPanel>
             <TextBlock x:Name="NavChoice" Classes="hint" Margin="0,8,0,0" Text="Click a breadcrumb or open a section." />
 
+            <TextBlock Classes="title" Text="Feedback" />
+            <TextBlock Classes="hint" Text="Spinner, toast, alert dialog, tooltip and hover card." />
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <ui:Spinner Size="Sm" />
+                <ui:Spinner />
+                <ui:Spinner Size="Lg" Token="MutedForeground" />
+            </StackPanel>
+            <WrapPanel ItemSpacing="8" LineSpacing="8" Margin="0,12,0,0">
+                <ui:Button x:Name="ToastDefault" Text="Show toast" Variant="Outline" />
+                <ui:Button x:Name="ToastSuccess" Text="Success" Variant="Outline" />
+                <ui:Button x:Name="ToastError" Text="Error" Variant="Outline" />
+                <ui:Button x:Name="ToastWarning" Text="Warning" Variant="Outline" />
+                <ui:Button x:Name="ToastInfo" Text="Info" Variant="Outline" />
+                <ui:Button x:Name="ToastAction" Text="With action" Variant="Outline" />
+            </WrapPanel>
+            <WrapPanel ItemSpacing="8" LineSpacing="8" Margin="0,12,0,0">
+                <ui:Button x:Name="DeleteAccount" Text="Delete account" Variant="Destructive" />
+                <ui:AlertDialog x:Name="DeleteDialog" Title="Are you absolutely sure?"
+                                Description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+                                ConfirmText="Delete account" ConfirmVariant="Destructive" />
+                <ui:Tooltip Text="Add to library">
+                    <ui:Button Icon="Plus" Size="Icon" Variant="Outline" />
+                </ui:Tooltip>
+                <ui:Tooltip Text="Tooltips can sit below too" Placement="Bottom">
+                    <ui:Button Text="Hover me" Variant="Outline" />
+                </ui:Tooltip>
+                <ui:HoverCard x:Name="DemoHoverCard">
+                    <ui:HoverCardTrigger><ui:Button Text="@shellui" Variant="Link" /></ui:HoverCardTrigger>
+                    <ui:HoverCardContent>
+                        <ui:ShellLabel Text="@shellui" Weight="Semibold" Size="Sm" />
+                        <ui:ShellLabel Text="Copy-and-own components for Blazor and native .NET apps." Size="Sm" />
+                        <ui:ShellLabel Text="Joined December 2024" Size="Sm" Variant="Muted" />
+                    </ui:HoverCardContent>
+                </ui:HoverCard>
+            </WrapPanel>
+            <TextBlock x:Name="FeedbackChoice" Classes="hint" Margin="0,8,0,0" Text="Open the alert dialog or show a toast." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />
