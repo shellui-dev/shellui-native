@@ -1431,6 +1431,9 @@ public abstract class ShellFloatingHost : Border
 
     protected abstract bool IsContent(Control child);
 
+    // A child the host places itself (AlertDialog's body) instead of rendering it in place.
+    protected virtual bool ClaimsChild(Control child) => false;
+
     // Rebuilt from Items on every change; Clear reports no old items, so diffing isn't worth it.
     private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -1440,7 +1443,7 @@ public abstract class ShellFloatingHost : Border
         foreach (var child in Items)
         {
             if (IsContent(child)) Popup.Child = FloatingContent = child;
-            else _inline.Children.Insert(_inline.Children.Count - 1, child);
+            else if (!ClaimsChild(child)) _inline.Children.Insert(_inline.Children.Count - 1, child);
         }
     }
 }

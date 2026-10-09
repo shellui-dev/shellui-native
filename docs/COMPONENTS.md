@@ -70,8 +70,9 @@ your background so the splash-to-app transition doesn't flash the template's pur
 Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, `checkbox`,
 `switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`), P1 (`dialog`,
 `drawer`, `sheet`, `dropdown`, `popover` and their parts), P2 (`textarea`, `select`, `slider`,
-`radio-group`, `calendar`, `date-picker`, `time-picker`) and P3 (`collapsible`, `accordion`,
-`tabs`, `breadcrumb` and their parts, `skeleton`, `scroll-area`). Not yet published to NuGet. In an
+`radio-group`, `calendar`, `date-picker`, `time-picker`), P3 (`collapsible`, `accordion`,
+`tabs`, `breadcrumb` and their parts, `skeleton`, `scroll-area`) and P4 (`spinner`, `tooltip`,
+`toast`, `alert-dialog`, `hover-card` and its parts). Not yet published to NuGet. In an
 Avalonia project, `shellui-native list` shows only these.
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
@@ -102,6 +103,10 @@ Same names, properties and variants as MAUI, except:
 | Tabs keyboard | Tab and Enter | Also Left / Right to select the neighbouring tab |
 | Skeleton `CornerRadius` | `double` | Border's `CornerRadius` (`CornerRadius="24"` still works) |
 | ScrollArea scrollbar | Platform scrollbar | Fluent's thin scrollbar, hidden while idle |
+| Tooltip | Shows on hover | Also shows on keyboard focus; `Placement` takes Avalonia's `PlacementMode` (`Top`, `Bottom`, `Left`, `Right`) |
+| Toaster | Declared on a page | Declared in a window; `Toast.Show` without one uses the active window |
+| HoverCard on touch | Tap toggles | Touch, pen and Enter / Space toggle; a mouse click acts on the wrapped control only |
+| AlertDialog extra content | One `Body` view | Any XAML children, stacked between the description and the buttons |
 
 ---
 
