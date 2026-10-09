@@ -35,8 +35,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P2 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P2 |
-| `feat/avalonia-p3-navigation` | `main` | **Active** | Phase 2 P3: Avalonia navigation and layout |
+| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P3 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P3 |
+| `feat/avalonia-p4-feedback` | `main` | **Active** | Phase 2 P4: Avalonia feedback and overlays |
 
 ---
 
@@ -434,7 +434,7 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p3-navigation` now)
+## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p4-feedback` now)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
@@ -472,6 +472,11 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   builds with 0 warnings; checked in the demo in light and dark, including keyboard tab switching.
   Also on this branch: floating panels keep their 4px gap when they flip above the trigger, and
   both demos use the ShellUI Native tile as their app icon (Android: adaptive, grid in the safe zone)
+- [x] P4: spinner, tooltip, toast, alert-dialog, hover-card (and its parts). Toasts live in the
+  window's overlay layer; AlertDialog builds on `ShellOverlayHost` (focus trap, Escape = Cancel);
+  `ShellFloatingHost.ClaimsChild` lets a host place XAML children itself. `ShellLabel` now wraps
+  like MAUI's Label. Each installs alone into a fresh `dotnet new avalonia.app` and builds with 0
+  warnings; checked in the demo in light and dark
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
