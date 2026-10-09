@@ -90,8 +90,15 @@ public class HoverCard : ShellPopoverHost
 
     public HoverCard()
     {
-        // A click elsewhere closes the card and still reaches what was clicked.
+        // Light dismiss lays a window-wide layer under the card, which takes the pointer off the
+        // trigger and closes a card opened by hover; leaving both closes it instead.
+        Popup.IsLightDismissEnabled = false;
+        // When a tap did open it, a click elsewhere closes it and still reaches what was clicked.
         Popup.OverlayDismissEventPassThrough = true;
+        IsOpenChanged += (_, open) =>
+        {
+            if (!open) Popup.IsLightDismissEnabled = false;
+        };
     }
 
     public int OpenDelay
@@ -107,6 +114,13 @@ public class HoverCard : ShellPopoverHost
     }
 
     protected override bool IsContent(Control child) => child is HoverCardContent;
+
+    // Touch, pen or keyboard: with no hover to leave, a tap outside closes it.
+    internal void ToggleFromTap()
+    {
+        Popup.IsLightDismissEnabled = !IsOpen;
+        Toggle();
+    }
 
     // Called by the trigger and the content as the pointer enters / leaves them.
     internal async void SetHovered(bool hovered)

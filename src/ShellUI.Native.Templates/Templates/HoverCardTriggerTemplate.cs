@@ -70,7 +70,7 @@ public class HoverCardTrigger : ShellTriggerView
     // A mouse click acts on the wrapped control only; hover already shows the card.
     protected override void OnActivated()
     {
-        if (!_mouse) this.FindParentOfType<HoverCard>()?.Toggle();
+        if (!_mouse) this.FindParentOfType<HoverCard>()?.ToggleFromTap();
     }
 }
 "
