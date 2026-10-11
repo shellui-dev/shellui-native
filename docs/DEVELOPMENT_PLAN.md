@@ -35,8 +35,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P6 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P6 |
-| `feat/avalonia-p7-remaining` | `main` | **Active** | Phase 2: the 14 components that were still MAUI-only |
+| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 merged: every component has an Avalonia version | 92 registry entries (89 CLI targets, 58 families), each with MAUI and Avalonia content |
+| `feat/p6-layout-navigation` | `main` | **Active** | resizable, navbar, sidebar (finishes P6), date-range-picker and file-upload (P7), each for MAUI and Avalonia |
 
 ---
 
@@ -496,6 +496,10 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   wrap-layout is a `Panel` with the MAUI layout's `LastChildFill`. Each installs alone into a
   fresh Avalonia app and builds with 0 warnings; checked in the demo in light and dark with
   pointer and key input
+- [x] From here on a component lands on both platforms in one branch. First
+  (`feat/p6-layout-navigation`): resizable, navbar and sidebar, which finish P6, then
+  date-range-picker (Calendar gains `RangeStart` / `RangeEnd`) and file-upload from P7; 97
+  registry entries. A release branch follows
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
