@@ -68,6 +68,13 @@ public partial class MainWindow : Window
         SourceCard.Clicked += (_, _) => DisplayChoice.Text = $"Link card: {SourceCard.Title}.";
         FileTree.SelectedValueChanged += (_, value) => DisplayChoice.Text = $"Tree: {value}.";
 
+        foreach (var button in DemoButtonGroup.Items.OfType<Components.UI.Button>())
+            button.Clicked += (_, _) => GroupChoice.Text = $"Button group: {button.Text}.";
+        DemoInputSearch.TextChanged += (_, _) => GroupChoice.Text = $"Input group: {DemoInputSearch.Text}.";
+        DemoInputUrl.TextChanged += (_, _) => GroupChoice.Text = $"Input group: https://{DemoInputUrl.Text}.com.";
+        foreach (var menu in DemoMenubar.Menus.OfType<MenubarMenu>())
+            foreach (var item in menu.Items.OfType<MenubarItem>())
+                item.Clicked += (_, _) => GroupChoice.Text = $"Menubar: {menu.Title} > {item.Text}.";
         DemoNavbar.SelectedValueChanged += (_, value) => LayoutChoice.Text = $"Navbar: {value}.";
         DemoSidebar.SelectedValueChanged += (_, value) =>
         {

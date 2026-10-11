@@ -39,6 +39,7 @@ public partial class Button : ContentView, IShellFocusable
     private readonly Label _label;
     private ButtonStyle _style = new();
     private bool _hovered;
+    private CornerRadius? _corners;
 
     public ButtonVariant Variant
     {
@@ -121,6 +122,13 @@ public partial class Button : ContentView, IShellFocusable
 
     private bool CanClick => IsEnabled && !IsLoading;
 
+    // Set by ButtonGroup so joined buttons only round their outer corners; null restores the default.
+    internal void SetCorners(CornerRadius? corners)
+    {
+        _corners = corners;
+        UpdateVisualState();
+    }
+
     private void Press()
     {
         if (!CanClick) return;
@@ -146,7 +154,7 @@ public partial class Button : ContentView, IShellFocusable
         _border.HeightRequest = _style.Height;
         _border.WidthRequest = _style.Width;
         _border.Padding = _style.Padding;
-        _border.StrokeShape = new RoundRectangle { CornerRadius = _style.CornerRadius };
+        _border.StrokeShape = new RoundRectangle { CornerRadius = _corners ?? new CornerRadius(_style.CornerRadius) };
         _border.StrokeThickness = _style.Border.HasValue ? 1 : 0;
         if (_style.Border.HasValue)
             _border.Token(Border.StrokeProperty, _style.Border.Value);

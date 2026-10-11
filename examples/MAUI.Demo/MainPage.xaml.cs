@@ -142,6 +142,8 @@ public partial class MainPage : ContentPage
         Report($"Table: {row.Children.OfType<TableCell>().FirstOrDefault()?.Text}");
     }
 
+    private void OnMenubarItem(object? sender, EventArgs e) => Report($"Menubar: {(sender as MenubarItem)?.Text}");
+    private void OnInputGroupChanged(object? sender, TextChangedEventArgs e) => Report($"Input group: {e.NewTextValue}");
     private void OnNavbarChanged(object? sender, string? value) => Report($"Navbar: {value}");
     private void OnSidebarChanged(object? sender, string? value)
     {

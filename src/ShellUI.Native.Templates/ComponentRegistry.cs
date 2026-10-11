@@ -126,7 +126,10 @@ public static class ComponentRegistry
         { "navbar", (NavbarTemplate.Metadata, NavbarTemplate.Contents) },
         { "sidebar", (SidebarTemplate.Metadata, SidebarTemplate.Contents) },
         { "date-range-picker", (DateRangePickerTemplate.Metadata, DateRangePickerTemplate.Contents) },
-        { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) }
+        { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) },
+        { "button-group", (ButtonGroupTemplate.Metadata, ButtonGroupTemplate.Contents) },
+        { "input-group", (InputGroupTemplate.Metadata, InputGroupTemplate.Contents) },
+        { "menubar", (MenubarTemplate.Metadata, MenubarTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

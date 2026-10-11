@@ -583,6 +583,54 @@
             </Border>
             <TextBlock x:Name="LayoutChoice" Classes="hint" Margin="0,8,0,0" Text="Pick a link or a page, or drag a divider." />
 
+            <TextBlock Classes="title" Text="Groups and menus" />
+            <TextBlock Classes="hint" Text="Button group, input group and menubar." />
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <ui:ButtonGroup x:Name="DemoButtonGroup">
+                    <ui:Button x:Name="GroupDay" Text="Day" Variant="Outline" />
+                    <ui:Button x:Name="GroupWeek" Text="Week" Variant="Outline" />
+                    <ui:Button x:Name="GroupMonth" Text="Month" Variant="Outline" />
+                </ui:ButtonGroup>
+                <ui:ButtonGroup>
+                    <ui:Button Text="Save" />
+                    <ui:Button Icon="ChevronDown" Size="Icon" />
+                </ui:ButtonGroup>
+                <ui:ButtonGroup Orientation="Vertical">
+                    <ui:Button Text="Top" Variant="Outline" />
+                    <ui:Button Text="Middle" Variant="Outline" />
+                    <ui:Button Text="Bottom" Variant="Outline" />
+                </ui:ButtonGroup>
+            </StackPanel>
+            <StackPanel Spacing="8" Width="360" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:InputGroup x:Name="DemoInputSearch" PrefixIcon="Search" Placeholder="Search components..." />
+                <ui:InputGroup x:Name="DemoInputUrl" PrefixText="https://" SuffixText=".com" Placeholder="example" />
+                <ui:InputGroup PrefixIcon="Mail" Placeholder="you@example.com">
+                    <ui:InputGroup.Suffix>
+                        <ui:Badge Text="Required" Variant="Secondary" />
+                    </ui:InputGroup.Suffix>
+                </ui:InputGroup>
+            </StackPanel>
+            <ui:Menubar x:Name="DemoMenubar" Margin="0,12,0,0">
+                <ui:MenubarMenu x:Name="MenuFile" Title="File">
+                    <ui:MenubarItem Text="New tab" Shortcut="Ctrl+T" />
+                    <ui:MenubarItem Text="New window" Shortcut="Ctrl+N" />
+                    <ui:MenubarSeparator />
+                    <ui:MenubarItem Text="Print" Icon="FileText" Shortcut="Ctrl+P" />
+                </ui:MenubarMenu>
+                <ui:MenubarMenu x:Name="MenuEdit" Title="Edit">
+                    <ui:MenubarItem Text="Undo" Icon="Undo2" Shortcut="Ctrl+Z" />
+                    <ui:MenubarItem Text="Redo" Icon="Redo2" Shortcut="Ctrl+Y" />
+                    <ui:MenubarSeparator />
+                    <ui:MenubarItem Text="Copy" Icon="Copy" />
+                    <ui:MenubarItem Text="Delete" Icon="Trash2" IsDestructive="True" />
+                </ui:MenubarMenu>
+                <ui:MenubarMenu x:Name="MenuView" Title="View">
+                    <ui:MenubarItem Text="Reload" Icon="RefreshCw" />
+                    <ui:MenubarItem Text="Full screen" IsEnabled="False" />
+                </ui:MenubarMenu>
+            </ui:Menubar>
+            <TextBlock x:Name="GroupChoice" Classes="hint" Margin="0,8,0,0" Text="Click a button, type in a field or pick a menu item." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

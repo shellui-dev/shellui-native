@@ -98,6 +98,25 @@
                     <ui:Button x:Name="LoadingBtn" Text="Click to load" Variant="Secondary" Margin="0,0,8,8" Clicked="OnLoadingClicked" />
                 </ui:WrapLayout>
 
+                <!-- Button group -->
+                <Label Text="Button Group" Style="{StaticResource SectionTitle}" />
+                <ui:WrapLayout>
+                    <ui:ButtonGroup x:Name="ButtonGroupDemo" Margin="0,0,16,8">
+                        <ui:Button Text="Day" Variant="Outline" Clicked="OnButtonClicked" />
+                        <ui:Button Text="Week" Variant="Outline" Clicked="OnButtonClicked" />
+                        <ui:Button Text="Month" Variant="Outline" Clicked="OnButtonClicked" />
+                    </ui:ButtonGroup>
+                    <ui:ButtonGroup Margin="0,0,16,8">
+                        <ui:Button Text="Save" Clicked="OnButtonClicked" />
+                        <ui:Button Icon="ChevronDown" Size="Icon" Clicked="OnButtonClicked" />
+                    </ui:ButtonGroup>
+                    <ui:ButtonGroup Orientation="Vertical" Margin="0,0,16,8">
+                        <ui:Button Text="Top" Variant="Outline" Clicked="OnButtonClicked" />
+                        <ui:Button Text="Middle" Variant="Outline" Clicked="OnButtonClicked" />
+                        <ui:Button Text="Bottom" Variant="Outline" Clicked="OnButtonClicked" />
+                    </ui:ButtonGroup>
+                </ui:WrapLayout>
+
                 <!-- Toggle -->
                 <Label Text="Toggle" Style="{StaticResource SectionTitle}" />
                 <ui:WrapLayout>
@@ -172,6 +191,18 @@
                     <ui:ShellLabel Text="This username is already taken." Size="Sm" Variant="Destructive" />
                 </VerticalStackLayout>
                 <ui:Input Text="Read-only value" IsReadOnly="True" />
+
+                <!-- Input group -->
+                <Label Text="Input Group" Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout Spacing="8" WidthRequest="{OnIdiom Phone=-1, Default=360}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:InputGroup x:Name="InputGroupSearch" PrefixIcon="Search" Placeholder="Search components..." TextChanged="OnInputGroupChanged" />
+                    <ui:InputGroup x:Name="InputGroupUrl" PrefixText="https://" SuffixText=".com" Placeholder="example" TextChanged="OnInputGroupChanged" />
+                    <ui:InputGroup PrefixIcon="Mail" Placeholder="you@example.com" Keyboard="Email">
+                        <ui:InputGroup.Suffix>
+                            <ui:Badge Text="Required" Variant="Secondary" />
+                        </ui:InputGroup.Suffix>
+                    </ui:InputGroup>
+                </VerticalStackLayout>
 
                 <!-- Input OTP -->
                 <Label Text="Input OTP" Style="{StaticResource SectionTitle}" />
@@ -462,6 +493,28 @@
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupNavigation" Spacing="16" IsVisible="False">
+                <!-- Menubar -->
+                <Label Text="Menubar" Style="{StaticResource SectionTitle}" />
+                <ui:Menubar x:Name="MenubarDemo">
+                    <ui:MenubarMenu x:Name="MenubarFile" Title="File">
+                        <ui:MenubarItem Text="New tab" Shortcut="Ctrl+T" Clicked="OnMenubarItem" />
+                        <ui:MenubarItem Text="New window" Shortcut="Ctrl+N" Clicked="OnMenubarItem" />
+                        <ui:MenubarSeparator />
+                        <ui:MenubarItem Text="Print" Icon="FileText" Shortcut="Ctrl+P" Clicked="OnMenubarItem" />
+                    </ui:MenubarMenu>
+                    <ui:MenubarMenu x:Name="MenubarEdit" Title="Edit">
+                        <ui:MenubarItem Text="Undo" Icon="Undo2" Shortcut="Ctrl+Z" Clicked="OnMenubarItem" />
+                        <ui:MenubarItem Text="Redo" Icon="Redo2" Shortcut="Ctrl+Y" Clicked="OnMenubarItem" />
+                        <ui:MenubarSeparator />
+                        <ui:MenubarItem Text="Copy" Icon="Copy" Clicked="OnMenubarItem" />
+                        <ui:MenubarItem Text="Delete" Icon="Trash2" IsDestructive="True" Clicked="OnMenubarItem" />
+                    </ui:MenubarMenu>
+                    <ui:MenubarMenu Title="View">
+                        <ui:MenubarItem Text="Reload" Icon="RefreshCw" Clicked="OnMenubarItem" />
+                        <ui:MenubarItem Text="Full screen" IsEnabled="False" Clicked="OnMenubarItem" />
+                    </ui:MenubarMenu>
+                </ui:Menubar>
+
                 <!-- Navbar -->
                 <Label Text="Navbar" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8">

@@ -119,6 +119,9 @@ public class TemplateContentTests
     [InlineData("sidebar")]
     [InlineData("date-range-picker")]
     [InlineData("file-upload")]
+    [InlineData("button-group")]
+    [InlineData("input-group")]
+    [InlineData("menubar")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
