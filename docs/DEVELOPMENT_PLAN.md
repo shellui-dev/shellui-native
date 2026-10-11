@@ -36,7 +36,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
 | `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 foundation and P0–P4 merged | 92 registry entries (89 CLI targets, 58 families); Avalonia templates for the foundation and P0–P4 |
-| `feat/avalonia-p5-data-display` | `main` | **Active** | Phase 2 P5: Avalonia data display |
+| `feat/avalonia-p5-data-display` | `main` | Pushed, PR next | Phase 2 P5: Avalonia data display |
+| `feat/avalonia-p6-advanced` | `feat/avalonia-p5-data-display` | **Active** | Phase 2 P6: Avalonia context menu, carousel and stepper |
 
 ---
 
@@ -434,7 +435,7 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p5-data-display` now)
+## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p6-advanced` now)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 
@@ -482,6 +483,13 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   and builds with 0 warnings; checked in the demo in light and dark. Both demos now use ShellUI
   content: Shewart Shepherd / @shewart, shellui-dev repositories, and the Shell family marks as
   avatar images
+- [x] P6: context-menu (one template: ContextMenu, ContextMenuTrigger, ContextMenuContent,
+  ContextMenuItem, ContextMenuSeparator), carousel, stepper (Stepper + StepperStep). The context
+  menu opens on Avalonia's `ContextRequested` (right-click, Menu key / Shift+F10) and on a touch
+  hold, at the pointer through `Popup.PlacementRect`; the carousel animates on the window's
+  animation frames. Each installs alone into a fresh Avalonia app and builds with 0 warnings;
+  checked in the demo in light and dark with real pointer and key input. resizable, navbar and
+  sidebar wait for their MAUI versions
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`

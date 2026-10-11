@@ -72,9 +72,9 @@ Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, 
 `drawer`, `sheet`, `dropdown`, `popover` and their parts), P2 (`textarea`, `select`, `slider`,
 `radio-group`, `calendar`, `date-picker`, `time-picker`), P3 (`collapsible`, `accordion`,
 `tabs`, `breadcrumb` and their parts, `skeleton`, `scroll-area`), P4 (`spinner`, `tooltip`,
-`toast`, `alert-dialog`, `hover-card` and its parts) and P5 (`avatar`, `toggle`, `callout`,
-`table`, `empty-state`, `pagination`). Not yet published to NuGet. In an
-Avalonia project, `shellui-native list` shows only these.
+`toast`, `alert-dialog`, `hover-card` and its parts), P5 (`avatar`, `toggle`, `callout`,
+`table`, `empty-state`, `pagination`) and P6 (`context-menu`, `carousel`, `stepper`). Not yet
+published to NuGet. In an Avalonia project, `shellui-native list` shows only these.
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
 tree (theme, DataContext and `FindParentOfType` work as declared), dropdowns and popovers get
@@ -110,6 +110,9 @@ Same names, properties and variants as MAUI, except:
 | AlertDialog extra content | One `Body` view | Any XAML children, stacked between the description and the buttons |
 | Avatar `Source` | `ImageSource` (`Source="profile.png"`) | `IImage`, an Avalonia resource path (`Source="/Assets/profile.png"`) |
 | TableRow clicks | `Tapped` event on the row | Avalonia's own `Tapped` event (`TappedEventArgs`) |
+| ContextMenu | Right-click, or long-press on touch | Also the Menu key / Shift+F10 while focus is inside the trigger; a right-click while it is open moves it; items are tab stops; children are collected in `Items` |
+| Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
+| Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
 
 ---
