@@ -65,16 +65,10 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 ---
 
-## Avalonia (in progress)
+## Avalonia
 
-Ported so far: `shell`, `icon`, `theme-toggle`, P0 (`button`, `input`, `label`, `checkbox`,
-`switch`, `card` and its parts, `separator`, `badge`, `progress`, `alert`), P1 (`dialog`,
-`drawer`, `sheet`, `dropdown`, `popover` and their parts), P2 (`textarea`, `select`, `slider`,
-`radio-group`, `calendar`, `date-picker`, `time-picker`), P3 (`collapsible`, `accordion`,
-`tabs`, `breadcrumb` and their parts, `skeleton`, `scroll-area`), P4 (`spinner`, `tooltip`,
-`toast`, `alert-dialog`, `hover-card` and its parts), P5 (`avatar`, `toggle`, `callout`,
-`table`, `empty-state`, `pagination`) and P6 (`context-menu`, `carousel`, `stepper`). Not yet
-published to NuGet. In an Avalonia project, `shellui-native list` shows only these.
+Every component on this page has an Avalonia version, installed by the same CLI commands. The
+Avalonia templates are not on NuGet yet: they ship with the next release.
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
 tree (theme, DataContext and `FindParentOfType` work as declared), dropdowns and popovers get
@@ -87,6 +81,10 @@ Setup after `shellui-native init`: call `Components.UI.ShellTheme.EnsureInitiali
 `App.Initialize` after `AvaloniaXamlLoader.Load(this);`, and add
 `xmlns:ui="using:YourApp.Components.UI"` to your XAML. Switch theme with
 `ShellTheme.SetTheme(ThemeVariant.Dark)` or `ShellTheme.ToggleTheme()`.
+
+Some names match Avalonia's own controls (`Button`, `Calendar`, `Carousel`, `ContextMenu`,
+`TreeView`, …). In XAML the `ui:` prefix picks the ShellUI one. In C# that imports both
+namespaces, qualify the name or add an alias: `using UI = YourApp.Components.UI;`.
 
 Same names, properties and variants as MAUI, except:
 
@@ -114,6 +112,17 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| ToggleGroup | Items toggle on tap | Items are also tab stops (Enter / Space); children are collected in `Items` |
+| NumberInput | Numeric keyboard | Up / Down step the value while the field has focus |
+| TagInput | Enter, comma or semicolon adds a tag | Backspace in the empty field also removes the last tag |
+| InputOtp | Hidden entry with the numeric keyboard | Invisible text box over the slots; `Focus()` focuses it |
+| Combobox / MultiSelect | Type to filter, Enter takes the first match | Up / Down move a highlight and Enter takes it; the search field has focus as soon as the panel opens; `Value` is `string?` |
+| TreeView | Rows are tab stops | Also Right to expand and Left to collapse |
+| TimelineItem content | One `Body` view | One child control, also reachable as `Body` |
+| CopyButton | `Clipboard.Default` | The window's clipboard; does nothing until the button is in a window |
+| LinkCard `Url` | `Launcher.Default` | The window's `Launcher` |
+| AspectRatio | `ContentView` | A `Border`, so `CornerRadius` rounds the content |
+| WrapLayout | Custom layout with `Padding` | A `Panel` (no `Padding`); Avalonia's own `WrapPanel` covers the plain case, `LastChildFill` is what this adds |
 
 ---
 

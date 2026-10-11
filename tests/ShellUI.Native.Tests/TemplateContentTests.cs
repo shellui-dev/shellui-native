@@ -20,7 +20,7 @@ public class TemplateContentTests
             .Where(name => ComponentRegistry.SupportsPlatform(name, NativePlatform.Avalonia))
             .Select(name => new object[] { name });
 
-    // Ported so far: the Phase 2 foundation, P0 to P5 and three of P6. Grows as components are ported.
+    // Every component registered so far. A new MAUI component is added here once it is ported.
     [Theory]
     [InlineData("shell")]
     [InlineData("icon")]
@@ -100,6 +100,20 @@ public class TemplateContentTests
     [InlineData("context-menu")]
     [InlineData("carousel")]
     [InlineData("stepper")]
+    [InlineData("toggle-group")]
+    [InlineData("number-input")]
+    [InlineData("tag-input")]
+    [InlineData("kbd")]
+    [InlineData("stat-card")]
+    [InlineData("timeline")]
+    [InlineData("multi-select")]
+    [InlineData("tree-view")]
+    [InlineData("copy-button")]
+    [InlineData("link-card")]
+    [InlineData("aspect-ratio")]
+    [InlineData("wrap-layout")]
+    [InlineData("combobox")]
+    [InlineData("input-otp")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));

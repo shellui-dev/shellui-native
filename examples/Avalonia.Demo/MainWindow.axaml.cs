@@ -50,6 +50,24 @@ public partial class MainWindow : Window
         DemoStepper.CurrentStepChanged += (_, step) => AdvancedChoice.Text = $"Step {step + 1} of 3.";
         DemoStepper.Confirmed += (_, _) => Toast.Success("Workspace created");
 
+        var frameworks = new[] { ".NET MAUI", "Avalonia", "Blazor", "Uno Platform", "WinUI", "WPF", "Flutter", "React Native", "SwiftUI", "Jetpack Compose" };
+        FrameworkCombobox.ItemsSource = frameworks;
+        FrameworkMultiSelect.ItemsSource = frameworks;
+        FrameworkMultiSelect.Values = new[] { "Avalonia", "Blazor" };
+        DemoTags.Tags = new[] { "avalonia", "design-system" };
+        ViewToggleGroup.ValueChanged += (_, value) => FormChoice.Text = $"Toggle group: {value ?? "none"}.";
+        MarksToggleGroup.ValuesChanged += (_, values) => FormChoice.Text = $"Toggle group: {(values.Count == 0 ? "none" : string.Join(", ", values))}.";
+        DemoOtp.Completed += (_, code) => FormChoice.Text = $"OTP complete: {code}.";
+        QuantityInput.ValueChanged += (_, value) => FormChoice.Text = $"Number: {(value.HasValue ? value.ToString() : "empty")}.";
+        DemoTags.TagsChanged += (_, tags) => FormChoice.Text = $"Tags: {string.Join(", ", tags)}.";
+        FrameworkCombobox.ValueChanged += (_, value) => FormChoice.Text = $"Combobox: {value}.";
+        FrameworkMultiSelect.ValuesChanged += (_, values) => FormChoice.Text = $"Multi select: {(values.Count == 0 ? "none" : string.Join(", ", values))}.";
+        CopyCommand.Copied += (_, _) => DisplayChoice.Text = $"Copied: {CopyCommand.Text}.";
+        CopyLink.Copied += (_, _) => DisplayChoice.Text = $"Copied: {CopyLink.Text}.";
+        DocsCard.Clicked += (_, _) => DisplayChoice.Text = $"Link card: {DocsCard.Title}.";
+        SourceCard.Clicked += (_, _) => DisplayChoice.Text = $"Link card: {SourceCard.Title}.";
+        FileTree.SelectedValueChanged += (_, value) => DisplayChoice.Text = $"Tree: {value}.";
+
         for (var i = 1; i <= 30; i++)
         {
             var tag = new TextBlock { Text = $"v1.2.0-beta.{31 - i}", FontSize = 14 };
