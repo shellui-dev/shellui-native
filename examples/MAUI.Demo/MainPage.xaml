@@ -229,6 +229,12 @@
                     <ui:TimePicker x:Name="TimePickerDemo" Time="9:30" Is24Hour="False" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
                     <ui:TimePicker Time="18:45" Is24Hour="True" MinuteStep="15" Margin="0,0,8,8" TimeChanged="OnTimeChanged" />
                 </ui:WrapLayout>
+                <ui:DateRangePicker x:Name="DateRangeDemo" RangeChanged="OnDateRangeChanged" />
+
+                <!-- File upload -->
+                <Label Text="File Upload" Style="{StaticResource SectionTitle}" />
+                <ui:FileUpload x:Name="FileUploadDemo" Multiple="True" MaxFiles="5" FilesChanged="OnFilesChanged"
+                               WidthRequest="{OnIdiom Phone=-1, Default=480}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}" />
 
                 <Label Text="Calendar" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 6"

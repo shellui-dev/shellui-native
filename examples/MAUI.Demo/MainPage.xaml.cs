@@ -105,6 +105,10 @@ public partial class MainPage : ContentPage
         if (sender is Components.UI.TimePicker picker)
             Report($"Time: {picker.Time.Hours:00}:{picker.Time.Minutes:00}");
     }
+    private void OnDateRangeChanged(object? sender, EventArgs e) =>
+        Report($"Date range: {DateRangeDemo.StartDate:d} to {(DateRangeDemo.EndDate.HasValue ? DateRangeDemo.EndDate.Value.ToString("d") : "…")}");
+    private void OnFilesChanged(object? sender, IReadOnlyList<FileResult> files) =>
+        Report($"Files: {(files.Count == 0 ? "none" : string.Join(", ", files.Select(f => f.FileName)))}");
     private void OnComboboxChanged(object? sender, string value) => Report($"Combobox: {value}");
 
     private void OnTogglePressed(object? sender, bool pressed) => Report($"Toggle: {(pressed ? "on" : "off")}");

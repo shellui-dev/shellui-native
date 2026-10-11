@@ -84,6 +84,11 @@ public partial class MainWindow : Window
         DemoResizable.Resized += (_, _) =>
             LayoutChoice.Text = $"Resizable: first panel is {ResizableFirst.Size / DemoResizable.Panels.OfType<ResizablePanel>().Sum(p => p.Size):P0} of the width.";
 
+        DemoDateRange.RangeChanged += (_, _) =>
+            PickerChoice.Text = $"Date range: {DemoDateRange.StartDate:d} to {(DemoDateRange.EndDate.HasValue ? DemoDateRange.EndDate.Value.ToString("d") : "…")}.";
+        DemoFileUpload.FilesChanged += (_, files) =>
+            PickerChoice.Text = $"Files: {(files.Count == 0 ? "none" : string.Join(", ", files.Select(f => f.Name)))}.";
+
         for (var i = 1; i <= 30; i++)
         {
             var tag = new TextBlock { Text = $"v1.2.0-beta.{31 - i}", FontSize = 14 };

@@ -24,7 +24,8 @@ namespace YourProjectNamespace.Components.UI;
 
 // Month calendar — prev/next header, weekday row, 6x7 day grid of 32px cells. Selected day is
 // bg-primary, today is bg-accent, days outside the month are muted. Month names, weekday names
-// and the first day of the week follow the current culture.
+// and the first day of the week follow the current culture. RangeStart and RangeEnd tint a span
+// of days (DateRangePicker uses them).
 // Usage: <ui:Calendar SelectedDate=""{Binding Day}"" DateSelected=""OnDay"" />
 public partial class Calendar : ContentView
 {
@@ -40,10 +41,31 @@ public partial class Calendar : ContentView
         BindableProperty.Create(nameof(MaximumDate), typeof(DateTime?), typeof(Calendar), null,
             propertyChanged: (b, o, n) => ((Calendar)b).Refresh());
 
+    // The ends of a highlighted span: both ends are bg-primary, the days between bg-accent.
+    public static readonly BindableProperty RangeStartProperty =
+        BindableProperty.Create(nameof(RangeStart), typeof(DateTime?), typeof(Calendar), null,
+            propertyChanged: (b, o, n) => ((Calendar)b).Refresh());
+
+    public static readonly BindableProperty RangeEndProperty =
+        BindableProperty.Create(nameof(RangeEnd), typeof(DateTime?), typeof(Calendar), null,
+            propertyChanged: (b, o, n) => ((Calendar)b).Refresh());
+
     public DateTime? SelectedDate
     {
         get => (DateTime?)GetValue(SelectedDateProperty);
         set => SetValue(SelectedDateProperty, value);
+    }
+
+    public DateTime? RangeStart
+    {
+        get => (DateTime?)GetValue(RangeStartProperty);
+        set => SetValue(RangeStartProperty, value);
+    }
+
+    public DateTime? RangeEnd
+    {
+        get => (DateTime?)GetValue(RangeEndProperty);
+        set => SetValue(RangeEndProperty, value);
     }
 
     public DateTime? MinimumDate
@@ -73,6 +95,7 @@ public partial class Calendar : ContentView
     private readonly Label _title;
     private readonly List<(Border Box, Label Text)> _cells = new();
     private readonly DateTime[] _dates = new DateTime[42];
+    private readonly bool[] _square = new bool[42];
     private int _hovered = -1;
 
     public Calendar()
@@ -211,12 +234,13 @@ public partial class Calendar : ContentView
         var date = _dates[index];
         var inMonth = date.Month == _month.Month;
         var selectable = IsSelectable(date);
-        var selected = SelectedDate?.Date == date;
+        var selected = SelectedDate?.Date == date || RangeStart?.Date == date || RangeEnd?.Date == date;
+        var inRange = !selected && RangeStart is { } from && RangeEnd is { } to && date > from.Date && date < to.Date;
         var today = date == DateTime.Today;
 
         if (selected)
             box.Token(VisualElement.BackgroundColorProperty, ShellToken.Primary);
-        else if (today || (index == _hovered && selectable))
+        else if (inRange || today || (index == _hovered && selectable))
             box.Token(VisualElement.BackgroundColorProperty, ShellToken.Accent);
         else
         {
@@ -224,9 +248,16 @@ public partial class Calendar : ContentView
             box.BackgroundColor = Colors.Transparent;
         }
 
+        // Days inside a span lose their corners, so the span reads as one band.
+        if (_square[index] != inRange)
+        {
+            _square[index] = inRange;
+            box.StrokeShape = new RoundRectangle { CornerRadius = inRange ? 0 : ShellTheme.RadiusMd };
+        }
+
         text.Token(Label.TextColorProperty,
-            selected ? ShellToken.PrimaryForeground : inMonth ? ShellToken.Foreground : ShellToken.MutedForeground);
-        box.Opacity = !selectable ? 0.3 : inMonth || selected ? 1 : 0.5;
+            selected ? ShellToken.PrimaryForeground : inMonth || inRange ? ShellToken.Foreground : ShellToken.MutedForeground);
+        box.Opacity = !selectable ? 0.3 : inMonth || selected || inRange ? 1 : 0.5;
     }
 }
 ",
@@ -245,7 +276,8 @@ namespace YourProjectNamespace.Components.UI;
 
 // Month calendar — prev/next header, weekday row, 6x7 day grid of 32px cells. Selected day is
 // bg-primary, today is bg-accent, days outside the month are muted. Month names, weekday names
-// and the first day of the week follow the current culture.
+// and the first day of the week follow the current culture. RangeStart and RangeEnd tint a span
+// of days (DateRangePicker uses them).
 // Usage: <ui:Calendar SelectedDate=""{Binding Day}"" DateSelected=""OnDay"" />
 public class Calendar : Border
 {
@@ -257,6 +289,13 @@ public class Calendar : Border
 
     public static readonly StyledProperty<DateTime?> MaximumDateProperty =
         AvaloniaProperty.Register<Calendar, DateTime?>(nameof(MaximumDate));
+
+    // The ends of a highlighted span: both ends are bg-primary, the days between bg-accent.
+    public static readonly StyledProperty<DateTime?> RangeStartProperty =
+        AvaloniaProperty.Register<Calendar, DateTime?>(nameof(RangeStart));
+
+    public static readonly StyledProperty<DateTime?> RangeEndProperty =
+        AvaloniaProperty.Register<Calendar, DateTime?>(nameof(RangeEnd));
 
     private const double Cell = 32;
 
@@ -271,12 +310,26 @@ public class Calendar : Border
         SelectedDateProperty.Changed.AddClassHandler<Calendar>((c, _) => c.OnSelectedDateChanged());
         MinimumDateProperty.Changed.AddClassHandler<Calendar>((c, _) => c.Refresh());
         MaximumDateProperty.Changed.AddClassHandler<Calendar>((c, _) => c.Refresh());
+        RangeStartProperty.Changed.AddClassHandler<Calendar>((c, _) => c.Refresh());
+        RangeEndProperty.Changed.AddClassHandler<Calendar>((c, _) => c.Refresh());
     }
 
     public DateTime? SelectedDate
     {
         get => GetValue(SelectedDateProperty);
         set => SetValue(SelectedDateProperty, value);
+    }
+
+    public DateTime? RangeStart
+    {
+        get => GetValue(RangeStartProperty);
+        set => SetValue(RangeStartProperty, value);
+    }
+
+    public DateTime? RangeEnd
+    {
+        get => GetValue(RangeEndProperty);
+        set => SetValue(RangeEndProperty, value);
     }
 
     public DateTime? MinimumDate
@@ -426,12 +479,13 @@ public class Calendar : Border
         var date = _dates[index];
         var inMonth = date.Month == _month.Month;
         var selectable = IsSelectable(date);
-        var selected = SelectedDate?.Date == date;
+        var selected = SelectedDate?.Date == date || RangeStart?.Date == date || RangeEnd?.Date == date;
+        var inRange = !selected && RangeStart is { } from && RangeEnd is { } to && date > from.Date && date < to.Date;
         var today = date == DateTime.Today;
 
         if (selected)
             box.Token(BackgroundProperty, ShellToken.Primary);
-        else if (today || (index == _hovered && selectable))
+        else if (inRange || today || (index == _hovered && selectable))
             box.Token(BackgroundProperty, ShellToken.Accent);
         else
         {
@@ -439,9 +493,12 @@ public class Calendar : Border
             box.Background = Brushes.Transparent;
         }
 
+        // Days inside a span lose their corners, so the span reads as one band.
+        box.CornerRadius = new CornerRadius(inRange ? 0 : ShellTheme.RadiusMd);
+
         text.Token(TextBlock.ForegroundProperty,
-            selected ? ShellToken.PrimaryForeground : inMonth ? ShellToken.Foreground : ShellToken.MutedForeground);
-        box.Opacity = !selectable ? 0.3 : inMonth || selected ? 1 : 0.5;
+            selected ? ShellToken.PrimaryForeground : inMonth || inRange ? ShellToken.Foreground : ShellToken.MutedForeground);
+        box.Opacity = !selectable ? 0.3 : inMonth || selected || inRange ? 1 : 0.5;
     }
 }
 "

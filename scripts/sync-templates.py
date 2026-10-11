@@ -90,12 +90,17 @@ NEW = {
                ["navbar", "navigation", "header", "menu"]),
     "Sidebar": ("sidebar", "Sidebar", "App sidebar with groups and items that collapses to an icon rail", "Navigation",
                 ["sidebar", "navigation", "menu", "layout"]),
+    "DateRangePicker": ("date-range-picker", "Date Range Picker", "Picks a start and an end date from one calendar", "Form",
+                        ["date", "range", "picker", "calendar"]),
+    "FileUpload": ("file-upload", "File Upload", "Drop zone that opens the file picker and lists the picked files", "Form",
+                   ["file", "upload", "picker", "drop"]),
 }
 
 # Component-to-component dependencies the code scan can't infer.
 EXTRA_DEPS = {
     "HoverCard": ["hover-card-trigger", "hover-card-content"],
     "DatePicker": ["calendar"],
+    "DateRangePicker": ["calendar"],
     "TagInput": ["wrap-layout"],
     "MultiSelect": ["wrap-layout"],
 }

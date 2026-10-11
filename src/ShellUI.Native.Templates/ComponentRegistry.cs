@@ -124,7 +124,9 @@ public static class ComponentRegistry
         { "multi-select", (MultiSelectTemplate.Metadata, MultiSelectTemplate.Contents) },
         { "resizable", (ResizableTemplate.Metadata, ResizableTemplate.Contents) },
         { "navbar", (NavbarTemplate.Metadata, NavbarTemplate.Contents) },
-        { "sidebar", (SidebarTemplate.Metadata, SidebarTemplate.Contents) }
+        { "sidebar", (SidebarTemplate.Metadata, SidebarTemplate.Contents) },
+        { "date-range-picker", (DateRangePickerTemplate.Metadata, DateRangePickerTemplate.Contents) },
+        { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
