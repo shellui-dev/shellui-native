@@ -1,0 +1,321 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Metadata;
+using AvaloniaDemo.Components.UI.Variants;
+
+namespace AvaloniaDemo.Components.UI;
+
+// Step-by-step flow — numbered circles joined by lines (active filled, completed checked), the
+// active step's content, and Previous / Next / Confirm buttons. A step becomes clickable (and a
+// tab stop) once it has been reached.
+//   <ui:Stepper Confirmed="OnDone">
+//       <ui:StepperStep Title="Account" Description="Your details"> ...any control... </ui:StepperStep>
+//       <ui:StepperStep Title="Plan"> ... </ui:StepperStep>
+//       <ui:StepperStep Title="Review"> ... </ui:StepperStep>
+//   </ui:Stepper>
+public class Stepper : Border
+{
+    public static readonly StyledProperty<int> CurrentStepProperty =
+        AvaloniaProperty.Register<Stepper, int>(nameof(CurrentStep), defaultBindingMode: BindingMode.TwoWay);
+
+    public static readonly StyledProperty<bool> ShowNavigationProperty =
+        AvaloniaProperty.Register<Stepper, bool>(nameof(ShowNavigation), true);
+
+    public static readonly StyledProperty<string> PreviousTextProperty =
+        AvaloniaProperty.Register<Stepper, string>(nameof(PreviousText), "Previous");
+
+    public static readonly StyledProperty<string> NextTextProperty =
+        AvaloniaProperty.Register<Stepper, string>(nameof(NextText), "Next");
+
+    public static readonly StyledProperty<string> ConfirmTextProperty =
+        AvaloniaProperty.Register<Stepper, string>(nameof(ConfirmText), "Confirm");
+
+    private const double CircleSize = 32;
+
+    private sealed class Marker
+    {
+        public Marker(Border circle, TextBlock number, Icon check, TextBlock title, Border before, Border after)
+        {
+            Circle = circle;
+            Number = number;
+            Check = check;
+            Title = title;
+            Before = before;
+            After = after;
+        }
+
+        public Border Circle { get; }
+        public TextBlock Number { get; }
+        public Icon Check { get; }
+        public TextBlock Title { get; }
+        public Border Before { get; }
+        public Border After { get; }
+    }
+
+    private readonly List<Marker> _markers = new();
+    private readonly Grid _header = new();
+    private readonly Panel _body = new() { Margin = new Thickness(0, 24, 0, 0) };
+    private readonly Panel _navigation;
+    private readonly Button _previous;
+    private readonly Button _next;
+    private int _highest;
+
+    static Stepper()
+    {
+        CurrentStepProperty.Changed.AddClassHandler<Stepper>((s, _) => s.OnCurrentStepChanged());
+        ShowNavigationProperty.Changed.AddClassHandler<Stepper>((s, _) => s.UpdateState());
+        PreviousTextProperty.Changed.AddClassHandler<Stepper>((s, _) => s.UpdateState());
+        NextTextProperty.Changed.AddClassHandler<Stepper>((s, _) => s.UpdateState());
+        ConfirmTextProperty.Changed.AddClassHandler<Stepper>((s, _) => s.UpdateState());
+    }
+
+    public int CurrentStep
+    {
+        get => GetValue(CurrentStepProperty);
+        set => SetValue(CurrentStepProperty, value);
+    }
+
+    public bool ShowNavigation
+    {
+        get => GetValue(ShowNavigationProperty);
+        set => SetValue(ShowNavigationProperty, value);
+    }
+
+    public string PreviousText
+    {
+        get => GetValue(PreviousTextProperty);
+        set => SetValue(PreviousTextProperty, value);
+    }
+
+    public string NextText
+    {
+        get => GetValue(NextTextProperty);
+        set => SetValue(NextTextProperty, value);
+    }
+
+    public string ConfirmText
+    {
+        get => GetValue(ConfirmTextProperty);
+        set => SetValue(ConfirmTextProperty, value);
+    }
+
+    // The StepperStep children. Every step stays in the tree; only the active one is visible.
+    [Content]
+    public Controls Steps => _body.Children;
+
+    public event EventHandler<int>? CurrentStepChanged;
+    // Raised by the Confirm button on the last step.
+    public event EventHandler? Confirmed;
+
+    public Stepper()
+    {
+        _previous = new Button { Variant = ButtonVariant.Outline, HorizontalAlignment = HorizontalAlignment.Left };
+        _previous.Clicked += (_, _) => Previous();
+        _next = new Button { HorizontalAlignment = HorizontalAlignment.Right };
+        _next.Clicked += (_, _) =>
+        {
+            if (IsLast)
+            {
+                _highest = Math.Max(_highest, StepList.Count - 1);
+                Confirmed?.Invoke(this, EventArgs.Empty);
+            }
+            else Next();
+        };
+        _navigation = new Panel { Margin = new Thickness(0, 24, 0, 0), Children = { _previous, _next } };
+
+        Child = new StackPanel { Children = { _header, _body, _navigation } };
+        _body.Children.CollectionChanged += (_, _) => Rebuild();
+        Rebuild();
+    }
+
+    private List<StepperStep> StepList => _body.Children.OfType<StepperStep>().ToList();
+    private int Current => Math.Clamp(CurrentStep, 0, Math.Max(0, StepList.Count - 1));
+    private bool IsLast => Current >= StepList.Count - 1;
+
+    public void Next()
+    {
+        if (!IsLast) CurrentStep = Current + 1;
+    }
+
+    public void Previous()
+    {
+        if (Current > 0) CurrentStep = Current - 1;
+    }
+
+    private void OnCurrentStepChanged()
+    {
+        _highest = Math.Max(_highest, Current);
+        UpdateState();
+        CurrentStepChanged?.Invoke(this, Current);
+    }
+
+    private void Rebuild()
+    {
+        var steps = StepList;
+        _header.Children.Clear();
+        _header.ColumnDefinitions.Clear();
+        _markers.Clear();
+
+        for (var i = 0; i < steps.Count; i++)
+        {
+            var index = i;
+            var step = steps[i];
+            step.PropertyChanged -= OnStepPropertyChanged;
+            step.PropertyChanged += OnStepPropertyChanged;
+
+            var number = new TextBlock
+            {
+                Text = (i + 1).ToString(CultureInfo.CurrentCulture),
+                FontSize = 14,
+                FontWeight = FontWeight.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var check = new Icon { Kind = IconName.Check, Size = 16, Token = ShellToken.Primary, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            var circle = new Border
+            {
+                Child = new Panel { Children = { number, check } },
+                Width = CircleSize,
+                Height = CircleSize,
+                BorderThickness = new Thickness(2),
+                CornerRadius = new CornerRadius(CircleSize / 2)
+            };
+            AutomationProperties.SetName(circle, string.IsNullOrEmpty(step.Title) ? $"Step {i + 1}" : step.Title);
+            ShellFocus.Ring(circle, circle);
+            circle.PointerReleased += (_, e) =>
+            {
+                if (e.InitialPressMouseButton != MouseButton.Left || index > _highest) return;
+                CurrentStep = index;
+                e.Handled = true;
+            };
+            circle.KeyDown += (_, e) =>
+            {
+                if (e.Key is not (Key.Enter or Key.Space) || index > _highest) return;
+                CurrentStep = index;
+                e.Handled = true;
+            };
+
+            // Lines run from each circle to the edges of its column, so neighbors meet.
+            var before = Line(i > 0);
+            var after = Line(i < steps.Count - 1);
+            var rail = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,*") };
+            Grid.SetColumn(circle, 1);
+            Grid.SetColumn(after, 2);
+            rail.Children.Add(before);
+            rail.Children.Add(circle);
+            rail.Children.Add(after);
+
+            var title = new TextBlock
+            {
+                Text = step.Title,
+                FontSize = 14,
+                FontWeight = FontWeight.Bold,
+                TextAlignment = TextAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(4, 8, 4, 0),
+                IsVisible = !string.IsNullOrEmpty(step.Title)
+            };
+            var description = new TextBlock
+            {
+                Text = step.Description,
+                FontSize = 12,
+                TextAlignment = TextAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(4, 2, 4, 0),
+                IsVisible = !string.IsNullOrEmpty(step.Description)
+            };
+            description.Token(TextBlock.ForegroundProperty, ShellToken.MutedForeground);
+
+            var column = new StackPanel { Children = { rail, title, description } };
+            Grid.SetColumn(column, i);
+            _header.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            _header.Children.Add(column);
+            _markers.Add(new Marker(circle, number, check, title, before, after));
+        }
+
+        _highest = Math.Min(_highest, Math.Max(0, steps.Count - 1));
+        UpdateState();
+
+        static Border Line(bool visible) => new()
+        {
+            Height = 2,
+            VerticalAlignment = VerticalAlignment.Center,
+            Opacity = visible ? 1 : 0
+        };
+    }
+
+    private void OnStepPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == StepperStep.TitleProperty || e.Property == StepperStep.DescriptionProperty) Rebuild();
+    }
+
+    private void UpdateState()
+    {
+        var steps = StepList;
+        var current = Current;
+        for (var i = 0; i < _markers.Count; i++)
+        {
+            var marker = _markers[i];
+            var active = i == current;
+            var completed = i < _highest && !active;
+            var reached = i <= _highest;
+
+            if (active) marker.Circle.Token(BackgroundProperty, ShellToken.Primary);
+            else
+            {
+                // Transparent, not null, so the whole circle stays hit-testable.
+                marker.Circle.ClearToken(BackgroundProperty);
+                marker.Circle.Background = Brushes.Transparent;
+            }
+            marker.Circle.Token(BorderBrushProperty, active || completed ? ShellToken.Primary : ShellToken.Border);
+            marker.Circle.Focusable = reached;
+            marker.Circle.Cursor = reached ? new Cursor(StandardCursorType.Hand) : null;
+            marker.Number.IsVisible = !completed;
+            marker.Number.Token(TextBlock.ForegroundProperty, active ? ShellToken.PrimaryForeground : ShellToken.MutedForeground);
+            marker.Check.IsVisible = completed;
+            marker.Title.Token(TextBlock.ForegroundProperty, active || completed ? ShellToken.Foreground : ShellToken.MutedForeground);
+            marker.Before.Token(BackgroundProperty, reached ? ShellToken.Primary : ShellToken.Border);
+            marker.After.Token(BackgroundProperty, i < _highest ? ShellToken.Primary : ShellToken.Border);
+        }
+
+        for (var i = 0; i < steps.Count; i++)
+            steps[i].IsVisible = i == current;
+
+        _navigation.IsVisible = ShowNavigation && steps.Count > 0;
+        _previous.Text = PreviousText;
+        _previous.IsEnabled = current > 0;
+        _next.Text = IsLast ? ConfirmText : NextText;
+    }
+}
+
+// One step of a Stepper: its Title and Description label the step, its content shows while the
+// step is active.
+public class StepperStep : Border
+{
+    public static readonly StyledProperty<string?> TitleProperty =
+        AvaloniaProperty.Register<StepperStep, string?>(nameof(Title));
+
+    public static readonly StyledProperty<string?> DescriptionProperty =
+        AvaloniaProperty.Register<StepperStep, string?>(nameof(Description));
+
+    public string? Title
+    {
+        get => GetValue(TitleProperty);
+        set => SetValue(TitleProperty, value);
+    }
+
+    public string? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+}

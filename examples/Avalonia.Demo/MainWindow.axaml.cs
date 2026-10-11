@@ -44,6 +44,12 @@ public partial class MainWindow : Window
             };
         DemoPagination.PageChanged += (_, page) => DataChoice.Text = $"Page {page} of 20.";
 
+        foreach (var item in DemoContextMenu.FindDescendantsOfType<ContextMenuItem>())
+            item.Clicked += (_, _) => AdvancedChoice.Text = $"Context menu: {item.Text}.";
+        DemoCarousel.PositionChanged += (_, position) => AdvancedChoice.Text = $"Slide {position + 1} of 4.";
+        DemoStepper.CurrentStepChanged += (_, step) => AdvancedChoice.Text = $"Step {step + 1} of 3.";
+        DemoStepper.Confirmed += (_, _) => Toast.Success("Workspace created");
+
         for (var i = 1; i <= 30; i++)
         {
             var tag = new TextBlock { Text = $"v1.2.0-beta.{31 - i}", FontSize = 14 };

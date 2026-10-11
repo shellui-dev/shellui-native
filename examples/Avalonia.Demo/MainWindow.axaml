@@ -369,6 +369,64 @@
             <ui:Pagination x:Name="DemoPagination" TotalPages="20" Page="5" Margin="0,12,0,0" />
             <TextBlock x:Name="DataChoice" Classes="hint" Margin="0,8,0,0" Text="Click a row or a page." />
 
+            <TextBlock Classes="title" Text="Menus, slides and steps" />
+            <TextBlock Classes="hint" Text="Context menu, carousel and stepper." />
+            <ui:ContextMenu x:Name="DemoContextMenu" Width="560" HorizontalAlignment="Left">
+                <ui:ContextMenuTrigger>
+                    <Panel Height="120">
+                        <Rectangle Stroke="{DynamicResource ShellUIBorderBrush}" StrokeThickness="1" StrokeDashArray="4,4"
+                                   RadiusX="6" RadiusY="6" />
+                        <ui:ShellLabel Text="Right-click here (long-press on touch)" Size="Sm" Variant="Muted"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Panel>
+                </ui:ContextMenuTrigger>
+                <ui:ContextMenuContent>
+                    <ui:ContextMenuItem Text="Back" Icon="ArrowLeft" Shortcut="Alt+Left" />
+                    <ui:ContextMenuItem Text="Reload" Icon="RefreshCw" Shortcut="Ctrl+R" />
+                    <ui:ContextMenuItem Text="Copy link" Icon="Link" />
+                    <ui:ContextMenuItem Text="Save as..." Icon="Save" IsEnabled="False" />
+                    <ui:ContextMenuSeparator />
+                    <ui:ContextMenuItem Text="Delete" Icon="Trash2" IsDestructive="True" />
+                </ui:ContextMenuContent>
+            </ui:ContextMenu>
+            <ui:Carousel x:Name="DemoCarousel" AspectRatio="2.4" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Panel Background="{DynamicResource ShellUIMutedBrush}">
+                    <TextBlock Text="1" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUISecondaryBrush}">
+                    <TextBlock Text="2" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUIAccentBrush}">
+                    <TextBlock Text="3" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUIMutedBrush}">
+                    <TextBlock Text="4" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+            </ui:Carousel>
+            <ui:Stepper x:Name="DemoStepper" Width="560" HorizontalAlignment="Left" Margin="0,24,0,0">
+                <ui:StepperStep Title="Account" Description="Your details">
+                    <StackPanel Spacing="8">
+                        <ui:ShellLabel Text="Email" Size="Sm" Weight="Medium" />
+                        <ui:Input Placeholder="you@example.com" />
+                    </StackPanel>
+                </ui:StepperStep>
+                <ui:StepperStep Title="Plan" Description="Pick a tier">
+                    <ui:RadioGroup Value="pro">
+                        <ui:RadioGroupItem Value="free" Text="Free" />
+                        <ui:RadioGroupItem Value="pro" Text="Pro" />
+                        <ui:RadioGroupItem Value="team" Text="Team" />
+                    </ui:RadioGroup>
+                </ui:StepperStep>
+                <ui:StepperStep Title="Review" Description="Confirm and finish">
+                    <ui:ShellLabel Text="Everything looks good. Press Confirm to create the workspace." Size="Sm" />
+                </ui:StepperStep>
+            </ui:Stepper>
+            <TextBlock x:Name="AdvancedChoice" Classes="hint" Margin="0,8,0,0" Text="Right-click the box, move the carousel or walk through the steps." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />
