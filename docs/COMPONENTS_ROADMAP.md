@@ -4,7 +4,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 
 Last revised: **2026-10-07** (first prerelease, `0.1.0-alpha.1`).
 
-**Status at a glance:** P0–P5 ✅ done · P6 partly done (resizable, navbar, sidebar open) · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2) ⏭️ next**.
+**Status at a glance:** P0–P5 ✅ done · P6 partly done (resizable, navbar, sidebar open) · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2): every component ported, not released yet**.
 
 ---
 
