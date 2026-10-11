@@ -4,7 +4,7 @@ Living document tracking **branches**, **phases**, and **feature implementations
 ShellUI Native. Companion to [PLAN.md](./PLAN.md) (long-term strategy) and
 [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md) (prioritized component backlog).
 
-Last revised: **2026-10-07** (Phase 1e merged; `0.1.0-alpha.1` release prep).
+Last revised: **2026-10-11** (Phase 2 merged; `0.1.0-alpha.2` release prep).
 
 ---
 
@@ -16,9 +16,9 @@ Short-lived sub-branches (`feat/<phase>/<slice>`) cut off the phase branch and m
 into it, not directly into `main`.
 
 ```
-main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand mark (PR #5) merged
- └─ chore/release-v0.1.0-alpha.1      ← first prerelease (active)
- └─ feat/avalonia-implementation      ← Phase 2 (next) — Avalonia templates + reference impl
+main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avalonia (PRs #7–#13),
+         layout, navigation and pickers on both platforms (PR #14) merged
+ └─ chore/release-v0.1.0-alpha.2      ← second prerelease, the first with Avalonia (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -35,8 +35,8 @@ main   ← Phase 1a (2026-07-05), 1b (PR #2), 1c + 1d (PR #3), 1e (PR #4), brand
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1a–1e, release `0.1.0-alpha.1`, Phase 2 merged: every component has an Avalonia version | 92 registry entries (89 CLI targets, 58 families), each with MAUI and Avalonia content |
-| `feat/p6-layout-navigation` | `main` | **Active** | resizable, navbar, sidebar (finishes P6), date-range-picker and file-upload (P7), each for MAUI and Avalonia |
+| `main` | — | Phase 1, release `0.1.0-alpha.1`, Phase 2 and PR #14 merged | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `chore/release-v0.1.0-alpha.2` | `main` | **Active** | Second prerelease: the first with Avalonia, plus five new components |
 
 ---
 
@@ -434,7 +434,26 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Phase 2 — Avalonia (active; one branch per tier, `feat/avalonia-p7-remaining` now)
+## Release `0.1.0-alpha.2` — `chore/release-v0.1.0-alpha.2` (**active**)
+
+Second NuGet prerelease of `ShellUI.Native.CLI`: the first with Avalonia templates, plus
+resizable, navbar, sidebar, date-range-picker and file-upload on both platforms.
+
+- [x] `Directory.Build.props` → `0.1.0` + `alpha.2`
+- [x] [RELEASE_NOTES.md](./RELEASE_NOTES.md) section, with the upgrade note for `calendar`
+- [x] Install docs cover Avalonia (README, QUICKSTART, the CLI package README)
+- [x] README version badge is static, set by `prepare-release.ps1` (the live NuGet badge
+  sometimes failed to load on GitHub)
+- [x] The packed tool, installed from the `.nupkg`, outside the repo: `init` and all 94 CLI
+  targets added together in a fresh Avalonia app and in a fresh `dotnet new maui` app (Windows
+  target), each building with 0 warnings; `update calendar` fixes a project that has the
+  alpha.1 Calendar
+
+After merge: tag `v0.1.0-alpha.2` on `main` and push the tag.
+
+---
+
+## Phase 2 — Avalonia (**merged**, PRs #7–#14; released in `0.1.0-alpha.2`)
 
 Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 

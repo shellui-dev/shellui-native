@@ -22,6 +22,15 @@ $content = $content -replace '<ShellUINativeVersionSuffix>[^<]*</ShellUINativeVe
 Set-Content $propsPath $content
 Write-Host "Updated Directory.Build.props to version $Version" -ForegroundColor Green
 
+# The README's version badge is static (a live NuGet lookup sometimes fails to load on GitHub)
+$fullVersion = if ($Suffix) { "$Version-$Suffix" } else { $Version }
+$readmePath = Join-Path $PSScriptRoot "docs/README.md"
+$readme = [System.IO.File]::ReadAllText($readmePath)
+$readme = $readme -replace 'badge/CLI-v[^?"]+-004880', "badge/CLI-v$($fullVersion.Replace('-', '--'))-004880"
+$readme = $readme -replace 'alt="ShellUI\.Native\.CLI v[^"]* on NuGet"', "alt=`"ShellUI.Native.CLI v$fullVersion on NuGet`""
+[System.IO.File]::WriteAllText($readmePath, $readme)
+Write-Host "Updated the version badge in docs/README.md" -ForegroundColor Green
+
 # Build and test (the MAUI demo is left out; it needs the MAUI workload)
 Write-Host "Building and testing..." -ForegroundColor Cyan
 dotnet test (Join-Path $PSScriptRoot "tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj") -c Release
@@ -40,7 +49,6 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-$fullVersion = if ($Suffix) { "$Version-$Suffix" } else { $Version }
 Write-Host ""
 Write-Host "Release preparation complete! Package: ./nupkg" -ForegroundColor Green
 Write-Host ""

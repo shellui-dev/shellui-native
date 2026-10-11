@@ -5,7 +5,7 @@ Get started with ShellUI Native in under 5 minutes.
 ## Prerequisites
 
 - .NET 10.0 SDK (see [global.json](../global.json))
-- A .NET MAUI project (`dotnet new maui`); Avalonia support is the next phase (see [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md))
+- A .NET MAUI project (`dotnet new maui`) or an Avalonia 12 project (`dotnet new avalonia.app`)
 
 ## Installation
 
@@ -36,8 +36,8 @@ This will:
 - Create `shellui-native.json` configuration
 - Generate theme resources (MAUI)
 
-> Templates exist for MAUI only so far. In an Avalonia, WinUI or WPF project, `init` skips the
-> `Shell.cs` utility and `add` reports that the component has no template for that platform.
+> Templates exist for MAUI and Avalonia. In a WinUI or WPF project, `init` skips the `Shell.cs`
+> utility and `add` reports that the component has no template for that platform.
 
 ### 4. Add Components
 
@@ -54,12 +54,22 @@ shellui-native add button,input,card
 
 ### 5. Load the Theme
 
-Publish the theme tokens before the first page loads, in `App.xaml.cs`:
+Publish the theme tokens before the first page loads. In a MAUI app, in `App.xaml.cs`:
 
 ```csharp
 public App()
 {
     InitializeComponent();
+    Components.UI.ShellTheme.EnsureInitialized();
+}
+```
+
+In an Avalonia app, in `App.axaml.cs`:
+
+```csharp
+public override void Initialize()
+{
+    AvaloniaXamlLoader.Load(this);
     Components.UI.ShellTheme.EnsureInitialized();
 }
 ```
@@ -82,6 +92,10 @@ Components also do this on first use, but calling it early lets your own
 
 </ContentPage>
 ```
+
+In Avalonia the namespace is `xmlns:ui="using:YourProject.Components.UI"`; the components have
+the same names and properties. See [COMPONENTS.md § Avalonia](./COMPONENTS.md#avalonia) for the
+few differences.
 
 ## Common Commands
 

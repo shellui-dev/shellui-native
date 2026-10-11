@@ -2,7 +2,7 @@
 
 # ShellUI Native CLI
 
-Command-line interface for ShellUI Native: shadcn-style, copy-and-own components for .NET MAUI, with the same design tokens as [ShellUI](https://shellui.dev/) for Blazor.
+Command-line interface for ShellUI Native: shadcn-style, copy-and-own components for .NET MAUI and Avalonia, with the same design tokens as [ShellUI](https://shellui.dev/) for Blazor.
 
 ## Installation
 
@@ -25,7 +25,7 @@ shellui-native update [--all]             # Update components
 ## Quick Start
 
 ```bash
-# Navigate to your MAUI project
+# Navigate to your MAUI or Avalonia project
 cd YourProject
 
 # Initialize ShellUI Native
@@ -35,7 +35,7 @@ shellui-native init --yes
 shellui-native add button input card
 ```
 
-Components are written to `Components/UI/` as plain C# files you own. Avalonia support is the next phase.
+Components are written to `Components/UI/` as plain C# files you own. `init` detects whether the project is MAUI or Avalonia and installs that platform's version of each component.
 
 ## More Information
 
