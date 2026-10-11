@@ -35,7 +35,7 @@ No `NUGET_API_KEY` secret is needed; delete an old one if it exists.
 
 ## Releasing a version
 
-1. Set the version in `Directory.Build.props` (`ShellUINativeVersion` and `ShellUINativeVersionSuffix`).
+1. Set the version in `Directory.Build.props` (`ShellUINativeVersion` and `ShellUINativeVersionSuffix`) and in the version badge at the top of [README.md](./README.md). `prepare-release.ps1 -Version 0.1.0 -Suffix alpha.2` does both, then tests and packs.
 2. Add a `# ShellUI Native v<version>` section to [RELEASE_NOTES.md](./RELEASE_NOTES.md). It becomes the GitHub release text.
 3. Merge to `main`, then tag and push:
 
