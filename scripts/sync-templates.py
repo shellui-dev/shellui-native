@@ -84,6 +84,12 @@ NEW = {
                     ["select", "multiple", "chips", "search"]),
     "EmptyState": ("empty-state", "Empty State", "Placeholder for an empty list or screen", "DataDisplay",
                    ["empty", "placeholder", "state"]),
+    "Resizable": ("resizable", "Resizable", "Panels that share space and resize by dragging the divider", "Layout",
+                  ["resizable", "split", "panels", "layout"]),
+    "Navbar": ("navbar", "Navbar", "Top navigation bar that collapses its links into a menu", "Navigation",
+               ["navbar", "navigation", "header", "menu"]),
+    "Sidebar": ("sidebar", "Sidebar", "App sidebar with groups and items that collapses to an icon rail", "Navigation",
+                ["sidebar", "navigation", "menu", "layout"]),
 }
 
 # Component-to-component dependencies the code scan can't infer.

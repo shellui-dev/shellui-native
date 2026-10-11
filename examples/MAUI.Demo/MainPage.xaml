@@ -456,6 +456,78 @@
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupNavigation" Spacing="16" IsVisible="False">
+                <!-- Navbar -->
+                <Label Text="Navbar" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8">
+                    <ui:Navbar x:Name="NavbarDemo" Title="ShellUI Native" Icon="Sparkles" SelectedValue="docs"
+                               SelectedValueChanged="OnNavbarChanged">
+                        <ui:NavbarItem Value="docs" Text="Docs" />
+                        <ui:NavbarItem Value="components" Text="Components" />
+                        <ui:NavbarItem Value="themes" Text="Themes" />
+                        <ui:Navbar.Actions>
+                            <ui:Button Icon="Search" Size="Icon" Variant="Ghost" Clicked="OnButtonClicked" />
+                        </ui:Navbar.Actions>
+                    </ui:Navbar>
+                </Border>
+
+                <!-- Sidebar -->
+                <Label Text="Sidebar" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8"
+                        HeightRequest="340">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <ui:Sidebar x:Name="SidebarDemo" SelectedValue="home" SelectedValueChanged="OnSidebarChanged"
+                                    IsCollapsedChanged="OnSidebarCollapsed">
+                            <ui:Sidebar.Header>
+                                <HorizontalStackLayout Spacing="8" Padding="10,6">
+                                    <ui:Icon Name="Sparkles" Size="20" VerticalOptions="Center" />
+                                    <Label x:Name="SidebarBrand" Text="ShellUI Native" FontSize="14" FontAttributes="Bold" VerticalOptions="Center"
+                                           TextColor="{DynamicResource ShellUIForeground}" />
+                                </HorizontalStackLayout>
+                            </ui:Sidebar.Header>
+                            <ui:SidebarGroup Label="Workspace">
+                                <ui:SidebarItem Value="home" Text="Home" Icon="House" />
+                                <ui:SidebarItem Value="inbox" Text="Inbox" Icon="Inbox" Badge="12" />
+                                <ui:SidebarItem Value="dashboard" Text="Dashboard" Icon="LayoutDashboard" />
+                            </ui:SidebarGroup>
+                            <ui:SidebarGroup Label="Account">
+                                <ui:SidebarItem Value="settings" Text="Settings" Icon="Settings" />
+                                <ui:SidebarItem Text="Log out" Icon="LogOut" Clicked="OnSidebarLogOut" />
+                            </ui:SidebarGroup>
+                        </ui:Sidebar>
+                        <VerticalStackLayout Grid.Column="1" Padding="16" Spacing="12">
+                            <ui:Button Icon="PanelLeft" Size="Icon" Variant="Outline" Clicked="OnSidebarToggle" />
+                            <Label x:Name="SidebarPage" Text="Home" FontSize="18" FontAttributes="Bold"
+                                   TextColor="{DynamicResource ShellUIForeground}" />
+                            <Label Text="Pick a page in the sidebar, or collapse it to a rail of icons." Style="{StaticResource Muted}" FontSize="14" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Resizable -->
+                <Label Text="Resizable" Style="{StaticResource SectionTitle}" />
+                <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8"
+                        HeightRequest="220" WidthRequest="{OnIdiom Phone=-1, Default=560}"
+                        HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:Resizable x:Name="ResizableDemo" Resized="OnResized">
+                        <ui:ResizablePanel x:Name="ResizableFirst" Size="1" MinSize="100">
+                            <Label Text="One" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   TextColor="{DynamicResource ShellUIForeground}" />
+                        </ui:ResizablePanel>
+                        <ui:ResizablePanel Size="2" MinSize="140">
+                            <ui:Resizable Orientation="Vertical">
+                                <ui:ResizablePanel Size="1">
+                                    <Label Text="Two" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                           TextColor="{DynamicResource ShellUIForeground}" />
+                                </ui:ResizablePanel>
+                                <ui:ResizablePanel Size="2">
+                                    <Label Text="Three" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                           TextColor="{DynamicResource ShellUIForeground}" />
+                                </ui:ResizablePanel>
+                            </ui:Resizable>
+                        </ui:ResizablePanel>
+                    </ui:Resizable>
+                </Border>
+
                 <!-- Collapsible -->
                 <Label Text="Collapsible" Style="{StaticResource SectionTitle}" />
                 <ui:Collapsible>

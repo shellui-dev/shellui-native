@@ -138,6 +138,22 @@ public partial class MainPage : ContentPage
         Report($"Table: {row.Children.OfType<TableCell>().FirstOrDefault()?.Text}");
     }
 
+    private void OnNavbarChanged(object? sender, string? value) => Report($"Navbar: {value}");
+    private void OnSidebarChanged(object? sender, string? value)
+    {
+        SidebarPage.Text = value is null ? string.Empty : char.ToUpperInvariant(value[0]) + value[1..];
+        Report($"Sidebar: {value}");
+    }
+    private void OnSidebarToggle(object? sender, EventArgs e) => SidebarDemo.Toggle();
+    private void OnSidebarCollapsed(object? sender, bool collapsed)
+    {
+        SidebarBrand.IsVisible = !collapsed;
+        Report($"Sidebar: {(collapsed ? "collapsed" : "expanded")}");
+    }
+    private void OnSidebarLogOut(object? sender, EventArgs e) => Report("Sidebar: Log out");
+    private void OnResized(object? sender, EventArgs e) =>
+        Report($"Resizable: first panel is {ResizableFirst.Size / ResizableDemo.Panels.Sum(p => p.Size):P0} of the width");
+
     private void OnDropdownItem(object? sender, EventArgs e) => Report($"Dropdown: {(sender as DropdownItem)?.Text}");
     private void OnTabChanged(object? sender, (string Old, string New) e) => Report($"Tab: {e.New}");
 

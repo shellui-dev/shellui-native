@@ -516,6 +516,70 @@
             </ui:AspectRatio>
             <TextBlock x:Name="DisplayChoice" Classes="hint" Margin="0,8,0,0" Text="Copy something, click a card or pick a file." />
 
+            <TextBlock Classes="title" Text="Layout and navigation" />
+            <TextBlock Classes="hint" Text="Navbar, sidebar and resizable panels." />
+            <Border x:Name="NavbarFrame" BorderThickness="1" CornerRadius="8" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                    Width="720" HorizontalAlignment="Left">
+                <ui:Navbar x:Name="DemoNavbar" Title="ShellUI Native" Icon="Sparkles" SelectedValue="docs">
+                    <ui:NavbarItem Value="docs" Text="Docs" />
+                    <ui:NavbarItem Value="components" Text="Components" />
+                    <ui:NavbarItem Value="themes" Text="Themes" />
+                    <ui:Navbar.Actions>
+                        <ui:Button Icon="Search" Size="Icon" Variant="Ghost" />
+                    </ui:Navbar.Actions>
+                </ui:Navbar>
+            </Border>
+            <Border BorderThickness="1" CornerRadius="8" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                    Width="720" Height="340" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Grid ColumnDefinitions="Auto,*">
+                    <ui:Sidebar x:Name="DemoSidebar" SelectedValue="home">
+                        <ui:Sidebar.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="10,6">
+                                <ui:Icon Kind="Sparkles" Size="20" VerticalAlignment="Center" />
+                                <ui:ShellLabel x:Name="SidebarBrand" Text="ShellUI Native" Size="Sm" Weight="Semibold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ui:Sidebar.Header>
+                        <ui:SidebarGroup Label="Workspace">
+                            <ui:SidebarItem Value="home" Text="Home" Icon="House" />
+                            <ui:SidebarItem Value="inbox" Text="Inbox" Icon="Inbox" Badge="12" />
+                            <ui:SidebarItem Value="dashboard" Text="Dashboard" Icon="LayoutDashboard" />
+                        </ui:SidebarGroup>
+                        <ui:SidebarGroup Label="Account">
+                            <ui:SidebarItem Value="settings" Text="Settings" Icon="Settings" />
+                            <ui:SidebarItem x:Name="SidebarLogOut" Text="Log out" Icon="LogOut" />
+                        </ui:SidebarGroup>
+                    </ui:Sidebar>
+                    <StackPanel Grid.Column="1" Margin="16" Spacing="12">
+                        <ui:Button x:Name="SidebarToggle" Icon="PanelLeft" Size="Icon" Variant="Outline" />
+                        <TextBlock x:Name="SidebarPage" Text="Home" FontSize="18" FontWeight="Bold"
+                                   Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                        <ui:ShellLabel Text="Pick a page in the sidebar, or collapse it to a rail of icons." Size="Sm" Variant="Muted" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border BorderThickness="1" CornerRadius="8" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                    Width="560" Height="220" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:Resizable x:Name="DemoResizable">
+                    <ui:ResizablePanel x:Name="ResizableFirst" Size="1" MinSize="100">
+                        <TextBlock Text="One" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                    </ui:ResizablePanel>
+                    <ui:ResizablePanel Size="2" MinSize="140">
+                        <ui:Resizable x:Name="InnerResizable" Orientation="Vertical">
+                            <ui:ResizablePanel Size="1">
+                                <TextBlock Text="Two" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            </ui:ResizablePanel>
+                            <ui:ResizablePanel Size="2">
+                                <TextBlock Text="Three" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            </ui:ResizablePanel>
+                        </ui:Resizable>
+                    </ui:ResizablePanel>
+                </ui:Resizable>
+            </Border>
+            <TextBlock x:Name="LayoutChoice" Classes="hint" Margin="0,8,0,0" Text="Pick a link or a page, or drag a divider." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />
