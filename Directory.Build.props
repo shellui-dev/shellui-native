@@ -3,7 +3,7 @@
   <!-- Centralized ShellUI Native Version - Update this single file to version all components -->
   <PropertyGroup>
     <ShellUINativeVersion>0.1.0</ShellUINativeVersion>
-    <ShellUINativeVersionSuffix>alpha.1</ShellUINativeVersionSuffix>
+    <ShellUINativeVersionSuffix>alpha.2</ShellUINativeVersionSuffix>
   </PropertyGroup>
 
   <!-- Common properties for all ShellUI Native projects -->
