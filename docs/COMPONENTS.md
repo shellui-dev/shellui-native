@@ -112,6 +112,9 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| ButtonGroup | Children are the buttons | Children are collected in `Items` |
+| InputGroup | `Keyboard` picks the on-screen keyboard | No `Keyboard`; a click on a control in the prefix or suffix is left to that control |
+| Menubar | Tap a title to open its menu | Titles are tab stops: Enter / Space / Down open a menu and Left / Right move between titles; in a menu Up / Down move and Enter picks; children are collected in `Menus` and `Items` |
 | Resizable | Drag a divider | Dividers are also tab stops: the arrow keys move them 16px; the pointer shows a resize cursor |
 | Navbar | Links and the menu button react to taps | They are also tab stops (Enter / Space); children are collected in `Items` |
 | Sidebar | Width animates on collapse | Same, with items as tab stops; children are collected in `Groups` and `Items` |
@@ -190,6 +193,29 @@ shellui-native add button
 
 ---
 
+### Button Group
+Buttons joined into one control: only the outer corners are rounded, and neighbouring borders
+overlap so `Outline` buttons share one line between them. Each button keeps its own `Clicked`.
+
+```bash
+shellui-native add button-group
+```
+
+**Properties:** `Orientation` (Horizontal, Vertical) · its children are the buttons
+
+```xml
+<ui:ButtonGroup>
+    <ui:Button Text="Day" Variant="Outline" />
+    <ui:Button Text="Week" Variant="Outline" />
+    <ui:Button Text="Month" Variant="Outline" />
+</ui:ButtonGroup>
+```
+
+It needs the `Button` that ships with it. If `button` is already in your project from an older
+CLI version, run `shellui-native update button` first.
+
+---
+
 ### Toggle
 Two-state button that stays pressed — transparent (or outlined) when off, `Accent` when on.
 
@@ -258,6 +284,30 @@ shellui-native add input
 ```
 
 **Events:** `TextChanged`, `Completed`
+
+---
+
+### Input Group
+An input with something before or after the text, inside the same border: an icon, a short
+text, or any view. Same height, focus ring and error state as `Input`.
+
+```bash
+shellui-native add input-group
+```
+
+**Properties:** `Text` (two-way), `Placeholder`, `IsPassword`, `HasError`, `Keyboard` (MAUI),
+`PrefixIcon`, `SuffixIcon`, `PrefixText`, `SuffixText`, `Prefix`, `Suffix` (a view; replaces the
+icon and text on that side) · **Events:** `TextChanged`, `Completed` · **Methods:** `Focus()`
+
+```xml
+<ui:InputGroup PrefixIcon="Search" Placeholder="Search..." />
+<ui:InputGroup PrefixText="https://" SuffixText=".com" Placeholder="example" />
+<ui:InputGroup Placeholder="you@example.com">
+    <ui:InputGroup.Suffix>
+        <ui:Badge Text="Required" Variant="Secondary" />
+    </ui:InputGroup.Suffix>
+</ui:InputGroup>
+```
 
 ---
 
@@ -745,6 +795,34 @@ shellui-native add accordion
 ---
 
 ## Navigation Components
+
+### Menubar
+A row of menus, like a desktop app's File / Edit / View. Each menu opens a panel of items under
+its title; clicking outside, picking an item or pressing Escape closes it, and opening one menu
+closes the other.
+
+```bash
+shellui-native add menubar
+```
+
+**MenubarMenu:** `Title`, `IsOpen` (read-only) · **Events:** `Opened`, `Closed` · **Methods:**
+`SetOpen(bool)`, `Close()`
+
+**MenubarItem:** `Text`, `Icon`, `Shortcut` (a hint at the end of the row; display only),
+`IsDestructive`, `IsEnabled` · **Events:** `Clicked` · **MenubarSeparator:** a divider
+
+```xml
+<ui:Menubar>
+    <ui:MenubarMenu Title="File">
+        <ui:MenubarItem Text="New tab" Shortcut="Ctrl+T" Clicked="OnNewTab" />
+        <ui:MenubarSeparator />
+        <ui:MenubarItem Text="Print" Icon="FileText" Clicked="OnPrint" />
+    </ui:MenubarMenu>
+    <ui:MenubarMenu Title="Edit"> ... </ui:MenubarMenu>
+</ui:Menubar>
+```
+
+---
 
 ### Navbar
 Top bar (56px, border below): a brand, links and actions at the end. Narrower than
