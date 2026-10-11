@@ -149,7 +149,7 @@
                             <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
                         </ui:DialogHeader>
                         <ui:ShellLabel Text="Name" Size="Sm" Weight="Medium" />
-                        <ui:Input Text="Pedro Duarte" />
+                        <ui:Input Text="Shewart Shepherd" />
                         <ui:DialogFooter>
                             <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
                             <ui:DialogClose><ui:Button Text="Save changes" /></ui:DialogClose>
@@ -212,7 +212,7 @@
                 <ui:TabsContent Value="account">
                     <ui:Card>
                         <ui:CardHeader Title="Account" Description="Make changes to your account here." />
-                        <ui:CardContent><ui:Input Text="Pedro Duarte" /></ui:CardContent>
+                        <ui:CardContent><ui:Input Text="Shewart Shepherd" /></ui:CardContent>
                     </ui:Card>
                 </ui:TabsContent>
                 <ui:TabsContent Value="password">
@@ -240,9 +240,9 @@
                 <ui:CollapsibleTrigger><ui:Button x:Name="ToggleCollapsible" Text="Show starred repositories" Icon="ChevronsUpDown" IconPosition="Right" Variant="Outline" /></ui:CollapsibleTrigger>
                 <ui:CollapsibleContent>
                     <StackPanel Spacing="8">
-                        <ui:ShellLabel Text="@radix-ui/primitives" Size="Sm" />
-                        <ui:ShellLabel Text="@radix-ui/colors" Size="Sm" />
-                        <ui:ShellLabel Text="@stitches/react" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shellui" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shellui-native" Size="Sm" />
+                        <ui:ShellLabel Text="shellui-dev/shell-icons" Size="Sm" />
                     </StackPanel>
                 </ui:CollapsibleContent>
             </ui:Collapsible>
@@ -291,13 +291,141 @@
                 <ui:HoverCard x:Name="DemoHoverCard">
                     <ui:HoverCardTrigger><ui:Button Text="@shellui" Variant="Link" /></ui:HoverCardTrigger>
                     <ui:HoverCardContent>
-                        <ui:ShellLabel Text="@shellui" Weight="Semibold" Size="Sm" />
-                        <ui:ShellLabel Text="Copy-and-own components for Blazor and native .NET apps." Size="Sm" />
-                        <ui:ShellLabel Text="Joined December 2024" Size="Sm" Variant="Muted" />
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <ui:Avatar Source="/Assets/Brand/shellui.png" Fallback="SU" VerticalAlignment="Top" />
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <ui:ShellLabel Text="@shellui" Weight="Semibold" Size="Sm" />
+                                <ui:ShellLabel Text="Copy-and-own components for Blazor and native .NET apps." Size="Sm" />
+                                <ui:ShellLabel Text="Joined December 2024" Size="Xs" Variant="Muted" />
+                            </StackPanel>
+                        </Grid>
                     </ui:HoverCardContent>
                 </ui:HoverCard>
             </WrapPanel>
             <TextBlock x:Name="FeedbackChoice" Classes="hint" Margin="0,8,0,0" Text="Open the alert dialog or show a toast." />
+
+            <TextBlock Classes="title" Text="Data display" />
+            <TextBlock Classes="hint" Text="Avatar, toggle, callout, table, empty state and pagination." />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <ui:Avatar Source="/Assets/Brand/shellui.png" Fallback="SU" />
+                <ui:Avatar Fallback="SS" />
+                <ui:Avatar />
+                <ui:Avatar Source="/Assets/Brand/shellicons.png" Fallback="SI" Size="Sm" />
+                <ui:Avatar Fallback="SS" Size="Lg" />
+                <ui:Avatar Source="/Assets/Brand/shellui_native.png" Fallback="SN" Size="Xl" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+                <ui:Toggle Icon="Star" />
+                <ui:Toggle Icon="Star" Text="Favorite" IsPressed="True" />
+                <ui:Toggle Text="Outline" Variant="Outline" />
+                <ui:Toggle Text="Small" Size="Sm" Variant="Outline" />
+                <ui:Toggle Text="Disabled" IsEnabled="False" />
+            </StackPanel>
+            <StackPanel Spacing="12" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:Callout Title="Note" Text="Components are copied into your project, so you own and can change the code." />
+                <ui:Callout Variant="Tip" Title="Pro tip" Text="Run shellui-native list to see every component for your platform." />
+                <ui:Callout Variant="Warning" Title="Heads up" Text="Avalonia templates aren't on NuGet yet." />
+                <ui:Callout Variant="Danger" Title="Breaking change" Text="Icon uses Kind instead of Name on Avalonia." />
+                <ui:Callout Variant="Default" Text="A neutral callout without a title." />
+            </StackPanel>
+            <ui:Table x:Name="DemoTable" Columns="*,*,1.4*,90" MinimumContentWidth="440" Width="560" HorizontalAlignment="Left"
+                      Caption="A list of your recent invoices." Margin="0,12,0,0">
+                <ui:TableHeader>
+                    <ui:TableHead Text="Invoice" />
+                    <ui:TableHead Text="Status" />
+                    <ui:TableHead Text="Method" />
+                    <ui:TableHead Text="Amount" HorizontalTextAlignment="End" />
+                </ui:TableHeader>
+                <ui:TableRow>
+                    <ui:TableCell Text="INV001" IsBold="True" />
+                    <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalAlignment="Left" VerticalAlignment="Center" /></ui:TableCell>
+                    <ui:TableCell Text="Credit Card" />
+                    <ui:TableCell Text="$250.00" HorizontalTextAlignment="End" />
+                </ui:TableRow>
+                <ui:TableRow>
+                    <ui:TableCell Text="INV002" IsBold="True" />
+                    <ui:TableCell><ui:Badge Text="Pending" Variant="Warning" HorizontalAlignment="Left" VerticalAlignment="Center" /></ui:TableCell>
+                    <ui:TableCell Text="PayPal" />
+                    <ui:TableCell Text="$150.00" HorizontalTextAlignment="End" />
+                </ui:TableRow>
+                <ui:TableRow>
+                    <ui:TableCell Text="INV003" IsBold="True" />
+                    <ui:TableCell><ui:Badge Text="Unpaid" Variant="Destructive" HorizontalAlignment="Left" VerticalAlignment="Center" /></ui:TableCell>
+                    <ui:TableCell Text="Bank Transfer" />
+                    <ui:TableCell Text="$350.00" HorizontalTextAlignment="End" />
+                </ui:TableRow>
+                <ui:TableRow>
+                    <ui:TableCell Text="INV004" IsBold="True" />
+                    <ui:TableCell><ui:Badge Text="Paid" Variant="Success" HorizontalAlignment="Left" VerticalAlignment="Center" /></ui:TableCell>
+                    <ui:TableCell Text="Credit Card" />
+                    <ui:TableCell Text="$450.00" HorizontalTextAlignment="End" />
+                </ui:TableRow>
+            </ui:Table>
+            <ui:EmptyState Icon="Folder" Title="No projects yet" Bordered="True" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0"
+                           Description="You haven't created any projects. Get started by creating your first one.">
+                <ui:Button Text="Create project" Icon="Plus" />
+                <ui:Button Text="Import" Variant="Outline" />
+            </ui:EmptyState>
+            <ui:Pagination x:Name="DemoPagination" TotalPages="20" Page="5" Margin="0,12,0,0" />
+            <TextBlock x:Name="DataChoice" Classes="hint" Margin="0,8,0,0" Text="Click a row or a page." />
+
+            <TextBlock Classes="title" Text="Menus, slides and steps" />
+            <TextBlock Classes="hint" Text="Context menu, carousel and stepper." />
+            <ui:ContextMenu x:Name="DemoContextMenu" Width="560" HorizontalAlignment="Left">
+                <ui:ContextMenuTrigger>
+                    <Panel Height="120">
+                        <Rectangle Stroke="{DynamicResource ShellUIBorderBrush}" StrokeThickness="1" StrokeDashArray="4,4"
+                                   RadiusX="6" RadiusY="6" />
+                        <ui:ShellLabel Text="Right-click here (long-press on touch)" Size="Sm" Variant="Muted"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Panel>
+                </ui:ContextMenuTrigger>
+                <ui:ContextMenuContent>
+                    <ui:ContextMenuItem Text="Back" Icon="ArrowLeft" Shortcut="Alt+Left" />
+                    <ui:ContextMenuItem Text="Reload" Icon="RefreshCw" Shortcut="Ctrl+R" />
+                    <ui:ContextMenuItem Text="Copy link" Icon="Link" />
+                    <ui:ContextMenuItem Text="Save as..." Icon="Save" IsEnabled="False" />
+                    <ui:ContextMenuSeparator />
+                    <ui:ContextMenuItem Text="Delete" Icon="Trash2" IsDestructive="True" />
+                </ui:ContextMenuContent>
+            </ui:ContextMenu>
+            <ui:Carousel x:Name="DemoCarousel" AspectRatio="2.4" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Panel Background="{DynamicResource ShellUIMutedBrush}">
+                    <TextBlock Text="1" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUISecondaryBrush}">
+                    <TextBlock Text="2" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUIAccentBrush}">
+                    <TextBlock Text="3" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+                <Panel Background="{DynamicResource ShellUIMutedBrush}">
+                    <TextBlock Text="4" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                </Panel>
+            </ui:Carousel>
+            <ui:Stepper x:Name="DemoStepper" Width="560" HorizontalAlignment="Left" Margin="0,24,0,0">
+                <ui:StepperStep Title="Account" Description="Your details">
+                    <StackPanel Spacing="8">
+                        <ui:ShellLabel Text="Email" Size="Sm" Weight="Medium" />
+                        <ui:Input Placeholder="you@example.com" />
+                    </StackPanel>
+                </ui:StepperStep>
+                <ui:StepperStep Title="Plan" Description="Pick a tier">
+                    <ui:RadioGroup Value="pro">
+                        <ui:RadioGroupItem Value="free" Text="Free" />
+                        <ui:RadioGroupItem Value="pro" Text="Pro" />
+                        <ui:RadioGroupItem Value="team" Text="Team" />
+                    </ui:RadioGroup>
+                </ui:StepperStep>
+                <ui:StepperStep Title="Review" Description="Confirm and finish">
+                    <ui:ShellLabel Text="Everything looks good. Press Confirm to create the workspace." Size="Sm" />
+                </ui:StepperStep>
+            </ui:Stepper>
+            <TextBlock x:Name="AdvancedChoice" Classes="hint" Margin="0,8,0,0" Text="Right-click the box, move the carousel or walk through the steps." />
 
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />

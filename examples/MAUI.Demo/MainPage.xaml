@@ -309,12 +309,12 @@
                 <!-- Avatar & Spinner -->
                 <Label Text="Avatar" Style="{StaticResource SectionTitle}" />
                 <HorizontalStackLayout Spacing="12">
-                    <ui:Avatar Source="dotnet_bot.png" Fallback="DB" />
-                    <ui:Avatar Fallback="CN" />
+                    <ui:Avatar Source="shellui.png" Fallback="SU" />
+                    <ui:Avatar Fallback="SS" />
                     <ui:Avatar />
-                    <ui:Avatar Fallback="SM" Size="Sm" />
-                    <ui:Avatar Fallback="LG" Size="Lg" />
-                    <ui:Avatar Source="dotnet_bot.png" Size="Xl" />
+                    <ui:Avatar Source="shellicons.png" Fallback="SI" Size="Sm" />
+                    <ui:Avatar Fallback="SS" Size="Lg" />
+                    <ui:Avatar Source="shellui_native.png" Fallback="SN" Size="Xl" />
                 </HorizontalStackLayout>
 
                 <Label Text="Spinner" Style="{StaticResource SectionTitle}" />
@@ -348,7 +348,7 @@
                             </ui:DialogHeader>
                             <VerticalStackLayout Spacing="8">
                                 <Label Text="Name" Style="{StaticResource FieldLabel}" />
-                                <ui:Input Text="Pedro Duarte" />
+                                <ui:Input Text="Shewart Shepherd" />
                             </VerticalStackLayout>
                             <ui:DialogFooter>
                                 <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
@@ -374,11 +374,11 @@
                             <Label Text="Make changes to your profile here." Style="{StaticResource Muted}" />
                             <VerticalStackLayout Spacing="8">
                                 <Label Text="Name" Style="{StaticResource FieldLabel}" />
-                                <ui:Input Text="Pedro Duarte" />
+                                <ui:Input Text="Shewart Shepherd" />
                             </VerticalStackLayout>
                             <VerticalStackLayout Spacing="8">
                                 <Label Text="Username" Style="{StaticResource FieldLabel}" />
-                                <ui:Input Text="@peduarte" />
+                                <ui:Input Text="@shewart" />
                             </VerticalStackLayout>
                             <ui:Button Text="Save changes" Clicked="OnSheetSave" />
                         </ui:SheetContent>
@@ -398,7 +398,7 @@
                         <ui:HoverCardTrigger><ui:Button Text="@shellui" Variant="Link" /></ui:HoverCardTrigger>
                         <ui:HoverCardContent>
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                <ui:Avatar Fallback="SU" VerticalOptions="Start" />
+                                <ui:Avatar Source="shellui.png" Fallback="SU" VerticalOptions="Start" />
                                 <VerticalStackLayout Grid.Column="1" Spacing="4">
                                     <Label Text="@shellui" Style="{StaticResource FieldLabel}" />
                                     <Label Text="Beautifully designed components for .NET: Blazor, MAUI and Avalonia." Style="{StaticResource Body}" />
@@ -460,16 +460,16 @@
                 <Label Text="Collapsible" Style="{StaticResource SectionTitle}" />
                 <ui:Collapsible>
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="@peduarte starred 3 repositories" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                        <Label Text="@shewart starred 3 repositories" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
                         <ui:CollapsibleTrigger Grid.Column="1">
                             <ui:Button Icon="ChevronsUpDown" Size="Icon" Variant="Ghost" />
                         </ui:CollapsibleTrigger>
                     </Grid>
-                    <ui:Card><Label Text="@radix-ui/primitives" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                    <ui:Card><Label Text="shellui-dev/shellui" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
                     <ui:CollapsibleContent>
                         <VerticalStackLayout Spacing="8">
-                            <ui:Card><Label Text="@radix-ui/colors" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
-                            <ui:Card><Label Text="@stitches/react" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                            <ui:Card><Label Text="shellui-dev/shellui-native" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
+                            <ui:Card><Label Text="shellui-dev/shell-icons" Style="{StaticResource Body}" Margin="16,12" /></ui:Card>
                         </VerticalStackLayout>
                     </ui:CollapsibleContent>
                 </ui:Collapsible>
@@ -508,7 +508,7 @@
                     <ui:TabsContent Value="account">
                         <ui:Card>
                             <ui:CardHeader Title="Account" Description="Make changes to your account here." />
-                            <ui:CardContent><ui:Input Text="Pedro Duarte" /></ui:CardContent>
+                            <ui:CardContent><ui:Input Text="Shewart Shepherd" /></ui:CardContent>
                         </ui:Card>
                     </ui:TabsContent>
                     <ui:TabsContent Value="password">
