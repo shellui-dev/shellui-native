@@ -112,6 +112,11 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| Resizable | Drag a divider | Dividers are also tab stops: the arrow keys move them 16px; the pointer shows a resize cursor |
+| Navbar | Links and the menu button react to taps | They are also tab stops (Enter / Space); children are collected in `Items` |
+| Sidebar | Width animates on collapse | Same, with items as tab stops; children are collected in `Groups` and `Items` |
+| DateRangePicker | Tap the trigger | Also Enter / Space / Down on the focused trigger; Escape closes the panel |
+| FileUpload | `Files` are `FileResult`; `FileTypes` is a `FilePickerFileType`; drop works on Windows only | `Files` are `IStorageFile`; `FileTypes` is a list of `FilePickerFileType` (e.g. `FilePickerFileTypes.ImageAll`); drop works wherever Avalonia supports it; Enter / Space open the picker |
 | ToggleGroup | Items toggle on tap | Items are also tab stops (Enter / Space); children are collected in `Items` |
 | NumberInput | Numeric keyboard | Up / Down step the value while the field has focus |
 | TagInput | Enter, comma or semicolon adds a tag | Backspace in the empty field also removes the last tag |
@@ -488,6 +493,61 @@ shellui-native add date-picker   # also installs calendar
 <ui:DatePicker Date="{Binding DueDate}" Format="MMM d, yyyy" />
 ```
 
+### DateRangePicker
+A DatePicker-style trigger that opens one calendar for a start and an end date. The first pick
+is the start, the second the end; a pick before the start, or one made when the range is
+already complete, starts over. The panel closes when the range is complete, and the × clears
+it.
+
+```bash
+shellui-native add date-range-picker
+```
+
+**Properties:** `StartDate`, `EndDate` (two-way, nullable), `Placeholder` ("Pick a date
+range"), `Format` ("MMM d, yyyy"), `AllowClear` (true), `MinimumDate`, `MaximumDate` ·
+**Events:** `RangeChanged` · **Methods:** `SetOpen(bool)`, `Close()`, `Clear()`
+
+```xml
+<ui:DateRangePicker StartDate="{Binding From}" EndDate="{Binding To}" />
+```
+
+It uses `Calendar`'s `RangeStart` and `RangeEnd`, which tint a span of days; you can set them
+on a `Calendar` of your own too.
+
+---
+
+### FileUpload
+A dashed drop zone with an upload icon and a prompt. Tapping it opens the platform file picker;
+the picked files are listed underneath, each with a × to remove it. On Windows, files can also
+be dropped on it.
+
+```bash
+shellui-native add file-upload
+```
+
+**Properties:** `Text`, `Multiple` (false: a new pick replaces the file), `MaxFiles` (0 = no
+limit; applies when `Multiple` is on), `FileTypes` (`FilePickerFileType`, e.g.
+`FilePickerFileType.Images`; null offers every file), `ShowFiles` (true), `Files` (read-only) ·
+**Events:** `FilesChanged` · **Methods:** `PickAsync()`, `Add(files)`, `Remove(file)`,
+`Clear()`
+
+```xml
+<ui:FileUpload Multiple="True" MaxFiles="5" FilesChanged="OnFiles" />
+```
+
+```csharp
+private async void OnFiles(object? sender, IReadOnlyList<FileResult> files)
+{
+    foreach (var file in files)
+    {
+        await using var stream = await file.OpenReadAsync();
+        // upload or read the stream
+    }
+}
+```
+
+---
+
 ### TimePicker
 Custom-drawn: a 40px trigger (clock icon + formatted time) that opens scrollable hour and minute
 columns — plus AM/PM on a 12-hour clock — floating over the page. Picking a value updates `Time`
@@ -568,6 +628,30 @@ shellui-native add wrap-layout
 ```
 
 Prefer it to `FlexLayout` for simple wrapping: it measures each child once per layout pass.
+
+### Resizable
+Panels side by side (or stacked) with a hairline between them. Dragging the hairline moves
+space from one neighbor to the other; neither goes under its `MinSize`. Groups nest, so a panel
+can hold another `Resizable` with the other orientation. Give the group a size.
+
+```bash
+shellui-native add resizable
+```
+
+**Properties (Resizable):** `Orientation` (Horizontal), `ShowHandle` (true: a short bar on each
+divider) · **Events:** `Resized` (a drag ended)
+
+**Properties (ResizablePanel):** `Size` (two-way; its share of the space, 2 is twice as much as
+1), `MinSize` (48) · its child view is the panel's content
+
+```xml
+<ui:Resizable HeightRequest="200">
+    <ui:ResizablePanel Size="1" MinSize="120"> ... </ui:ResizablePanel>
+    <ui:ResizablePanel Size="2"> ... </ui:ResizablePanel>
+</ui:Resizable>
+```
+
+---
 
 ### Card
 `rounded-xl border bg-card shadow-sm` container.
@@ -661,6 +745,68 @@ shellui-native add accordion
 ---
 
 ## Navigation Components
+
+### Navbar
+Top bar (56px, border below): a brand, links and actions at the end. Narrower than
+`CollapseBelow`, the links move into a menu that a button opens under the bar; picking a link
+closes it.
+
+```bash
+shellui-native add navbar
+```
+
+**Properties (Navbar):** `Title`, `Icon`, `Brand` (a view that replaces the icon and title),
+`Actions` (a view at the end of the bar), `SelectedValue` (two-way), `CollapseBelow` (640; 0
+never collapses), `IsMenuOpen` (two-way) · **Events:** `SelectedValueChanged`
+
+**Properties (NavbarItem):** `Text`, `Value`, `Icon`, `IsEnabled` · **Events:** `Clicked`
+
+```xml
+<ui:Navbar Title="ShellUI" Icon="Sparkles" SelectedValue="{Binding Page}">
+    <ui:NavbarItem Value="docs" Text="Docs" />
+    <ui:NavbarItem Value="components" Text="Components" />
+    <ui:Navbar.Actions>
+        <ui:Button Icon="Search" Size="Icon" Variant="Ghost" />
+    </ui:Navbar.Actions>
+</ui:Navbar>
+```
+
+---
+
+### Sidebar
+App sidebar: a 256px column with a header, scrolling groups of items and a footer. Collapsed,
+it is a 56px rail that shows the icons only. Put it in a column next to your content (or
+inside a `Sheet` on phones).
+
+```bash
+shellui-native add sidebar
+```
+
+**Properties (Sidebar):** `IsCollapsed` (two-way), `SelectedValue` (two-way), `ExpandedWidth`
+(256), `CollapsedWidth` (56), `Side` (Left, Right: the border is drawn on the inner edge),
+`Header`, `Footer` · **Events:** `IsCollapsedChanged`, `SelectedValueChanged` · **Methods:**
+`Toggle()`
+
+**SidebarGroup:** `Label` · **SidebarItem:** `Text`, `Value`, `Icon`, `Badge`, `IsEnabled` ·
+**Events:** `Clicked`
+
+The header and footer are your own views: hide what doesn't fit the rail in
+`IsCollapsedChanged`.
+
+```xml
+<Grid ColumnDefinitions="Auto,*">
+    <ui:Sidebar x:Name="AppSidebar" SelectedValue="{Binding Page}">
+        <ui:Sidebar.Header> ... </ui:Sidebar.Header>
+        <ui:SidebarGroup Label="Workspace">
+            <ui:SidebarItem Value="home" Text="Home" Icon="House" />
+            <ui:SidebarItem Value="inbox" Text="Inbox" Icon="Inbox" Badge="12" />
+        </ui:SidebarGroup>
+    </ui:Sidebar>
+    <ContentView Grid.Column="1"> ... </ContentView>
+</Grid>
+```
+
+---
 
 ### Tabs
 A muted pill-shaped list; the active tab is raised on the background color. Panels fade in on switch.

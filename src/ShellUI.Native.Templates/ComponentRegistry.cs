@@ -121,7 +121,12 @@ public static class ComponentRegistry
         { "aspect-ratio", (AspectRatioTemplate.Metadata, AspectRatioTemplate.Contents) },
         { "link-card", (LinkCardTemplate.Metadata, LinkCardTemplate.Contents) },
         { "tree-view", (TreeViewTemplate.Metadata, TreeViewTemplate.Contents) },
-        { "multi-select", (MultiSelectTemplate.Metadata, MultiSelectTemplate.Contents) }
+        { "multi-select", (MultiSelectTemplate.Metadata, MultiSelectTemplate.Contents) },
+        { "resizable", (ResizableTemplate.Metadata, ResizableTemplate.Contents) },
+        { "navbar", (NavbarTemplate.Metadata, NavbarTemplate.Contents) },
+        { "sidebar", (SidebarTemplate.Metadata, SidebarTemplate.Contents) },
+        { "date-range-picker", (DateRangePickerTemplate.Metadata, DateRangePickerTemplate.Contents) },
+        { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

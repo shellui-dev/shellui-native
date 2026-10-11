@@ -4,7 +4,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 
 Last revised: **2026-10-07** (first prerelease, `0.1.0-alpha.1`).
 
-**Status at a glance:** P0–P5 ✅ done · P6 partly done (resizable, navbar, sidebar open) · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2): every component ported, not released yet**.
+**Status at a glance:** P0–P6 ✅ done · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2): every component ported, not released yet**.
 
 ---
 
@@ -187,15 +187,15 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 
 ---
 
-### P6 — Lower (Advanced) — partly done
+### P6 — Lower (Advanced) ✅
 | Component | Priority | Dependencies | ShellUI Ref | Notes |
 |-----------|----------|--------------|-------------|-------|
 | **context-menu** ✅ | P6.1 | shell, icon, element-extensions | ContextMenu | Done 2026-10-05 — one template; opens at the pointer on right-click, under the trigger on long-press |
 | **carousel** ✅ | P6.2 | shell, icon | Carousel | Done 2026-10-05 — one template; swipe, arrows, dots, loop, auto-play |
 | **stepper** ✅ | P6.3 | shell, icon, button | Stepper | Done 2026-10-05 — one template (Stepper + StepperStep) with built-in navigation |
-| **resizable** | P6.4 | — | Resizable | Resizable panels |
-| **navbar** | P6.5 | nav-trigger, nav-content, nav-list, nav-item | Navbar | Collapsible nav bar |
-| **sidebar** | P6.6 | — | Sidebar | App sidebar layout |
+| **resizable** ✅ | P6.4 | shell | Resizable | Done 2026-10-11 — one template (Resizable + ResizablePanel); drag the divider, nests for both directions |
+| **navbar** ✅ | P6.5 | shell, icon, element-extensions | Navbar | Done 2026-10-11 — one template (Navbar + NavbarItem); links collapse into a menu under the bar |
+| **sidebar** ✅ | P6.6 | shell, icon, element-extensions | Sidebar | Done 2026-10-11 — one template (Sidebar, SidebarGroup, SidebarItem); collapses to an icon rail |
 
 ---
 
@@ -204,9 +204,9 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 |-----------|----------|-------|
 | chart (line, bar, pie, area) | P7 | Consider external chart lib integration |
 | combobox ✅ | P7 | Done 2026-10-04 — Select with a filter field, Enter picks the first match |
-| file-upload | P7 | File picker |
+| **file-upload** ✅ | P7 | Done 2026-10-11, MAUI and Avalonia — drop zone, platform file picker, list of picked files |
 | input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
-| date-range-picker | P7 | Date range selection |
+| **date-range-picker** ✅ | P7 | Done 2026-10-11, MAUI and Avalonia — one calendar, start then end; `Calendar` gained `RangeStart` / `RangeEnd` |
 | toggle-group ✅ | — | Done 2026-10-05 — single or multiple selection, Default / Outline |
 | number-input ✅ | — | Done 2026-10-05 — − / + buttons, min / max clamp, decimal value |
 | tag-input ✅ | — | Done 2026-10-05 — chips with remove, Enter / comma / semicolon to commit |
@@ -293,6 +293,5 @@ P7 items marked ✅ above — 58 families, 89 CLI targets, MAUI only.
 component APIs, tokens and sizing contract. MAUI is far ahead, so new MAUI components wait
 until Avalonia has P0 + P1.
 
-**MAUI backlog after that:** resizable, navbar, sidebar (P6); chart, file-upload,
-date-range-picker (P7); and the ShellUI Blazor targets not yet ported (button-group,
+**Backlog after that:** chart (P7); and the ShellUI Blazor targets not yet ported (button-group,
 input-group, command / command-palette, menubar, navigation-menu, data-table, …).
