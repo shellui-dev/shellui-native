@@ -210,7 +210,7 @@ All packages share a single version defined in `Directory.Build.props`:
 
 ```xml
 <ShellUINativeVersion>0.1.0</ShellUINativeVersion>
-<ShellUINativeVersionSuffix>alpha.1</ShellUINativeVersionSuffix>
+<ShellUINativeVersionSuffix>alpha.2</ShellUINativeVersionSuffix>
 ```
 
 The build stamps it into the assemblies, and component metadata reads it from there at runtime,

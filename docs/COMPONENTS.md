@@ -67,8 +67,8 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 ## Avalonia
 
-Every component on this page has an Avalonia version, installed by the same CLI commands. The
-Avalonia templates are not on NuGet yet: they ship with the next release.
+Every component on this page has an Avalonia version, installed by the same CLI commands
+(since `0.1.0-alpha.2`).
 
 Overlays use Avalonia's `Popup` in the window's overlay layer: the content stays in the logical
 tree (theme, DataContext and `FindParentOfType` work as declared), dropdowns and popovers get

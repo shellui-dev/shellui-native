@@ -2,9 +2,9 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
-Last revised: **2026-10-07** (first prerelease, `0.1.0-alpha.1`).
+Last revised: **2026-10-11** (second prerelease, `0.1.0-alpha.2`).
 
-**Status at a glance:** P0–P6 ✅ done · P7 partly done · shipped as `0.1.0-alpha.1` (58 families, 89 CLI targets) · **Avalonia (Phase 2): every component ported, not released yet**.
+**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia.
 
 ---
 
@@ -289,9 +289,9 @@ public static T? FindParentOfType<T>(this Element element) where T : Element
 [RELEASE_NOTES.md](./RELEASE_NOTES.md)): P0–P5, P6 context-menu / carousel / stepper, and the
 P7 items marked ✅ above — 58 families, 89 CLI targets, MAUI only.
 
-**Next — Phase 2 (Avalonia).** Port in the same order as MAUI (P0 → P1 first), reusing the
-component APIs, tokens and sizing contract. MAUI is far ahead, so new MAUI components wait
-until Avalonia has P0 + P1.
+**Shipped in `0.1.0-alpha.2`:** Phase 2 (an Avalonia version of every component), then
+resizable, navbar, sidebar, date-range-picker and file-upload on both platforms — 63 families,
+94 CLI targets. From here on a component lands on both platforms together.
 
-**Backlog after that:** chart (P7); and the ShellUI Blazor targets not yet ported (button-group,
+**Backlog:** chart (P7); and the ShellUI Blazor targets not yet ported (button-group,
 input-group, command / command-palette, menubar, navigation-menu, data-table, …).

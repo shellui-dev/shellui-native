@@ -25,15 +25,15 @@ ShellUI Native brings the same beautiful, accessible, and customizable component
 ### Phase 1: MAUI (Primary Focus)
 - **Target:** .NET MAUI (iOS, Android, Windows, macOS) on .NET 10
 - **Components:** 50+ native controls
-- **Status:** First prerelease `0.1.0-alpha.1` — 58 component families (89 CLI targets),
-  P0–P5 complete, P6 partly; remaining work tracked in
+- **Status:** Released since `0.1.0-alpha.1`; `0.1.0-alpha.2` has 63 component families
+  (94 CLI targets), P0–P6 complete; remaining work tracked in
   [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).
 
 ### Phase 2: Avalonia UI
 - **Target:** Windows, macOS, Linux (desktop-first; mobile/WASM heads are stretch goals)
 - **Components:** 50+ controls, mirrored 1:1 with the MAUI set once that set stabilizes
-- **Status:** Planned — starts after MAUI hits P0+P1 parity and Template System v2 lands.
-  Supersedes the former WPF phase.
+- **Status:** Released in `0.1.0-alpha.2` — every component has an Avalonia version; checked
+  on Windows. Supersedes the former WPF phase.
 - **Why now and not later:** the template/pattern work only needs to be proven once (on MAUI);
   porting to Avalonia is mechanical translation of the same component contracts, and doing it
   before the template system calcifies around MAUI-only assumptions is cheaper than retrofitting
@@ -147,7 +147,7 @@ dotnet tool install -g ShellUI.Native.CLI --prerelease
 ```bash
 shellui-native init     # Initialize project (creates shellui-native.json)
 shellui-native add      # Add components (copies to Components/UI/)
-shellui-native list     # List available components (89 targets)
+shellui-native list     # List available components (94 targets)
 shellui-native remove   # Remove components
 shellui-native update   # Update components to latest version
 ```
@@ -162,7 +162,7 @@ shellui-native update   # Update components to latest version
   "installedComponents": [
     {
       "name": "button",
-      "version": "0.1.0-alpha.1",
+      "version": "0.1.0-alpha.2",
       "platform": "MAUI",
       "installedAt": "2026-01-11T...",
       "isCustomized": false

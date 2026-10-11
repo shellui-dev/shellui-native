@@ -10,7 +10,7 @@
 
 <p align="center">
   One design system, every platform.<br/>
-  Copy-and-own native components for .NET MAUI, inspired by <a href="https://ui.shadcn.com/">shadcn/ui</a>.
+  Copy-and-own native components for .NET MAUI and Avalonia, inspired by <a href="https://ui.shadcn.com/">shadcn/ui</a>.
 </p>
 
 <p align="center">
@@ -39,7 +39,7 @@ Unlike [ShellUI Blazor](https://shellui.dev/), **ShellUI Native does not use Tai
 # Install the CLI tool (prerelease)
 dotnet tool install -g ShellUI.Native.CLI --prerelease
 
-# Initialize in your MAUI project
+# Initialize in your MAUI or Avalonia project
 shellui-native init --yes
 
 # Add components
@@ -53,8 +53,8 @@ shellui-native list
 
 | Platform | Status | .NET Version |
 |----------|--------|--------------|
-| .NET MAUI | Available (`0.1.0-alpha.1`) — Android, iOS, Mac Catalyst, Windows | .NET 10.0 |
-| Avalonia UI | Every component ported (Phase 2); not on NuGet yet, ships with the next release | .NET 10.0 (Avalonia 12) |
+| .NET MAUI | Available since `0.1.0-alpha.1` — Android, iOS, Mac Catalyst, Windows | .NET 10.0 |
+| Avalonia UI | Available since `0.1.0-alpha.2` — every component; checked on Windows | .NET 10.0 (Avalonia 12) |
 | WinUI 3 | Conditional (Phase 3) | .NET 10.0 |
 
 WPF is intentionally not on this list — it's recognized for project detection only, not an
@@ -126,7 +126,7 @@ YourProject/
 │       └── Shell.cs
 ├── Resources/
 │   └── Styles/
-│       └── ShellUITheme.xaml
+│       └── ShellUITheme.xaml       # MAUI only
 └── shellui-native.json
 ```
 
