@@ -44,6 +44,7 @@ public class Button : Border, IShellFocusable
     private DispatcherTimer? _spinning;
     private bool _hovered;
     private bool _pressed;
+    private CornerRadius? _corners;
 
     static Button()
     {
@@ -180,6 +181,13 @@ public class Button : Border, IShellFocusable
         e.Handled = true;
     }
 
+    // Set by ButtonGroup so joined buttons only round their outer corners; null restores the default.
+    internal void SetCorners(CornerRadius? corners)
+    {
+        _corners = corners;
+        UpdateVisualState();
+    }
+
     private void UpdateVisualState()
     {
         _style = ButtonVariants.GetStyle(Variant, Size);
@@ -187,7 +195,7 @@ public class Button : Border, IShellFocusable
         Height = _style.Height;
         Width = _style.Width;
         Padding = _style.Padding;
-        CornerRadius = new CornerRadius(_style.CornerRadius);
+        CornerRadius = _corners ?? new CornerRadius(_style.CornerRadius);
         BorderThickness = new Thickness(_style.Border.HasValue ? 1 : 0);
         if (_style.Border.HasValue)
             this.Token(BorderBrushProperty, _style.Border.Value);

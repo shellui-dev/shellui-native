@@ -4,7 +4,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 
 Last revised: **2026-10-11** (second prerelease, `0.1.0-alpha.2`).
 
-**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia.
+**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar.
 
 ---
 
@@ -293,5 +293,8 @@ P7 items marked ✅ above — 58 families, 89 CLI targets, MAUI only.
 resizable, navbar, sidebar, date-range-picker and file-upload on both platforms — 63 families,
 94 CLI targets. From here on a component lands on both platforms together.
 
-**Backlog:** chart (P7); and the ShellUI Blazor targets not yet ported (button-group,
-input-group, command / command-palette, menubar, navigation-menu, data-table, …).
+**After `0.1.0-alpha.2`, from ShellUI's Blazor set** (both platforms): button-group ✅,
+input-group ✅ and menubar ✅ (2026-10-11; 66 families, 97 CLI targets).
+
+**Backlog:** chart (P7); and the ShellUI Blazor targets not yet ported (command /
+command-palette, navigation-menu, data-table, …).

@@ -18,7 +18,8 @@ into it, not directly into `main`.
 ```
 main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avalonia (PRs #7–#13),
          layout, navigation and pickers on both platforms (PR #14) merged
- └─ chore/release-v0.1.0-alpha.2      ← second prerelease, the first with Avalonia (active)
+         release 0.1.0-alpha.2 (PR #15), CI action bumps (PR #16) merged
+ └─ feat/button-group-input-group-menubar  ← first batch from ShellUI's Blazor set (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -35,8 +36,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, release `0.1.0-alpha.1`, Phase 2 and PR #14 merged | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `chore/release-v0.1.0-alpha.2` | `main` | **Active** | Second prerelease: the first with Avalonia, plus five new components |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2` | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `feat/button-group-input-group-menubar` | `main` | **Active** | button-group, input-group and menubar for MAUI and Avalonia (100 registry entries, 97 CLI targets, 66 families) |
 
 ---
 
@@ -434,7 +435,7 @@ After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
 
 ---
 
-## Release `0.1.0-alpha.2` — `chore/release-v0.1.0-alpha.2` (**active**)
+## Release `0.1.0-alpha.2` — `chore/release-v0.1.0-alpha.2` (**released**; tag `v0.1.0-alpha.2`)
 
 Second NuGet prerelease of `ShellUI.Native.CLI`: the first with Avalonia templates, plus
 resizable, navbar, sidebar, date-range-picker and file-upload on both platforms.
@@ -449,7 +450,7 @@ resizable, navbar, sidebar, date-range-picker and file-upload on both platforms.
   target), each building with 0 warnings; `update calendar` fixes a project that has the
   alpha.1 Calendar
 
-After merge: tag `v0.1.0-alpha.2` on `main` and push the tag.
+Tagged `v0.1.0-alpha.2` on `main` 2026-10-11; published to NuGet by the Release workflow.
 
 ---
 
@@ -519,6 +520,10 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   (`feat/p6-layout-navigation`): resizable, navbar and sidebar, which finish P6, then
   date-range-picker (Calendar gains `RangeStart` / `RangeEnd`) and file-upload from P7; 97
   registry entries. A release branch follows
+- [x] After the release, the first batch from ShellUI's Blazor set
+  (`feat/button-group-input-group-menubar`): button-group (Button gains an internal corner
+  override, so an older `button` needs `shellui-native update button`), input-group and
+  menubar (one template: Menubar, MenubarMenu, MenubarItem, MenubarSeparator)
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
