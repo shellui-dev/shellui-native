@@ -112,6 +112,7 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| DataTable | Tap a header to sort | Sortable headers are also tab stops (Enter / Space) and keep focus after sorting; a click on a row's checkbox does not raise `RowTapped` |
 | Command | Enter picks the highlighted item (the first match) | Up / Down move the highlight and Enter picks it; `Value`, `Text` and the other strings are nullable; children are collected in `Groups` and `Items` |
 | CommandPalette | Open it from code | Also `Hotkey`, a key gesture that toggles it anywhere in the window (Ctrl+K by default; `Hotkey="{x:Null}"` for none) |
 | NavigationMenu | Tap an item to open its panel | Items are tab stops: Enter / Space / Down open a panel and Left / Right move between items; in a panel Up / Down move and Enter picks; children are collected in `Items` and `Links` |
@@ -1193,6 +1194,48 @@ shellui-native add table
 Use star and fixed widths in `Columns`: every row is its own grid, so an `Auto` column would size
 per row. For long lists, put a `TableHeader` above a `CollectionView` whose item template is a
 `TableRow` with the same `Columns` set on the row itself.
+
+### Data Table
+A `Table` filled from a list of objects, with a filter field, sortable column headers, optional
+row selection and pages. Each column names the item property it shows.
+
+```bash
+shellui-native add data-table
+```
+
+**Properties (DataTable):** `ItemsSource` (any list; an `ObservableCollection` refreshes the
+table as it changes), `ShowFilter` (true), `FilterPlaceholder`, `Filter` (the filter text),
+`ShowPagination` (true), `PageSize` (10), `ShowSelection` (false: adds a checkbox column),
+`EmptyText` ("No results."), `MinimumContentWidth`, `SelectedItems`, `Page`, `PageCount`
+(read-only) · **Events:** `SelectionChanged` (the selected items), `RowTapped` (the row's item)
+· **Methods:** `Refresh()`, `GoToPage(int)`, `SortBy(column, descending)`, `ClearSelection()`
+
+**Properties (DataTableColumn):** `Header`, `Property` (the item property to show), `Format` (a
+.NET format string such as `C` or `MMM d, yyyy`), `Width` (`*`, `2*` or a fixed number),
+`IsSortable` (true), `IsBold`, `HorizontalTextAlignment`, `Value` (a function that reads the
+value; set in code, replaces `Property`)
+
+```xml
+<ui:DataTable ItemsSource="{Binding Invoices}" ShowSelection="True" PageSize="5">
+    <ui:DataTableColumn Header="Invoice" Property="Number" IsBold="True" />
+    <ui:DataTableColumn Header="Status" Property="Status" />
+    <ui:DataTableColumn Header="Amount" Property="Amount" Format="C" Width="120" HorizontalTextAlignment="End" />
+</ui:DataTable>
+```
+
+The filter matches every typed word against the text of any column. A sortable header cycles
+ascending, descending and unsorted; numbers and dates sort by value. The header checkbox selects
+every row that passes the filter, across pages. Cells show text only: for badges or buttons in
+cells, build the rows yourself with `Table`.
+
+`Property` is read by name at run time. In an app published with trimming or NativeAOT, set
+`Value` in code instead, so the property is not trimmed away:
+
+```csharp
+InvoiceTable.Columns[0].Value = item => ((Invoice)item).Number;
+```
+
+---
 
 ### Carousel
 One slide at a time in a rounded frame. Swipe, use the round arrow buttons or tap a dot to move.

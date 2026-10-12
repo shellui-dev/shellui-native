@@ -100,6 +100,8 @@ NEW = {
                 ["command", "palette", "search", "menu"]),
     "NavigationMenu": ("navigation-menu", "Navigation Menu", "Row of top-level links that open panels of links", "Navigation",
                        ["navigation", "menu", "header", "links"]),
+    "DataTable": ("data-table", "Data Table", "Table filled from a list, with filter, sorting, selection and pages", "DataDisplay",
+                  ["data", "table", "grid", "sort", "filter", "pagination"]),
     "DateRangePicker": ("date-range-picker", "Date Range Picker", "Picks a start and an end date from one calendar", "Form",
                         ["date", "range", "picker", "calendar"]),
     "FileUpload": ("file-upload", "File Upload", "Drop zone that opens the file picker and lists the picked files", "Form",
@@ -112,6 +114,7 @@ EXTRA_DEPS = {
     "DatePicker": ["calendar"],
     "DateRangePicker": ["calendar"],
     "ButtonGroup": ["button"],
+    "DataTable": ["table", "input", "checkbox"],
     "TagInput": ["wrap-layout"],
     "MultiSelect": ["wrap-layout"],
 }

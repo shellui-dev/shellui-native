@@ -19,8 +19,8 @@ into it, not directly into `main`.
 main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avalonia (PRs #7–#13),
          layout, navigation and pickers on both platforms (PR #14) merged
          release 0.1.0-alpha.2 (PR #15), CI action bumps (PR #16), button-group,
-         input-group and menubar (PR #17) merged
- └─ feat/command-navigation-menu      ← second batch from ShellUI's Blazor set (active)
+         input-group and menubar (PR #17), command and navigation-menu (PR #18) merged
+ └─ feat/data-table                   ← data-table from ShellUI's Blazor set (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -37,8 +37,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PR #17 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `feat/command-navigation-menu` | `main` | **Active** | command (with a command palette) and navigation-menu for MAUI and Avalonia (102 registry entries, 99 CLI targets, 68 families) |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17 and #18 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `feat/data-table` | `main` | **Active** | data-table for MAUI and Avalonia (103 registry entries, 100 CLI targets, 69 families) |
 
 ---
 
@@ -529,6 +529,9 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
   CommandGroup, CommandItem, CommandSeparator and CommandPalette, which hosts a Command in a
   `ShellOverlayHost`; Avalonia adds a window-wide hotkey) and navigation-menu (NavigationMenu,
   NavigationMenuItem, NavigationMenuLink)
+- [x] data-table (`feat/data-table`): DataTable + DataTableColumn on top of `table`, `input`,
+  `checkbox` and `button`; columns read item properties by name (reflection, with a `Value`
+  function for trimmed apps); no row actions or server-side paging yet
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`

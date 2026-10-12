@@ -672,6 +672,17 @@
             </ui:CommandPalette>
             <TextBlock x:Name="CommandChoice" Classes="hint" Margin="0,8,0,0" Text="Search, pick a command or open a menu." />
 
+            <TextBlock Classes="title" Text="Data table" />
+            <TextBlock Classes="hint" Text="Filter, sort by a column, select rows and page through a list." />
+            <ui:DataTable x:Name="DemoDataTable" ShowSelection="True" PageSize="5" Width="720" HorizontalAlignment="Left">
+                <ui:DataTableColumn Header="Invoice" Property="Number" IsBold="True" Width="110" />
+                <ui:DataTableColumn Header="Customer" Property="Customer" Width="1.4*" />
+                <ui:DataTableColumn Header="Status" Property="Status" />
+                <ui:DataTableColumn Header="Date" Property="Date" Format="MMM d, yyyy" />
+                <ui:DataTableColumn Header="Amount" Property="Amount" Format="C" Width="120" HorizontalTextAlignment="End" />
+            </ui:DataTable>
+            <TextBlock x:Name="DataTableChoice" Classes="hint" Margin="0,8,0,0" Text="Select or click a row." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />
