@@ -75,6 +75,15 @@ public partial class MainWindow : Window
         foreach (var menu in DemoMenubar.Menus.OfType<MenubarMenu>())
             foreach (var item in menu.Items.OfType<MenubarItem>())
                 item.Clicked += (_, _) => GroupChoice.Text = $"Menubar: {menu.Title} > {item.Text}.";
+        foreach (var item in DemoNavigationMenu.Items.OfType<NavigationMenuItem>())
+        {
+            item.Clicked += (_, _) => CommandChoice.Text = $"Navigation menu: {item.Title}.";
+            foreach (var link in item.Links.OfType<NavigationMenuLink>())
+                link.Clicked += (_, _) => CommandChoice.Text = $"Navigation menu: {item.Title} > {link.Title}.";
+        }
+        DemoCommand.ItemSelected += (_, item) => CommandChoice.Text = $"Command: {item.Value}.";
+        DemoPalette.ItemSelected += (_, item) => CommandChoice.Text = $"Palette: {item.Value}.";
+        OpenPalette.Clicked += (_, _) => DemoPalette.SetOpen(true);
         DemoNavbar.SelectedValueChanged += (_, value) => LayoutChoice.Text = $"Navbar: {value}.";
         DemoSidebar.SelectedValueChanged += (_, value) =>
         {

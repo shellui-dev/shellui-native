@@ -142,6 +142,10 @@ public partial class MainPage : ContentPage
         Report($"Table: {row.Children.OfType<TableCell>().FirstOrDefault()?.Text}");
     }
 
+    private void OnNavigationMenuLink(object? sender, EventArgs e) => Report($"Navigation menu: {(sender as NavigationMenuLink)?.Title}");
+    private void OnNavigationMenuItem(object? sender, EventArgs e) => Report($"Navigation menu: {(sender as NavigationMenuItem)?.Title}");
+    private void OnCommandSelected(object? sender, CommandItem item) => Report($"Command: {item.Value}");
+    private void OnOpenCommandPalette(object? sender, EventArgs e) => CommandPaletteDemo.SetOpen(true);
     private void OnMenubarItem(object? sender, EventArgs e) => Report($"Menubar: {(sender as MenubarItem)?.Text}");
     private void OnInputGroupChanged(object? sender, TextChangedEventArgs e) => Report($"Input group: {e.NewTextValue}");
     private void OnNavbarChanged(object? sender, string? value) => Report($"Navbar: {value}");

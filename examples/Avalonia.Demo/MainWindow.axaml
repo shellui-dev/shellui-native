@@ -631,6 +631,47 @@
             </ui:Menubar>
             <TextBlock x:Name="GroupChoice" Classes="hint" Margin="0,8,0,0" Text="Click a button, type in a field or pick a menu item." />
 
+            <TextBlock Classes="title" Text="Command and navigation menu" />
+            <TextBlock Classes="hint" Text="A searchable command list, a command palette (Ctrl+K) and a navigation menu." />
+            <ui:NavigationMenu x:Name="DemoNavigationMenu">
+                <ui:NavigationMenuItem x:Name="NavStart" Title="Getting started">
+                    <ui:NavigationMenuLink Title="Introduction" Description="What ShellUI Native is and how it works." Icon="Sparkles" />
+                    <ui:NavigationMenuLink Title="Installation" Description="Add the CLI and your first component." Icon="Download" />
+                    <ui:NavigationMenuLink Title="Theming" />
+                </ui:NavigationMenuItem>
+                <ui:NavigationMenuItem x:Name="NavComponents" Title="Components">
+                    <ui:NavigationMenuLink Title="Button" Description="Variants, sizes, icons and loading." />
+                    <ui:NavigationMenuLink Title="Dialog" Description="A modal window over the page." />
+                </ui:NavigationMenuItem>
+                <ui:NavigationMenuItem x:Name="NavDocs" Title="Docs" />
+            </ui:NavigationMenu>
+            <ui:Command x:Name="DemoCommand" Width="420" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <ui:CommandGroup Heading="Suggestions">
+                    <ui:CommandItem Text="Calendar" Icon="Calendar" Value="calendar" />
+                    <ui:CommandItem Text="Search components" Icon="Search" Value="search" Keywords="find lookup" />
+                    <ui:CommandItem Text="Launch" Icon="Zap" Value="launch" IsEnabled="False" />
+                </ui:CommandGroup>
+                <ui:CommandSeparator />
+                <ui:CommandGroup Heading="Settings">
+                    <ui:CommandItem Text="Profile" Icon="User" Value="profile" Shortcut="Ctrl+P" />
+                    <ui:CommandItem Text="Billing" Icon="CreditCard" Value="billing" Shortcut="Ctrl+B" />
+                    <ui:CommandItem Text="Settings" Icon="Settings" Value="settings" Shortcut="Ctrl+," Keywords="preferences options" />
+                </ui:CommandGroup>
+            </ui:Command>
+            <ui:Button x:Name="OpenPalette" Text="Open command palette" Icon="Command" Variant="Outline" Margin="0,12,0,0" />
+            <ui:CommandPalette x:Name="DemoPalette">
+                <ui:CommandGroup Heading="Pages">
+                    <ui:CommandItem Text="Home" Icon="House" Value="home" />
+                    <ui:CommandItem Text="Inbox" Icon="Inbox" Value="inbox" />
+                    <ui:CommandItem Text="Dashboard" Icon="LayoutDashboard" Value="dashboard" />
+                </ui:CommandGroup>
+                <ui:CommandGroup Heading="Actions">
+                    <ui:CommandItem Text="Toggle theme" Icon="Moon" Value="theme" Keywords="dark light" />
+                    <ui:CommandItem Text="Log out" Icon="LogOut" Value="logout" />
+                </ui:CommandGroup>
+            </ui:CommandPalette>
+            <TextBlock x:Name="CommandChoice" Classes="hint" Margin="0,8,0,0" Text="Search, pick a command or open a menu." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

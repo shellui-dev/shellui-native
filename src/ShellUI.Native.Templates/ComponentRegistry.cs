@@ -129,7 +129,9 @@ public static class ComponentRegistry
         { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) },
         { "button-group", (ButtonGroupTemplate.Metadata, ButtonGroupTemplate.Contents) },
         { "input-group", (InputGroupTemplate.Metadata, InputGroupTemplate.Contents) },
-        { "menubar", (MenubarTemplate.Metadata, MenubarTemplate.Contents) }
+        { "menubar", (MenubarTemplate.Metadata, MenubarTemplate.Contents) },
+        { "command", (CommandTemplate.Metadata, CommandTemplate.Contents) },
+        { "navigation-menu", (NavigationMenuTemplate.Metadata, NavigationMenuTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
