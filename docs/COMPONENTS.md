@@ -112,6 +112,7 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| ChatInput | The send button sends | Also Enter sends and Shift+Enter starts a new line |
 | DataTable | Tap a header to sort | Sortable headers are also tab stops (Enter / Space) and keep focus after sorting; a click on a row's checkbox does not raise `RowTapped` |
 | Command | Enter picks the highlighted item (the first match) | Up / Down move the highlight and Enter picks it; `Value`, `Text` and the other strings are nullable; children are collected in `Groups` and `Items` |
 | CommandPalette | Open it from code | Also `Hotkey`, a key gesture that toggles it anywhere in the window (Ctrl+K by default; `Hotkey="{x:Null}"` for none) |
@@ -363,6 +364,39 @@ shellui-native add tag-input   # also installs wrap-layout
 
 ```xml
 <ui:TagInput Tags="{Binding Labels}" Placeholder="Add a label..." MaxTags="6" />
+```
+
+---
+
+### Form
+Fields stacked with even spacing. Each `FormField` is a label, a control, an optional
+description and an error message. Validation is yours: set a field's `Error` and the form
+reports it.
+
+```bash
+shellui-native add form
+```
+
+**Properties (Form):** `Spacing` (24), `IsValid` (no field has an `Error`), `FirstInvalid`
+(read-only) · **Methods:** `FormFields()`, `ClearErrors()`
+
+**Properties (FormField):** `Label`, `Description`, `Error` (two-way; shown in the destructive
+color, and the label turns red), `IsRequired` (a red asterisk), `HasError` (read-only) · its
+child view is the control
+
+```xml
+<ui:Form x:Name="SignUp">
+    <ui:FormField x:Name="EmailField" Label="Email" Description="We never share it." IsRequired="True">
+        <ui:Input x:Name="Email" Placeholder="you@example.com" />
+    </ui:FormField>
+    <ui:Button Text="Create account" Clicked="OnSubmit" />
+</ui:Form>
+```
+
+```csharp
+EmailField.Error = Email.Text.Contains('@') ? "" : "Enter a valid email address.";
+Email.HasError = EmailField.HasError;   // the red border is the control's own property
+if (SignUp.IsValid) { /* submit */ }
 ```
 
 ---
@@ -1233,6 +1267,49 @@ cells, build the rows yourself with `Table`.
 
 ```csharp
 InvoiceTable.Columns[0].Value = item => ((Invoice)item).Number;
+```
+
+---
+
+### Chat
+A conversation panel: an optional header, a scrolling list of messages that follows the newest
+one, and an optional footer, usually a `ChatInput`. Give it a height.
+
+```bash
+shellui-native add chat
+```
+
+**Properties (Chat):** `Header`, `Footer` (views), `AutoScroll` (true: follows new messages and
+a message that grows, unless the reader has scrolled up), `Messages` · **Methods:**
+`ScrollToEnd()`
+
+**Properties (ChatMessage):** `Role` (Assistant, User, System), `Text`, `Sender`, `Timestamp`,
+`IsStreaming` (three bouncing dots while a reply is arriving), `AvatarText` (initials),
+`Avatar` (a view; replaces the initials), `Actions` (a view under the bubble) · its child view
+goes inside the bubble, under the text
+
+**Properties (ChatInput):** `Text` (two-way), `Placeholder`, `IsLoading` (a spinner in the send
+button; blocks sending), `Actions` (a view before the text) · **Events:** `Submitted` (the
+trimmed text; the box is cleared) · **Methods:** `Submit()`, `Focus()`
+
+```xml
+<ui:Chat x:Name="Conversation" HeightRequest="420">
+    <ui:ChatMessage Role="Assistant" Sender="ShellUI" AvatarText="S" Text="How can I help?" />
+    <ui:ChatMessage Role="User" Text="Show me the button." />
+    <ui:Chat.Footer>
+        <ui:ChatInput Submitted="OnSend" />
+    </ui:Chat.Footer>
+</ui:Chat>
+```
+
+```csharp
+private void OnSend(object? sender, string text)
+{
+    Conversation.Messages.Add(new ChatMessage { Role = ChatRole.User, Text = text });
+    var reply = new ChatMessage { Role = ChatRole.Assistant, IsStreaming = true };
+    Conversation.Messages.Add(reply);
+    // later: reply.Text = "..."; reply.IsStreaming = false;
+}
 ```
 
 ---

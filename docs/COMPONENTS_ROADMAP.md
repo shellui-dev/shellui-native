@@ -4,7 +4,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 
 Last revised: **2026-10-11** (second prerelease, `0.1.0-alpha.2`).
 
-**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar, command, navigation-menu, data-table.
+**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar, command, navigation-menu, data-table, chat, form.
 
 ---
 
@@ -296,8 +296,9 @@ resizable, navbar, sidebar, date-range-picker and file-upload on both platforms 
 **After `0.1.0-alpha.2`, from ShellUI's Blazor set** (both platforms): button-group ✅,
 input-group ✅ and menubar ✅ (2026-10-11), then command ✅ (with a command palette) and
 navigation-menu ✅, then data-table ✅ (client-side filter, sort, selection and pages;
-2026-10-12; 69 families, 100 CLI targets).
+2026-10-12), then chat ✅ and form ✅ (2026-10-13; 71 families, 102 CLI targets).
 
-**Backlog:** chart (P7); and the ShellUI Blazor targets not yet ported (chat, form,
-image-viewer, qr-code, …). Not in the native data-table yet: row actions and server-side
+**Backlog:** chart (P7); and the ShellUI Blazor targets not yet ported (image-viewer,
+prev-next-nav, …). qr-code waits, like the icon switch, for NuGet package dependencies in the
+CLI: it needs a QR encoder. Not in the native data-table yet: row actions and server-side
 paging.
