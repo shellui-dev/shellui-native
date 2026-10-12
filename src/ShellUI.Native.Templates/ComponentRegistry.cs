@@ -131,7 +131,8 @@ public static class ComponentRegistry
         { "input-group", (InputGroupTemplate.Metadata, InputGroupTemplate.Contents) },
         { "menubar", (MenubarTemplate.Metadata, MenubarTemplate.Contents) },
         { "command", (CommandTemplate.Metadata, CommandTemplate.Contents) },
-        { "navigation-menu", (NavigationMenuTemplate.Metadata, NavigationMenuTemplate.Contents) }
+        { "navigation-menu", (NavigationMenuTemplate.Metadata, NavigationMenuTemplate.Contents) },
+        { "data-table", (DataTableTemplate.Metadata, DataTableTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

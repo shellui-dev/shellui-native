@@ -830,6 +830,17 @@
                     </ui:TableRow>
                 </ui:Table>
 
+                <!-- Data table -->
+                <Label Text="Data Table" Style="{StaticResource SectionTitle}" />
+                <ui:DataTable x:Name="DataTableDemo" ShowSelection="True" PageSize="5" MinimumContentWidth="560"
+                              SelectionChanged="OnDataTableSelection" RowTapped="OnDataTableRow">
+                    <ui:DataTableColumn Header="Invoice" Property="Number" IsBold="True" Width="110" />
+                    <ui:DataTableColumn Header="Customer" Property="Customer" Width="1.4*" />
+                    <ui:DataTableColumn Header="Status" Property="Status" />
+                    <ui:DataTableColumn Header="Date" Property="Date" Format="MMM d, yyyy" />
+                    <ui:DataTableColumn Header="Amount" Property="Amount" Format="C" Width="120" HorizontalTextAlignment="End" />
+                </ui:DataTable>
+
                 <!-- Empty state -->
                 <Label Text="Empty State" Style="{StaticResource SectionTitle}" />
                 <ui:EmptyState Icon="Folder" Title="No projects yet" Bordered="True"

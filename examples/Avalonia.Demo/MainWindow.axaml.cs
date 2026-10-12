@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -84,6 +85,24 @@ public partial class MainWindow : Window
         DemoCommand.ItemSelected += (_, item) => CommandChoice.Text = $"Command: {item.Value}.";
         DemoPalette.ItemSelected += (_, item) => CommandChoice.Text = $"Palette: {item.Value}.";
         OpenPalette.Clicked += (_, _) => DemoPalette.SetOpen(true);
+        DemoDataTable.ItemsSource = new List<DemoInvoice>
+        {
+            new DemoInvoice("INV001", "Shewart Shepherd", "Paid", 250.00m, new DateTime(2026, 9, 2)),
+            new DemoInvoice("INV002", "ShellUI", "Pending", 150.00m, new DateTime(2026, 9, 5)),
+            new DemoInvoice("INV003", "ShellIcons", "Unpaid", 350.00m, new DateTime(2026, 9, 9)),
+            new DemoInvoice("INV004", "ShellDocs", "Paid", 450.00m, new DateTime(2026, 9, 12)),
+            new DemoInvoice("INV005", "Shewart Shepherd", "Paid", 550.00m, new DateTime(2026, 9, 14)),
+            new DemoInvoice("INV006", "ShellUI Native", "Pending", 200.00m, new DateTime(2026, 9, 18)),
+            new DemoInvoice("INV007", "ShellUI", "Unpaid", 300.00m, new DateTime(2026, 9, 21)),
+            new DemoInvoice("INV008", "ShellDocs", "Paid", 75.50m, new DateTime(2026, 9, 24)),
+            new DemoInvoice("INV009", "ShellIcons", "Paid", 1200.00m, new DateTime(2026, 9, 27)),
+            new DemoInvoice("INV010", "ShellUI Native", "Pending", 89.99m, new DateTime(2026, 10, 1)),
+            new DemoInvoice("INV011", "Shewart Shepherd", "Unpaid", 640.00m, new DateTime(2026, 10, 4)),
+            new DemoInvoice("INV012", "ShellUI", "Paid", 310.25m, new DateTime(2026, 10, 8)),
+        };
+        DemoDataTable.SelectionChanged += (_, items) =>
+            DataTableChoice.Text = $"Data table: {items.Count} selected ({string.Join(", ", items.Cast<DemoInvoice>().Select(i => i.Number))}).";
+        DemoDataTable.RowTapped += (_, item) => DataTableChoice.Text = $"Data table row: {((DemoInvoice)item).Number}.";
         DemoNavbar.SelectedValueChanged += (_, value) => LayoutChoice.Text = $"Navbar: {value}.";
         DemoSidebar.SelectedValueChanged += (_, value) =>
         {
@@ -139,3 +158,5 @@ public partial class MainWindow : Window
         }
     }
 }
+
+public sealed record DemoInvoice(string Number, string Customer, string Status, decimal Amount, DateTime Date);
