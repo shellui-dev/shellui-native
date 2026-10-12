@@ -493,6 +493,50 @@
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupNavigation" Spacing="16" IsVisible="False">
+                <!-- Navigation menu -->
+                <Label Text="Navigation Menu" Style="{StaticResource SectionTitle}" />
+                <ui:NavigationMenu x:Name="NavigationMenuDemo">
+                    <ui:NavigationMenuItem x:Name="NavMenuStart" Title="Getting started">
+                        <ui:NavigationMenuLink Title="Introduction" Description="What ShellUI Native is and how it works." Icon="Sparkles" Clicked="OnNavigationMenuLink" />
+                        <ui:NavigationMenuLink Title="Installation" Description="Add the CLI and your first component." Icon="Download" Clicked="OnNavigationMenuLink" />
+                        <ui:NavigationMenuLink Title="Theming" Clicked="OnNavigationMenuLink" />
+                    </ui:NavigationMenuItem>
+                    <ui:NavigationMenuItem x:Name="NavMenuComponents" Title="Components">
+                        <ui:NavigationMenuLink Title="Button" Description="Variants, sizes, icons and loading." Clicked="OnNavigationMenuLink" />
+                        <ui:NavigationMenuLink Title="Dialog" Description="A modal window over the page." Clicked="OnNavigationMenuLink" />
+                    </ui:NavigationMenuItem>
+                    <ui:NavigationMenuItem x:Name="NavMenuDocs" Title="Docs" Clicked="OnNavigationMenuItem" />
+                </ui:NavigationMenu>
+
+                <!-- Command -->
+                <Label Text="Command" Style="{StaticResource SectionTitle}" />
+                <ui:Command x:Name="CommandDemo" ItemSelected="OnCommandSelected"
+                            WidthRequest="{OnIdiom Phone=-1, Default=420}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:CommandGroup Heading="Suggestions">
+                        <ui:CommandItem Text="Calendar" Icon="Calendar" Value="calendar" />
+                        <ui:CommandItem Text="Search components" Icon="Search" Value="search" Keywords="find lookup" />
+                        <ui:CommandItem Text="Launch" Icon="Zap" Value="launch" IsEnabled="False" />
+                    </ui:CommandGroup>
+                    <ui:CommandSeparator />
+                    <ui:CommandGroup Heading="Settings">
+                        <ui:CommandItem Text="Profile" Icon="User" Value="profile" Shortcut="Ctrl+P" />
+                        <ui:CommandItem Text="Billing" Icon="CreditCard" Value="billing" Shortcut="Ctrl+B" />
+                        <ui:CommandItem Text="Settings" Icon="Settings" Value="settings" Shortcut="Ctrl+," Keywords="preferences options" />
+                    </ui:CommandGroup>
+                </ui:Command>
+                <ui:Button Text="Open command palette" Icon="Command" Variant="Outline" Clicked="OnOpenCommandPalette" />
+                <ui:CommandPalette x:Name="CommandPaletteDemo" ItemSelected="OnCommandSelected">
+                    <ui:CommandGroup Heading="Pages">
+                        <ui:CommandItem Text="Home" Icon="House" Value="home" />
+                        <ui:CommandItem Text="Inbox" Icon="Inbox" Value="inbox" />
+                        <ui:CommandItem Text="Dashboard" Icon="LayoutDashboard" Value="dashboard" />
+                    </ui:CommandGroup>
+                    <ui:CommandGroup Heading="Actions">
+                        <ui:CommandItem Text="Toggle theme" Icon="Moon" Value="theme" Keywords="dark light" />
+                        <ui:CommandItem Text="Log out" Icon="LogOut" Value="logout" />
+                    </ui:CommandGroup>
+                </ui:CommandPalette>
+
                 <!-- Menubar -->
                 <Label Text="Menubar" Style="{StaticResource SectionTitle}" />
                 <ui:Menubar x:Name="MenubarDemo">

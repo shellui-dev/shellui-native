@@ -122,6 +122,8 @@ public class TemplateContentTests
     [InlineData("button-group")]
     [InlineData("input-group")]
     [InlineData("menubar")]
+    [InlineData("command")]
+    [InlineData("navigation-menu")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
