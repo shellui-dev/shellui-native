@@ -683,6 +683,41 @@
             </ui:DataTable>
             <TextBlock x:Name="DataTableChoice" Classes="hint" Margin="0,8,0,0" Text="Select or click a row." />
 
+            <TextBlock Classes="title" Text="Chat and form" />
+            <TextBlock Classes="hint" Text="A conversation with a message box, and form fields with validation messages." />
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <ui:Chat x:Name="DemoChat" Width="480" Height="420" VerticalAlignment="Top">
+                    <ui:Chat.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ui:Icon Kind="Sparkles" Size="18" VerticalAlignment="Center" />
+                            <ui:ShellLabel Text="ShellUI assistant" Size="Sm" Weight="Semibold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </ui:Chat.Header>
+                    <ui:ChatMessage Role="System" Text="This conversation is a demo." />
+                    <ui:ChatMessage Role="Assistant" Sender="ShellUI" Timestamp="09:41" AvatarText="S" Text="Hi! Ask me about any component." />
+                    <ui:ChatMessage Role="User" Sender="Shewart" Timestamp="09:42" AvatarText="SS" Text="How do I add the data table?" />
+                    <ui:ChatMessage Role="Assistant" Sender="ShellUI" Timestamp="09:42" AvatarText="S" Text="Run the command below, then bind ItemsSource to your list.">
+                        <ui:Kbd Text="shellui-native add data-table" HorizontalAlignment="Left" />
+                    </ui:ChatMessage>
+                    <ui:Chat.Footer>
+                        <ui:ChatInput x:Name="DemoChatInput" />
+                    </ui:Chat.Footer>
+                </ui:Chat>
+                <ui:Form x:Name="DemoForm" Width="360" VerticalAlignment="Top">
+                    <ui:FormField x:Name="DemoEmailField" Label="Email" Description="We never share your email." IsRequired="True">
+                        <ui:Input x:Name="DemoEmail" Placeholder="you@example.com" />
+                    </ui:FormField>
+                    <ui:FormField x:Name="DemoPasswordField" Label="Password" Description="At least 8 characters." IsRequired="True">
+                        <ui:Input x:Name="DemoPassword" Placeholder="Password" IsPassword="True" />
+                    </ui:FormField>
+                    <ui:FormField Label="Bio">
+                        <ui:Textarea Placeholder="Tell us a little about yourself" />
+                    </ui:FormField>
+                    <ui:Button x:Name="DemoFormSubmit" Text="Create account" />
+                </ui:Form>
+            </StackPanel>
+            <TextBlock x:Name="ChatFormChoice" Classes="hint" Margin="0,8,0,0" Text="Send a message or submit the form." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

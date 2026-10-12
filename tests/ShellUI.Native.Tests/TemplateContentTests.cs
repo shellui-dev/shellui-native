@@ -125,6 +125,8 @@ public class TemplateContentTests
     [InlineData("command")]
     [InlineData("navigation-menu")]
     [InlineData("data-table")]
+    [InlineData("chat")]
+    [InlineData("form")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
