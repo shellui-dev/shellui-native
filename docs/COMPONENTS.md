@@ -112,6 +112,9 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| Command | Enter picks the highlighted item (the first match) | Up / Down move the highlight and Enter picks it; `Value`, `Text` and the other strings are nullable; children are collected in `Groups` and `Items` |
+| CommandPalette | Open it from code | Also `Hotkey`, a key gesture that toggles it anywhere in the window (Ctrl+K by default; `Hotkey="{x:Null}"` for none) |
+| NavigationMenu | Tap an item to open its panel | Items are tab stops: Enter / Space / Down open a panel and Left / Right move between items; in a panel Up / Down move and Enter picks; children are collected in `Items` and `Links` |
 | ButtonGroup | Children are the buttons | Children are collected in `Items` |
 | InputGroup | `Keyboard` picks the on-screen keyboard | No `Keyboard`; a click on a control in the prefix or suffix is left to that control |
 | Menubar | Tap a title to open its menu | Titles are tab stops: Enter / Space / Down open a menu and Left / Right move between titles; in a menu Up / Down move and Enter picks; children are collected in `Menus` and `Items` |
@@ -795,6 +798,78 @@ shellui-native add accordion
 ---
 
 ## Navigation Components
+
+### Navigation Menu
+A row of top-level links for a site or app header. An item with links inside shows a chevron
+and opens a panel of them, each with a title, an optional description and an optional icon. An
+item without links is a plain link.
+
+```bash
+shellui-native add navigation-menu
+```
+
+**NavigationMenuItem:** `Title`, `IsOpen` (read-only), `IsEnabled` · **Events:** `Clicked` (an
+item without links) · **Methods:** `SetOpen(bool)`, `Close()`
+
+**NavigationMenuLink:** `Title`, `Description`, `Icon`, `IsEnabled` · **Events:** `Clicked`
+
+```xml
+<ui:NavigationMenu>
+    <ui:NavigationMenuItem Title="Getting started">
+        <ui:NavigationMenuLink Title="Introduction" Description="What ShellUI Native is." Clicked="OnLink" />
+        <ui:NavigationMenuLink Title="Installation" Description="Add it to your app." Clicked="OnLink" />
+    </ui:NavigationMenuItem>
+    <ui:NavigationMenuItem Title="Docs" Clicked="OnDocs" />
+</ui:NavigationMenu>
+```
+
+---
+
+### Command
+A search field over a list of grouped items. Typing filters the list by each item's `Text` and
+`Keywords`, and Enter picks the highlighted item. `CommandPalette`, in the same file, shows the
+list in a dialog near the top of the page.
+
+```bash
+shellui-native add command
+```
+
+**Properties (Command):** `Placeholder`, `EmptyText` ("No results found."), `MaxListHeight`
+(300), `Query` (read-only) · **Events:** `ItemSelected` (the item) · **Methods:** `Focus()`,
+`Reset()`, `Items()`
+
+**CommandGroup:** `Heading` · **CommandItem:** `Text`, `Value`, `Icon`, `Shortcut` (a hint at
+the end of the row; display only), `Keywords`, `IsEnabled` · **Events:** `Clicked` ·
+**CommandSeparator:** a divider, hidden while the list is filtered
+
+```xml
+<ui:Command ItemSelected="OnCommand">
+    <ui:CommandGroup Heading="Suggestions">
+        <ui:CommandItem Text="Calendar" Icon="Calendar" Value="calendar" />
+        <ui:CommandItem Text="Settings" Icon="Settings" Value="settings" Shortcut="Ctrl+," Keywords="preferences options" />
+    </ui:CommandGroup>
+</ui:Command>
+```
+
+**CommandPalette:** `Open` (two-way), `Placeholder`, `EmptyText`, `Command` (the list inside) ·
+**Events:** `ItemSelected`, `OpenChanged` · **Methods:** `SetOpen(bool)`. Picking an item,
+tapping the backdrop or pressing Escape closes it, and it opens with an empty search.
+
+```xml
+<ui:CommandPalette x:Name="Palette" ItemSelected="OnCommand">
+    <ui:CommandGroup Heading="Pages"> ... </ui:CommandGroup>
+</ui:CommandPalette>
+```
+
+```csharp
+Palette.SetOpen(true);
+```
+
+On MAUI the name matches `Microsoft.Maui.Controls.Command` (the `ICommand` helper). In C# that
+imports both namespaces, qualify one of them or add an alias:
+`using UI = YourApp.Components.UI;`.
+
+---
 
 ### Menubar
 A row of menus, like a desktop app's File / Edit / View. Each menu opens a panel of items under
