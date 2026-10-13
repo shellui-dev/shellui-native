@@ -63,6 +63,7 @@
                     <ui:ToggleGroupItem Value="overlays" Text="Overlays" />
                     <ui:ToggleGroupItem Value="navigation" Text="Navigation" />
                     <ui:ToggleGroupItem Value="data" Text="Data" />
+                    <ui:ToggleGroupItem Value="charts" Text="Charts" />
                 </ui:ToggleGroup>
             </ScrollView>
             <ui:Separator />
@@ -924,6 +925,106 @@
                     </ui:ScrollArea>
                 </Border>
 
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="GroupCharts" Spacing="16" IsVisible="False">
+                <!-- Charts -->
+                <Label Text="Charts" Style="{StaticResource SectionTitle}" />
+                <ui:WrapLayout>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Bar chart" Description="Two series side by side." />
+                    <ui:CardContent>
+                <ui:BarChart x:Name="BarChartDemo" Labels="Jan, Feb, Mar, Apr, May, Jun" Description="Visitors by month, desktop and mobile" HeightRequest="260">
+                <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+                <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+                </ui:BarChart>
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Stacked bars" Description="IsStacked puts the series on top of each other." />
+                    <ui:CardContent>
+                <ui:BarChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsStacked="True" HeightRequest="260">
+                <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+                <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+                </ui:BarChart>
+                    </ui:CardContent>
+                </ui:Card>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Horizontal bars" Description="IsHorizontal lays the bars down; negative values go the other way." />
+                    <ui:CardContent>
+                <ui:BarChart Labels="Chrome, Safari, Firefox, Edge, Other" IsHorizontal="True" ShowLegend="False" HeightRequest="260">
+                <ui:ChartSeries Name="Change" Values="12, -5, 8, -3, 4" />
+                </ui:BarChart>
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Line chart" Description="Smooth by default, with a dot on every point here." />
+                    <ui:CardContent>
+                <ui:LineChart x:Name="LineChartDemo" Labels="Jan, Feb, Mar, Apr, May, Jun" ShowDots="True" HeightRequest="260">
+                <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+                <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+                </ui:LineChart>
+                    </ui:CardContent>
+                </ui:Card>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Area chart" Description="Stacked, each series sits on the one before it." />
+                    <ui:CardContent>
+                <ui:AreaChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsStacked="True" HeightRequest="260">
+                <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+                <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+                </ui:AreaChart>
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Straight lines" Description="IsSmooth off, and a fixed value axis." />
+                    <ui:CardContent>
+                <ui:AreaChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsSmooth="False" Maximum="400" ValueFormat="0" HeightRequest="260">
+                <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+                </ui:AreaChart>
+                    </ui:CardContent>
+                </ui:Card>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Pie chart" Description="One slice per value, named by Labels." />
+                    <ui:CardContent>
+                <ui:PieChart x:Name="PieChartDemo" Labels="Chrome, Safari, Firefox, Edge, Other" HeightRequest="260">
+                <ui:ChartSeries Values="275, 200, 187, 173, 90" />
+                </ui:PieChart>
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Donut chart" Description="A pie with a hole for a value and a label." />
+                    <ui:CardContent>
+                <ui:DonutChart Labels="Chrome, Safari, Firefox, Edge, Other" CenterValue="925" CenterLabel="Visitors" HeightRequest="260">
+                <ui:ChartSeries Values="275, 200, 187, 173, 90" />
+                </ui:DonutChart>
+                    </ui:CardContent>
+                </ui:Card>
+                </ui:WrapLayout>
+                <ui:WrapLayout>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Radar chart" Description="A spoke per category and a shape per series." />
+                    <ui:CardContent>
+                <ui:RadarChart x:Name="RadarChartDemo" Labels="Speed, Power, Range, Comfort, Price, Safety" HeightRequest="280">
+                <ui:ChartSeries Name="Model A" Values="80, 65, 90, 70, 55, 85" />
+                <ui:ChartSeries Name="Model B" Values="60, 85, 70, 80, 75, 65" />
+                </ui:RadarChart>
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card WidthRequest="{OnIdiom Phone=-1, Default=420}" Margin="0,0,16,16">
+                    <ui:CardHeader Title="Radial chart" Description="A ring per value, filling towards Maximum." />
+                    <ui:CardContent>
+                <ui:RadialChart x:Name="RadialChartDemo" Labels="Move, Exercise, Stand" Maximum="100" CenterValue="72%" CenterLabel="Move" HeightRequest="260">
+                <ui:ChartSeries Values="72, 48, 90" />
+                </ui:RadialChart>
+                    </ui:CardContent>
+                </ui:Card>
+                </ui:WrapLayout>
                 </VerticalStackLayout>
 
                 <ui:Separator Margin="0,24,0,0" />

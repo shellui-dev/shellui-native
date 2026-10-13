@@ -136,7 +136,14 @@ public static class ComponentRegistry
         { "chat", (ChatTemplate.Metadata, ChatTemplate.Contents) },
         { "form", (FormTemplate.Metadata, FormTemplate.Contents) },
         { "image-viewer", (ImageViewerTemplate.Metadata, ImageViewerTemplate.Contents) },
-        { "prev-next-nav", (PrevNextNavTemplate.Metadata, PrevNextNavTemplate.Contents) }
+        { "prev-next-nav", (PrevNextNavTemplate.Metadata, PrevNextNavTemplate.Contents) },
+        { "chart", (ChartTemplate.Metadata, ChartTemplate.Contents) },
+        { "bar-chart", (BarChartTemplate.Metadata, BarChartTemplate.Contents) },
+        { "line-chart", (LineChartTemplate.Metadata, LineChartTemplate.Contents) },
+        { "area-chart", (AreaChartTemplate.Metadata, AreaChartTemplate.Contents) },
+        { "pie-chart", (PieChartTemplate.Metadata, PieChartTemplate.Contents) },
+        { "radar-chart", (RadarChartTemplate.Metadata, RadarChartTemplate.Contents) },
+        { "radial-chart", (RadialChartTemplate.Metadata, RadialChartTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
