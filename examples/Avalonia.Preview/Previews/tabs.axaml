@@ -1,0 +1,22 @@
+<Panel xmlns="https://github.com/avaloniaui"
+       xmlns:ui="using:AvaloniaDemo.Components.UI"
+       MaxWidth="420" VerticalAlignment="Center">
+    <ui:Tabs Value="account">
+        <ui:TabsList>
+            <ui:TabsTrigger Value="account" Text="Account" />
+            <ui:TabsTrigger Value="password" Text="Password" />
+        </ui:TabsList>
+        <ui:TabsContent Value="account">
+            <ui:Card>
+                <ui:CardHeader Title="Account" Description="Make changes to your account here." />
+                <ui:CardContent><ui:Input Text="Shewart Shepherd" /></ui:CardContent>
+            </ui:Card>
+        </ui:TabsContent>
+        <ui:TabsContent Value="password">
+            <ui:Card>
+                <ui:CardHeader Title="Password" Description="Change your password here." />
+                <ui:CardContent><ui:Input Placeholder="New password" IsPassword="True" /></ui:CardContent>
+            </ui:Card>
+        </ui:TabsContent>
+    </ui:Tabs>
+</Panel>

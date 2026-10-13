@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShellUI Native preview</title>
+    <script>
+        // Before first paint, so the loading screen is in the reader's theme.
+        const theme = new URLSearchParams(location.search).get('theme');
+        if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme;
+    </script>
+    <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+    <div id="out">
+        <div class="avalonia-splash">
+            <div class="spinner" role="status" aria-label="Loading the preview"></div>
+        </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

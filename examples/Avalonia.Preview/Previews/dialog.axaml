@@ -1,0 +1,23 @@
+<Panel xmlns="https://github.com/avaloniaui"
+       xmlns:ui="using:AvaloniaDemo.Components.UI"
+       HorizontalAlignment="Center" VerticalAlignment="Center">
+    <ui:Dialog>
+        <ui:DialogTrigger>
+            <ui:Button Text="Edit profile" Variant="Outline" />
+        </ui:DialogTrigger>
+        <ui:DialogContent>
+            <ui:DialogHeader>
+                <ui:DialogTitle Text="Edit profile" />
+                <ui:DialogDescription Text="Make changes to your profile here. Click save when you're done." />
+            </ui:DialogHeader>
+            <StackPanel Spacing="8">
+                <ui:ShellLabel Text="Name" Size="Sm" Weight="Medium" />
+                <ui:Input Text="Shewart Shepherd" />
+            </StackPanel>
+            <ui:DialogFooter>
+                <ui:DialogClose><ui:Button Text="Cancel" Variant="Outline" /></ui:DialogClose>
+                <ui:DialogClose><ui:Button Text="Save changes" /></ui:DialogClose>
+            </ui:DialogFooter>
+        </ui:DialogContent>
+    </ui:Dialog>
+</Panel>
