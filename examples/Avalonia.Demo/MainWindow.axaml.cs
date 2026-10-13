@@ -123,6 +123,17 @@ public partial class MainWindow : Window
             DemoPassword.HasError = DemoPasswordField.HasError;
             ChatFormChoice.Text = DemoForm.IsValid ? "Form: valid." : $"Form: {DemoForm.FormFields().Count(f => f.HasError)} error(s), first is {DemoForm.FirstInvalid?.Label}.";
         };
+        var docsPages = new[] { "Installation", "Quick start", "Theming", "Components" };
+        var docsPage = 1;
+        void ShowDocsPage(int page)
+        {
+            docsPage = Math.Clamp(page, 0, docsPages.Length - 1);
+            DemoPrevNext.PreviousLabel = docsPage > 0 ? docsPages[docsPage - 1] : null;
+            DemoPrevNext.NextLabel = docsPage < docsPages.Length - 1 ? docsPages[docsPage + 1] : null;
+            PrevNextChoice.Text = $"Page: {docsPages[docsPage]}.";
+        }
+        DemoPrevNext.PreviousClicked += (_, _) => ShowDocsPage(docsPage - 1);
+        DemoPrevNext.NextClicked += (_, _) => ShowDocsPage(docsPage + 1);
         DemoNavbar.SelectedValueChanged += (_, value) => LayoutChoice.Text = $"Navbar: {value}.";
         DemoSidebar.SelectedValueChanged += (_, value) =>
         {

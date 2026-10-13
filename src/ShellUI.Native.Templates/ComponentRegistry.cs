@@ -134,7 +134,9 @@ public static class ComponentRegistry
         { "navigation-menu", (NavigationMenuTemplate.Metadata, NavigationMenuTemplate.Contents) },
         { "data-table", (DataTableTemplate.Metadata, DataTableTemplate.Contents) },
         { "chat", (ChatTemplate.Metadata, ChatTemplate.Contents) },
-        { "form", (FormTemplate.Metadata, FormTemplate.Contents) }
+        { "form", (FormTemplate.Metadata, FormTemplate.Contents) },
+        { "image-viewer", (ImageViewerTemplate.Metadata, ImageViewerTemplate.Contents) },
+        { "prev-next-nav", (PrevNextNavTemplate.Metadata, PrevNextNavTemplate.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.

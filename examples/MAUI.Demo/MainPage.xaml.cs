@@ -148,6 +148,18 @@ public partial class MainPage : ContentPage
     private void OnCarouselChanged(object? sender, int position) => Report($"Carousel: slide {position + 1}");
 
     private TableRow? _selectedRow;
+    private static readonly string[] DocsPages = { "Installation", "Quick start", "Theming", "Components" };
+    private int _docsPage = 1;
+    private void OnPrevious(object? sender, EventArgs e) => ShowDocsPage(_docsPage - 1);
+    private void OnNext(object? sender, EventArgs e) => ShowDocsPage(_docsPage + 1);
+    private void ShowDocsPage(int page)
+    {
+        _docsPage = Math.Clamp(page, 0, DocsPages.Length - 1);
+        PrevNextDemo.PreviousLabel = _docsPage > 0 ? DocsPages[_docsPage - 1] : string.Empty;
+        PrevNextDemo.NextLabel = _docsPage < DocsPages.Length - 1 ? DocsPages[_docsPage + 1] : string.Empty;
+        Report($"Prev next: page {DocsPages[_docsPage]}");
+    }
+
     private void OnFormSubmit(object? sender, EventArgs e)
     {
         FormEmailField.Error = (FormEmail.Text ?? string.Empty).Contains('@') ? string.Empty : "Enter a valid email address.";

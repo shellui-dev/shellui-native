@@ -508,6 +508,11 @@
                 </VerticalStackLayout>
 
                 <VerticalStackLayout x:Name="GroupNavigation" Spacing="16" IsVisible="False">
+                <!-- Prev / next -->
+                <Label Text="Prev Next Nav" Style="{StaticResource SectionTitle}" />
+                <ui:PrevNextNav x:Name="PrevNextDemo" PreviousLabel="Installation" NextLabel="Theming"
+                                PreviousClicked="OnPrevious" NextClicked="OnNext" />
+
                 <!-- Navigation menu -->
                 <Label Text="Navigation Menu" Style="{StaticResource SectionTitle}" />
                 <ui:NavigationMenu x:Name="NavigationMenuDemo">
@@ -844,6 +849,15 @@
                         <ui:TableCell Text="$450.00" HorizontalTextAlignment="End" />
                     </ui:TableRow>
                 </ui:Table>
+
+                <!-- Image viewer -->
+                <Label Text="Image Viewer" Style="{StaticResource SectionTitle}" />
+                <HorizontalStackLayout Spacing="12">
+                    <ui:ImageViewer x:Name="ImageViewerDemo" Source="shellui_native.png" Description="The ShellUI Native mark"
+                                    WidthRequest="120" HeightRequest="120" />
+                    <ui:ImageViewer Source="shellui.png" Description="The ShellUI mark" WidthRequest="120" HeightRequest="120" />
+                    <ui:ImageViewer Source="shellicons.png" Description="The ShellIcons mark" WidthRequest="120" HeightRequest="120" />
+                </HorizontalStackLayout>
 
                 <!-- Chat -->
                 <Label Text="Chat" Style="{StaticResource SectionTitle}" />
