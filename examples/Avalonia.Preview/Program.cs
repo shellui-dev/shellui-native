@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -26,6 +27,12 @@ internal static partial class Program
         var query = args.Length > 0 && Uri.TryCreate(args[0], UriKind.Absolute, out var uri) ? uri.Query : "";
         Component = Read(query, "c");
         Theme = ParseTheme(Read(query, "theme"));
+
+        // Without ICU data the only culture is the invariant one, whose currency sign is a
+        // placeholder. Money in the previews reads as dollars instead.
+        var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+        culture.NumberFormat.CurrencySymbol = "$";
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = culture;
         return BuildAvaloniaApp().WithInterFont().StartBrowserAppAsync("out");
     }
 
@@ -39,6 +46,11 @@ internal static partial class Program
         if (Application.Current is null) return;
         Dispatcher.UIThread.Post(() => ShellTheme.SetTheme(Theme));
     }
+
+    // The height the preview asks for, with the frame's padding, so a page can size its frame.
+    [JSExport]
+    internal static double ContentHeight() =>
+        App.Host?.Child is { } preview ? Math.Ceiling(preview.DesiredSize.Height + App.Host.Padding.Top + App.Host.Padding.Bottom) : 0;
 
     private static ThemeVariant ParseTheme(string theme) => theme switch
     {

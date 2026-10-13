@@ -22,6 +22,16 @@
     <TrimmerRootAssembly Include="AvaloniaPreview" />
   </ItemGroup>
 
+  <!-- The docs site keeps a preview per example in its own repository and builds this project with
+       -p:PreviewsDir=<that folder>. The files in Previews are samples for working here alone. -->
+  <ItemGroup Condition="'$(PreviewsDir)' != ''">
+    <AvaloniaXaml Remove="Previews\**" />
+    <AvaloniaXaml Include="$(PreviewsDir)\**\*.axaml" Link="Previews/%(Filename)%(Extension)" />
+    <Compile Include="$(PreviewsDir)\**\*.cs" Link="Previews/%(Filename)%(Extension)" />
+    <!-- Pictures the previews show, addressed as /Assets/<file>. -->
+    <AvaloniaResource Include="$(PreviewsDir)\assets\**" Link="Assets/%(Filename)%(Extension)" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia.Browser" Version="12.1.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />

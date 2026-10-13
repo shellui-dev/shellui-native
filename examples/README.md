@@ -51,7 +51,11 @@ dotnet publish examples/Avalonia.Preview/AvaloniaPreview.csproj -c Release
 ```
 
 A preview is one file, `Previews/<name>.axaml`: the markup the docs page shows, inside a panel that
-places it. The project is not in the solution, so building the solution doesn't need the workload.
+places it. The ones here are samples. The docs site keeps a preview for every example in its own
+repository and builds this project with `-p:PreviewsDir=<that folder>` (`.axaml` files, their
+`.axaml.cs` files, and pictures under `assets/`, addressed as `/Assets/<file>`).
+
+The project is not in the solution, so building the solution doesn't need the workload.
 
 ## Purpose
 

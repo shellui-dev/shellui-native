@@ -14,6 +14,9 @@ namespace AvaloniaPreview;
 
 public class App : Application
 {
+    // The frame around the preview.
+    public static Border? Host { get; private set; }
+
     public override void Initialize()
     {
         Styles.Add(new FluentTheme());
@@ -25,9 +28,9 @@ public class App : Application
     {
         if (ApplicationLifetime is ISingleViewApplicationLifetime single)
         {
-            var host = new Border { Padding = new Thickness(24), Child = Load(Program.Component) };
-            host.Token(Border.BackgroundProperty, ShellToken.Background);
-            single.MainView = host;
+            Host = new Border { Padding = new Thickness(24), Child = Load(Program.Component) };
+            Host.Token(Border.BackgroundProperty, ShellToken.Background);
+            single.MainView = Host;
         }
 
         base.OnFrameworkInitializationCompleted();
