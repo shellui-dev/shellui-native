@@ -20,6 +20,7 @@ active one as application resources, so switching theme repaints every component
 | `Destructive`, `Success`, `Warning`, `Info` (+ `*Foreground`) | Status variants (badge, alert, progress, labels) |
 | `Border`, `Input`, `Ring` | Dividers, field borders, focus ring |
 | `Overlay` | Dialog / drawer / sheet backdrop |
+| `Chart1` … `Chart5` | Chart series, in order (ShellUI's `--chart-1` … `--chart-5`) |
 
 **Use the tokens in your own XAML** — each token is published as a Color (`ShellUI<Token>`) and a
 Brush (`ShellUI<Token>Brush`):
@@ -112,6 +113,7 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| Charts | Drawn with `GraphicsView`; on touch a tap or a drag shows the tooltip; `HeightRequest` | Drawn in `Render`, in the control's own font; `Height`; `ChartSeries.Color` and the token colors are Avalonia `Color`s (`Color.Parse("#E76E50")`) |
 | ImageViewer | `Source` is an `ImageSource`; `Aspect`; pinch zooms | `Source` is an `IImage` (a resource path such as `/Assets/photo.jpg`); `Stretch` instead of `Aspect`; the wheel and the + / - / 0 keys zoom; the thumbnail and the controls are tab stops |
 | PrevNextNav | Tap a card | The cards are also tab stops (Enter / Space) |
 | ChatInput | The send button sends | Also Enter sends and Shift+Enter starts a new line |
@@ -1465,6 +1467,121 @@ Bordered callout with an icon. **Properties:** `Title`, `Message`, `Variant` (De
 <ui:Alert Title="Heads up!" Message="You can add components to your app using the CLI." />
 <ui:Alert Title="Error" Message="Your session has expired." Variant="Destructive" />
 ```
+
+---
+
+## Charts
+
+Bar, line, area, pie, donut, radar and radial charts. They are drawn by the components
+themselves (MAUI's `GraphicsView`, Avalonia's `Render`), so they need no charting package, and
+they take their colors from the theme: `Chart1` to `Chart5`, in order. Every chart has a legend,
+a tooltip under the pointer (or the finger) and a grow-in animation.
+
+```bash
+shellui-native add bar-chart line-chart area-chart pie-chart radar-chart radial-chart
+```
+
+Each chart installs `chart`, the shared core. The chart colors are new theme tokens: a project
+whose `shell` came from an older CLI version needs `shellui-native update shell` first.
+
+### Data
+
+A chart's children are its series; `Labels` names the categories (or the slices of a pie). In
+XAML both are comma-separated lists.
+
+**ChartSeries:** `Name` (shown in the legend and tooltip), `Values`, `Color` (replaces the
+theme color for that series)
+
+```xml
+<ui:BarChart Labels="Jan, Feb, Mar, Apr, May, Jun" HeightRequest="260">
+    <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+    <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+</ui:BarChart>
+```
+
+From code:
+
+```csharp
+Sales.Labels = new ChartLabels(months);
+Sales.Series.Add(new ChartSeries { Name = "Desktop", Values = new ChartValues(desktopVisits) });
+```
+
+Adding or removing a series, or setting a series' `Values`, `Name` or `Color`, redraws the chart.
+After changing numbers inside an existing `Values` list, call `Refresh()`.
+
+**Every chart:** `Labels`, `ShowLegend` (true), `ShowTooltip` (true), `IsAnimated` (true),
+`ValueFormat` (a .NET number format; `#,0.##`), `EmptyText` ("No data"), `Description` (for
+screen readers) · **Methods:** `Refresh()`, `PlayAnimation()`
+
+**Bar, line and area charts also have:** `ShowGrid`, `ShowXAxis`, `ShowYAxis` (all true),
+`Minimum`, `Maximum` (the ends of the value axis; by default they fit the data and include zero)
+
+Give a chart a height (`HeightRequest`, or `Height` on Avalonia).
+
+### Bar Chart
+One bar per series for each category. **Properties:** `IsStacked`, `IsHorizontal` (bars lie
+down; negative values go the other way), `CornerRadius` (4), `MaxBarSize` (56)
+
+```xml
+<ui:BarChart Labels="Jan, Feb, Mar" IsStacked="True" HeightRequest="260"> ... </ui:BarChart>
+```
+
+### Line Chart
+One line per series, from edge to edge of the plot. **Properties:** `IsSmooth` (true; false
+joins the points with straight segments), `ShowDots`, `StrokeWidth` (2)
+
+### Area Chart
+A line per series with the space under it filled. **Properties:** `IsSmooth` (true),
+`IsStacked`, `FillOpacity` (0.4), `StrokeWidth` (2)
+
+### Pie Chart and Donut Chart
+The first series' values as slices, clockwise from twelve o'clock, named by `Labels` and colored
+from the chart colors in order. The tooltip shows a slice's value and its share. `DonutChart` is
+a pie with a hole. **Properties:** `InnerRadius` (0 for a pie, 0.6 for a donut), `Gap` (degrees
+between slices; 1), `ShowLabels` (the value outside each slice), `CenterValue`, `CenterLabel`
+(text in a donut's hole)
+
+```xml
+<ui:DonutChart Labels="Chrome, Safari, Firefox" CenterValue="662" CenterLabel="Visitors" HeightRequest="260">
+    <ui:ChartSeries Values="275, 200, 187" />
+</ui:DonutChart>
+```
+
+### Radar Chart
+One spoke per category around a ringed grid, and a filled shape per series. It needs at least
+three categories. **Properties:** `Maximum` (the value at the outer ring), `FillOpacity` (0.5),
+`ShowDots`
+
+### Radial Chart
+The first series' values as concentric rings on a muted track, each filling clockwise towards
+`Maximum`; the first value is the outer ring. **Properties:** `Maximum` (a full ring; by default
+the largest value), `InnerRadius` (0.35), `IsRounded` (true), `CenterValue`, `CenterLabel`
+
+```xml
+<ui:RadialChart Labels="Move, Exercise, Stand" Maximum="100" CenterValue="72%" CenterLabel="Move" HeightRequest="260">
+    <ui:ChartSeries Values="72, 48, 90" />
+</ui:RadialChart>
+```
+
+### Colors
+The chart colors are theme tokens, so they follow light and dark mode and can be replaced like
+any other token, before the first page loads:
+
+```csharp
+ShellTheme.Light[ShellToken.Chart1] = Color.FromArgb("#E76E50");
+ShellTheme.Dark[ShellToken.Chart1] = Color.FromArgb("#2662D9");
+```
+
+Past the fifth series (or slice) the colors repeat, fainter. A series' own `Color` wins over the
+theme.
+
+### What the charts don't do
+Zooming and panning, mixing bars and lines in one chart, click events on a bar or slice, and very
+large data sets (every point is drawn). For those, a charting library such as LiveCharts sits
+fine next to ShellUI Native: color it from `ShellTheme.Get(ShellToken.Chart1)`.
+
+To draw a chart of your own, derive from `ChartBase` and draw in `DrawChart` with the
+`IChartCanvas` it hands you; the legend, tooltip and animation come with the base class.
 
 ---
 

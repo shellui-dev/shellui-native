@@ -4,7 +4,7 @@ Prioritized list of components to create for ShellUI Native, aligned with [Shell
 
 Last revised: **2026-10-11** (second prerelease, `0.1.0-alpha.2`).
 
-**Status at a glance:** P0–P6 ✅ done · P7 done except chart · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar, command, navigation-menu, data-table, chat, form, image-viewer, prev-next-nav.
+**Status at a glance:** P0–P7 ✅ done · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar, command, navigation-menu, data-table, chat, form, image-viewer, prev-next-nav, charts.
 
 ---
 
@@ -202,7 +202,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 ### P7 — Optional (Charts, Pickers, etc.)
 | Component | Priority | Notes |
 |-----------|----------|-------|
-| chart (line, bar, pie, area) | P7 | Consider external chart lib integration |
+| **chart** ✅ | P7 | Done 2026-10-13, MAUI and Avalonia — drawn natively with no library: bar, line, area, pie / donut, radar and radial charts on a shared `chart` core (axes, legend, tooltip, animation), colored from five new theme tokens |
 | combobox ✅ | P7 | Done 2026-10-04 — Select with a filter field, Enter picks the first match |
 | **file-upload** ✅ | P7 | Done 2026-10-11, MAUI and Avalonia — drop zone, platform file picker, list of picked files |
 | input-otp ✅ | P7 | Done 2026-10-04 — slots over one hidden field (paste / autofill / numeric keyboard) |
@@ -297,8 +297,9 @@ resizable, navbar, sidebar, date-range-picker and file-upload on both platforms 
 input-group ✅ and menubar ✅ (2026-10-11), then command ✅ (with a command palette) and
 navigation-menu ✅, then data-table ✅ (client-side filter, sort, selection and pages;
 2026-10-12), then chat ✅ and form ✅, then image-viewer ✅ and prev-next-nav ✅ (2026-10-13;
-73 families, 104 CLI targets).
+73 families, 104 CLI targets), then the charts ✅ (bar, line, area, pie / donut, radar,
+radial; 80 families, 111 CLI targets).
 
-**Backlog:** chart (P7). qr-code waits, like the icon switch, for NuGet package dependencies in the
+**Backlog:** qr-code waits, like the icon switch, for NuGet package dependencies in the
 CLI: it needs a QR encoder. Not in the native data-table yet: row actions and server-side
 paging.

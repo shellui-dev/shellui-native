@@ -20,8 +20,9 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
          layout, navigation and pickers on both platforms (PR #14) merged
          release 0.1.0-alpha.2 (PR #15), CI action bumps (PR #16), button-group,
          input-group and menubar (PR #17), command and navigation-menu (PR #18),
-         data-table (PR #19), chat and form (PR #20) merged
- └─ feat/image-viewer-prev-next       ← image-viewer and prev-next-nav (active)
+         data-table (PR #19), chat and form (PR #20), image-viewer and prev-next-nav (PR #21)
+         merged
+ └─ feat/charts                       ← charts drawn natively, no library (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -38,8 +39,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#20 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `feat/image-viewer-prev-next` | `main` | **Active** | image-viewer and prev-next-nav for MAUI and Avalonia (107 registry entries, 104 CLI targets, 73 families) |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#21 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `feat/charts` | `main` | **Active** | chart core plus bar, line, area, pie / donut, radar and radial charts for MAUI and Avalonia (114 registry entries, 111 CLI targets, 80 families) |
 
 ---
 
@@ -539,6 +540,14 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 - [x] image-viewer and prev-next-nav (`feat/image-viewer-prev-next`): ImageViewer is a
   `ShellOverlayHost` whose trigger is its own thumbnail; zoom scales the image, no panning.
   With these, the Blazor set is ported except the chart family and qr-code
+- [x] Charts (`feat/charts`), drawn natively instead of wrapping a library (decided
+  2026-10-13: ShellUI on Blazor wraps ApexCharts; on native a library would need NuGet
+  dependencies in the CLI, would add SkiaSharp, and LiveCharts' Avalonia package targets
+  Avalonia 11). `chart` holds the series model, the `IChartCanvas` abstraction (lines,
+  polylines, polygons and text only; curves and arcs are turned into points), axes, legend,
+  tooltip and animation; bar-chart, line-chart, area-chart, pie-chart (with DonutChart),
+  radar-chart and radial-chart draw on it. `ShellToken.Chart1`–`Chart5` are new, from ShellUI's
+  `--chart-1`–`--chart-5`, so an older `shell` needs `shellui-native update shell`
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
