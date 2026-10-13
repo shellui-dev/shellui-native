@@ -262,6 +262,21 @@
                 </ui:WrapLayout>
                 <ui:DateRangePicker x:Name="DateRangeDemo" RangeChanged="OnDateRangeChanged" />
 
+                <!-- Form -->
+                <Label Text="Form" Style="{StaticResource SectionTitle}" />
+                <ui:Form x:Name="FormDemo" WidthRequest="{OnIdiom Phone=-1, Default=420}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:FormField x:Name="FormEmailField" Label="Email" Description="We never share your email." IsRequired="True">
+                        <ui:Input x:Name="FormEmail" Placeholder="you@example.com" Keyboard="Email" />
+                    </ui:FormField>
+                    <ui:FormField x:Name="FormPasswordField" Label="Password" Description="At least 8 characters." IsRequired="True">
+                        <ui:Input x:Name="FormPassword" Placeholder="Password" IsPassword="True" />
+                    </ui:FormField>
+                    <ui:FormField Label="Bio">
+                        <ui:Textarea Placeholder="Tell us a little about yourself" />
+                    </ui:FormField>
+                    <ui:Button Text="Create account" Clicked="OnFormSubmit" />
+                </ui:Form>
+
                 <!-- File upload -->
                 <Label Text="File Upload" Style="{StaticResource SectionTitle}" />
                 <ui:FileUpload x:Name="FileUploadDemo" Multiple="True" MaxFiles="5" FilesChanged="OnFilesChanged"
@@ -829,6 +844,27 @@
                         <ui:TableCell Text="$450.00" HorizontalTextAlignment="End" />
                     </ui:TableRow>
                 </ui:Table>
+
+                <!-- Chat -->
+                <Label Text="Chat" Style="{StaticResource SectionTitle}" />
+                <ui:Chat x:Name="ChatDemo" HeightRequest="420" WidthRequest="{OnIdiom Phone=-1, Default=520}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:Chat.Header>
+                        <HorizontalStackLayout Spacing="8">
+                            <ui:Icon Name="Sparkles" Size="18" VerticalOptions="Center" />
+                            <Label Text="ShellUI assistant" FontSize="14" FontAttributes="Bold" VerticalOptions="Center"
+                                   TextColor="{DynamicResource ShellUIForeground}" />
+                        </HorizontalStackLayout>
+                    </ui:Chat.Header>
+                    <ui:ChatMessage Role="System" Text="This conversation is a demo." />
+                    <ui:ChatMessage Role="Assistant" Sender="ShellUI" Timestamp="09:41" AvatarText="S" Text="Hi! Ask me about any component." />
+                    <ui:ChatMessage Role="User" Sender="Shewart" Timestamp="09:42" AvatarText="SS" Text="How do I add the data table?" />
+                    <ui:ChatMessage Role="Assistant" Sender="ShellUI" Timestamp="09:42" AvatarText="S" Text="Run the command below, then bind ItemsSource to your list.">
+                        <ui:Kbd Text="shellui-native add data-table" HorizontalOptions="Start" />
+                    </ui:ChatMessage>
+                    <ui:Chat.Footer>
+                        <ui:ChatInput x:Name="ChatInputDemo" Submitted="OnChatSubmitted" />
+                    </ui:Chat.Footer>
+                </ui:Chat>
 
                 <!-- Data table -->
                 <Label Text="Data Table" Style="{StaticResource SectionTitle}" />

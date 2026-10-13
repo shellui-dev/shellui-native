@@ -148,6 +148,28 @@ public partial class MainPage : ContentPage
     private void OnCarouselChanged(object? sender, int position) => Report($"Carousel: slide {position + 1}");
 
     private TableRow? _selectedRow;
+    private void OnFormSubmit(object? sender, EventArgs e)
+    {
+        FormEmailField.Error = (FormEmail.Text ?? string.Empty).Contains('@') ? string.Empty : "Enter a valid email address.";
+        FormPasswordField.Error = (FormPassword.Text ?? string.Empty).Length >= 8 ? string.Empty : "Use at least 8 characters.";
+        FormEmail.HasError = FormEmailField.HasError;
+        FormPassword.HasError = FormPasswordField.HasError;
+        Report(FormDemo.IsValid ? "Form: valid" : $"Form: {FormDemo.FormFields().Count(f => f.HasError)} error(s), first is {FormDemo.FirstInvalid?.Label}");
+    }
+
+    private async void OnChatSubmitted(object? sender, string text)
+    {
+        ChatDemo.Messages.Add(new ChatMessage { Role = ChatRole.User, Sender = "Shewart", AvatarText = "SS", Text = text });
+        var reply = new ChatMessage { Role = ChatRole.Assistant, Sender = "ShellUI", AvatarText = "S", IsStreaming = true };
+        ChatDemo.Messages.Add(reply);
+        ChatInputDemo.IsLoading = true;
+        Report($"Chat: sent \"{text}\"");
+        await Task.Delay(1200);
+        reply.Text = $"You said: {text}";
+        reply.IsStreaming = false;
+        ChatInputDemo.IsLoading = false;
+    }
+
     private void OnDataTableSelection(object? sender, IReadOnlyList<object> items) =>
         Report($"Data table: {items.Count} selected ({string.Join(", ", items.Cast<DemoInvoice>().Select(i => i.Number))})");
     private void OnDataTableRow(object? sender, object item) => Report($"Data table row: {((DemoInvoice)item).Number}");

@@ -19,8 +19,9 @@ into it, not directly into `main`.
 main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avalonia (PRs #7–#13),
          layout, navigation and pickers on both platforms (PR #14) merged
          release 0.1.0-alpha.2 (PR #15), CI action bumps (PR #16), button-group,
-         input-group and menubar (PR #17), command and navigation-menu (PR #18) merged
- └─ feat/data-table                   ← data-table from ShellUI's Blazor set (active)
+         input-group and menubar (PR #17), command and navigation-menu (PR #18),
+         data-table (PR #19) merged
+ └─ feat/chat-form                    ← chat and form from ShellUI's Blazor set (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -37,8 +38,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17 and #18 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `feat/data-table` | `main` | **Active** | data-table for MAUI and Avalonia (103 registry entries, 100 CLI targets, 69 families) |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#19 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `feat/chat-form` | `main` | **Active** | chat and form for MAUI and Avalonia (105 registry entries, 102 CLI targets, 71 families) |
 
 ---
 
@@ -532,6 +533,9 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 - [x] data-table (`feat/data-table`): DataTable + DataTableColumn on top of `table`, `input`,
   `checkbox` and `button`; columns read item properties by name (reflection, with a `Value`
   function for trimmed apps); no row actions or server-side paging yet
+- [x] chat and form (`feat/chat-form`): Chat, ChatMessage and ChatInput (the message's name
+  property is `Sender` on both platforms, since Avalonia controls already have a `Name`); Form
+  and FormField, where validation stays with the app and the form only reports field errors
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`

@@ -103,6 +103,26 @@ public partial class MainWindow : Window
         DemoDataTable.SelectionChanged += (_, items) =>
             DataTableChoice.Text = $"Data table: {items.Count} selected ({string.Join(", ", items.Cast<DemoInvoice>().Select(i => i.Number))}).";
         DemoDataTable.RowTapped += (_, item) => DataTableChoice.Text = $"Data table row: {((DemoInvoice)item).Number}.";
+        DemoChatInput.Submitted += async (_, text) =>
+        {
+            DemoChat.Messages.Add(new ChatMessage { Role = ChatRole.User, Sender = "Shewart", AvatarText = "SS", Text = text });
+            var reply = new ChatMessage { Role = ChatRole.Assistant, Sender = "ShellUI", AvatarText = "S", IsStreaming = true };
+            DemoChat.Messages.Add(reply);
+            DemoChatInput.IsLoading = true;
+            ChatFormChoice.Text = $"Chat: sent \"{text}\".";
+            await System.Threading.Tasks.Task.Delay(1200);
+            reply.Text = $"You said: {text}";
+            reply.IsStreaming = false;
+            DemoChatInput.IsLoading = false;
+        };
+        DemoFormSubmit.Clicked += (_, _) =>
+        {
+            DemoEmailField.Error = (DemoEmail.Text ?? string.Empty).Contains('@') ? string.Empty : "Enter a valid email address.";
+            DemoPasswordField.Error = (DemoPassword.Text ?? string.Empty).Length >= 8 ? string.Empty : "Use at least 8 characters.";
+            DemoEmail.HasError = DemoEmailField.HasError;
+            DemoPassword.HasError = DemoPasswordField.HasError;
+            ChatFormChoice.Text = DemoForm.IsValid ? "Form: valid." : $"Form: {DemoForm.FormFields().Count(f => f.HasError)} error(s), first is {DemoForm.FirstInvalid?.Label}.";
+        };
         DemoNavbar.SelectedValueChanged += (_, value) => LayoutChoice.Text = $"Navbar: {value}.";
         DemoSidebar.SelectedValueChanged += (_, value) =>
         {
