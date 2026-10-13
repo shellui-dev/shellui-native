@@ -718,6 +718,16 @@
             </StackPanel>
             <TextBlock x:Name="ChatFormChoice" Classes="hint" Margin="0,8,0,0" Text="Send a message or submit the form." />
 
+            <TextBlock Classes="title" Text="Image viewer and prev / next" />
+            <TextBlock Classes="hint" Text="Click a thumbnail to open it; + and - zoom, 0 resets, Escape closes." />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <ui:ImageViewer x:Name="DemoImageViewer" Source="/Assets/Brand/shellui_native.png" Description="The ShellUI Native mark" Width="120" Height="120" />
+                <ui:ImageViewer Source="/Assets/Brand/shellui.png" Description="The ShellUI mark" Width="120" Height="120" />
+                <ui:ImageViewer Source="/Assets/Brand/shellicons.png" Description="The ShellIcons mark" Width="120" Height="120" />
+            </StackPanel>
+            <ui:PrevNextNav x:Name="DemoPrevNext" PreviousLabel="Installation" NextLabel="Theming" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0" />
+            <TextBlock x:Name="PrevNextChoice" Classes="hint" Margin="0,8,0,0" Text="Page: Quick start." />
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

@@ -112,6 +112,8 @@ Same names, properties and variants as MAUI, except:
 | Carousel | Swipe, arrows, dots | Drag with the mouse or touch; the arrows are tab stops and Left / Right move while one has focus; with `AspectRatio="0"` set `Height` |
 | Stepper | Shows the active step's view | Every step stays in the tree and only the active one is visible; reached steps are tab stops (Enter / Space) |
 | Pagination | Labels hidden on phones | `ShowLabels` defaults to true; every page and arrow is a tab stop (Enter / Space) |
+| ImageViewer | `Source` is an `ImageSource`; `Aspect`; pinch zooms | `Source` is an `IImage` (a resource path such as `/Assets/photo.jpg`); `Stretch` instead of `Aspect`; the wheel and the + / - / 0 keys zoom; the thumbnail and the controls are tab stops |
+| PrevNextNav | Tap a card | The cards are also tab stops (Enter / Space) |
 | ChatInput | The send button sends | Also Enter sends and Shift+Enter starts a new line |
 | DataTable | Tap a header to sort | Sortable headers are also tab stops (Enter / Space) and keep focus after sorting; a click on a row's checkbox does not raise `RowTapped` |
 | Command | Enter picks the highlighted item (the first match) | Up / Down move the highlight and Enter picks it; `Value`, `Text` and the other strings are nullable; children are collected in `Groups` and `Items` |
@@ -1120,6 +1122,24 @@ the current one, default 1), `ShowLabels` (text next to the chevrons) · **Event
 
 ---
 
+### Prev Next Nav
+Previous and next links for the foot of a page: two bordered cards side by side, each a small
+"Previous" or "Next" over the page's name. A side with no label is left empty.
+
+```bash
+shellui-native add prev-next-nav
+```
+
+**Properties:** `PreviousLabel`, `NextLabel`, `PreviousText` ("Previous"), `NextText` ("Next"),
+`IsEnabled` · **Events:** `PreviousClicked`, `NextClicked`
+
+```xml
+<ui:PrevNextNav PreviousLabel="Installation" NextLabel="Theming"
+                PreviousClicked="OnPrevious" NextClicked="OnNext" />
+```
+
+---
+
 ## Data Display & Feedback
 
 ### Badge
@@ -1332,6 +1352,29 @@ with `HeightRequest` instead) · **Events:** `PositionChanged` · **Methods:** `
     <Image Source="two.jpg" Aspect="AspectFill" />
 </ui:Carousel>
 ```
+
+### Image Viewer
+A thumbnail that opens the image over the page on a dark backdrop, with zoom out, reset, zoom in
+and close controls. A tap on the backdrop or Escape closes it. Give it a size: the thumbnail
+fills it.
+
+```bash
+shellui-native add image-viewer
+```
+
+**Properties:** `Source`, `ThumbnailSource` (a smaller file for the page; `Source` then loads
+only in the viewer), `Description` (for screen readers), `Aspect` (how the thumbnail fills its
+box; AspectFill), `Open` (two-way), `Zoom` (read-only; 0.5 to 4, 1 fits the page) ·
+**Events:** `OpenChanged` · **Methods:** `SetOpen(bool)`, `ZoomIn()`, `ZoomOut()`, `ResetZoom()`
+
+```xml
+<ui:ImageViewer Source="photo.jpg" Description="The harbour at dusk"
+                WidthRequest="160" HeightRequest="120" />
+```
+
+Zooming scales the image around its centre; it does not pan.
+
+---
 
 ### Empty State
 Placeholder for an empty list or screen: icon in a muted tile, title, description and optional
