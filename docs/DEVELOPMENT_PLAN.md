@@ -20,8 +20,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
          layout, navigation and pickers on both platforms (PR #14) merged
          release 0.1.0-alpha.2 (PR #15), CI action bumps (PR #16), button-group,
          input-group and menubar (PR #17), command and navigation-menu (PR #18),
-         data-table (PR #19) merged
- └─ feat/chat-form                    ← chat and form from ShellUI's Blazor set (active)
+         data-table (PR #19), chat and form (PR #20) merged
+ └─ feat/image-viewer-prev-next       ← image-viewer and prev-next-nav (active)
  └─ feat/winui                        ← Phase 3 (conditional)
 ```
 
@@ -38,8 +38,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#19 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `feat/chat-form` | `main` | **Active** | chat and form for MAUI and Avalonia (105 registry entries, 102 CLI targets, 71 families) |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#20 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
+| `feat/image-viewer-prev-next` | `main` | **Active** | image-viewer and prev-next-nav for MAUI and Avalonia (107 registry entries, 104 CLI targets, 73 families) |
 
 ---
 
@@ -536,6 +536,9 @@ Cross-desktop (Windows + macOS + Linux) from one XAML codebase.
 - [x] chat and form (`feat/chat-form`): Chat, ChatMessage and ChatInput (the message's name
   property is `Sender` on both platforms, since Avalonia controls already have a `Name`); Form
   and FormField, where validation stays with the app and the form only reports field errors
+- [x] image-viewer and prev-next-nav (`feat/image-viewer-prev-next`): ImageViewer is a
+  `ShellOverlayHost` whose trigger is its own thumbnail; zoom scales the image, no panning.
+  With these, the Blazor set is ported except the chart family and qr-code
 - [ ] Replace the generated `Icon.cs` with the `ShellIcons.Maui` / `ShellIcons.Avalonia` packages
   once they are on NuGet. Their names already match (`IconName`, `Icon`, `Kind` on Avalonia), so
   components change little: token tinting binds the package's `Color` (MAUI) or `Foreground`
