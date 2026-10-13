@@ -45,7 +45,8 @@ public enum ShellToken
     Warning, WarningForeground,
     Info, InfoForeground,
     Border, Input, Ring,
-    Overlay
+    Overlay,
+    Chart1, Chart2, Chart3, Chart4, Chart5
 }
 
 /* Publishes both palettes as theme dictionaries of the application resources ("ShellUIPrimary" is
@@ -87,6 +88,11 @@ public static class ShellTheme
         [ShellToken.Input] = Color.Parse("#E4E4E4"),
         [ShellToken.Ring] = Color.Parse("#A3A3A3"),
         [ShellToken.Overlay] = Color.Parse("#80000000"),
+        [ShellToken.Chart1] = Color.Parse("#FFAE04"),
+        [ShellToken.Chart2] = Color.Parse("#2D62EF"),
+        [ShellToken.Chart3] = Color.Parse("#A4A4A4"),
+        [ShellToken.Chart4] = Color.Parse("#E4E4E4"),
+        [ShellToken.Chart5] = Color.Parse("#747474"),
     };
 
     public static Dictionary<ShellToken, Color> Dark { get; } = new()
@@ -117,6 +123,11 @@ public static class ShellTheme
         [ShellToken.Input] = Color.Parse("#333333"),
         [ShellToken.Ring] = Color.Parse("#737373"),
         [ShellToken.Overlay] = Color.Parse("#B3000000"),
+        [ShellToken.Chart1] = Color.Parse("#FFAE04"),
+        [ShellToken.Chart2] = Color.Parse("#2671F4"),
+        [ShellToken.Chart3] = Color.Parse("#747474"),
+        [ShellToken.Chart4] = Color.Parse("#525252"),
+        [ShellToken.Chart5] = Color.Parse("#E4E4E4"),
     };
 
     // --radius: 0.5rem. Tailwind's rounded-sm / rounded-md / rounded-lg derive from it.
