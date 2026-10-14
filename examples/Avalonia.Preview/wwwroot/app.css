@@ -1,0 +1,62 @@
+/* The colours match ShellTheme's Background, Border and MutedForeground. */
+:root {
+    color-scheme: light dark;
+    --background: #fcfcfc;
+    --border: #e4e4e4;
+    --muted-foreground: #737373;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --background: #0a0a0a;
+        --border: #2a2a2a;
+        --muted-foreground: #a3a3a3;
+    }
+}
+
+:root[data-theme="dark"] {
+    --background: #0a0a0a;
+    --border: #2a2a2a;
+    --muted-foreground: #a3a3a3;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--background);
+}
+
+#out {
+    position: relative;
+    height: 100%;
+}
+
+.avalonia-splash {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    transition: opacity 150ms ease-out;
+}
+
+/* Avalonia adds this class when the first frame is ready. */
+.avalonia-splash.splash-close {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--muted-foreground);
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

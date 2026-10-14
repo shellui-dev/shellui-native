@@ -8,6 +8,7 @@ This folder contains example projects demonstrating ShellUI Native components.
 |---------|----------|-------------|
 | [MAUI.Demo](./MAUI.Demo/) | .NET MAUI | Complete MAUI app showcasing all components |
 | [Avalonia.Demo](./Avalonia.Demo/) | Avalonia 12 | Avalonia components as they are ported (Phase 2) |
+| [Avalonia.Preview](./Avalonia.Preview/) | Avalonia 12 on WebAssembly | One component per URL, for the live previews on the docs site |
 | WinUI.Demo | WinUI 3 | *(Coming Soon)* |
 | WPF.Demo | WPF | *(Coming Soon)* |
 
@@ -37,6 +38,24 @@ dotnet run --project examples/Avalonia.Demo/AvaloniaDemo.csproj
 ```
 
 Runs on Windows, macOS and Linux.
+
+### Avalonia Preview
+
+The Avalonia components running in the browser. It compiles the demo's own component files, and
+shows the preview named in the address: `?c=button`, with `&theme=dark` or `&theme=light`.
+
+```bash
+dotnet workload install wasm-tools
+dotnet run --project examples/Avalonia.Preview/AvaloniaPreview.csproj
+dotnet publish examples/Avalonia.Preview/AvaloniaPreview.csproj -c Release
+```
+
+A preview is one file, `Previews/<name>.axaml`: the markup the docs page shows, inside a panel that
+places it. The ones here are samples. The docs site keeps a preview for every example in its own
+repository and builds this project with `-p:PreviewsDir=<that folder>` (`.axaml` files, their
+`.axaml.cs` files, and pictures under `assets/`, addressed as `/Assets/<file>`).
+
+The project is not in the solution, so building the solution doesn't need the workload.
 
 ## Purpose
 

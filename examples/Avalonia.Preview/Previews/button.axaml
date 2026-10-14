@@ -1,0 +1,10 @@
+<WrapPanel xmlns="https://github.com/avaloniaui"
+           xmlns:ui="using:AvaloniaDemo.Components.UI"
+           ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <ui:Button Text="Default" />
+    <ui:Button Text="Secondary" Variant="Secondary" />
+    <ui:Button Text="Outline" Variant="Outline" />
+    <ui:Button Text="Ghost" Variant="Ghost" />
+    <ui:Button Text="Destructive" Variant="Destructive" />
+    <ui:Button Text="Link" Variant="Link" />
+</WrapPanel>

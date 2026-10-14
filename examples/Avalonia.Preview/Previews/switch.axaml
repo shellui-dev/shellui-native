@@ -1,0 +1,6 @@
+<StackPanel xmlns="https://github.com/avaloniaui"
+            xmlns:ui="using:AvaloniaDemo.Components.UI"
+            Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <ui:Switch Label="Release emails" IsToggled="True" />
+    <ui:Switch Label="Airplane mode" />
+</StackPanel>
