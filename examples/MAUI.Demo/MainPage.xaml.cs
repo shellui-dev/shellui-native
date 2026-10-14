@@ -61,6 +61,7 @@ public partial class MainPage : ContentPage
         GroupOverlays.IsVisible = value == "overlays";
         GroupNavigation.IsVisible = value == "navigation";
         GroupData.IsVisible = value == "data";
+        GroupCharts.IsVisible = value == "charts";
         _ = PageScroll.ScrollToAsync(0, 0, false);
     }
 

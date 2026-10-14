@@ -40,6 +40,11 @@ public static class StyleTemplates
     <Color x:Key=""ShellUIInput"">#E4E4E4</Color>
     <Color x:Key=""ShellUIRing"">#A3A3A3</Color>
     <Color x:Key=""ShellUIOverlay"">#80000000</Color>
+    <Color x:Key=""ShellUIChart1"">#FFAE04</Color>
+    <Color x:Key=""ShellUIChart2"">#2D62EF</Color>
+    <Color x:Key=""ShellUIChart3"">#A4A4A4</Color>
+    <Color x:Key=""ShellUIChart4"">#E4E4E4</Color>
+    <Color x:Key=""ShellUIChart5"">#747474</Color>
 
     <!-- Spacing -->
     <x:Double x:Key=""ShellUISpacingXs"">4</x:Double>
@@ -101,6 +106,11 @@ public static class StyleTemplates
     <Color x:Key=""ShellUIInput"">#333333</Color>
     <Color x:Key=""ShellUIRing"">#737373</Color>
     <Color x:Key=""ShellUIOverlay"">#B3000000</Color>
+    <Color x:Key=""ShellUIChart1"">#FFAE04</Color>
+    <Color x:Key=""ShellUIChart2"">#2671F4</Color>
+    <Color x:Key=""ShellUIChart3"">#747474</Color>
+    <Color x:Key=""ShellUIChart4"">#525252</Color>
+    <Color x:Key=""ShellUIChart5"">#E4E4E4</Color>
 
 </ResourceDictionary>";
 }

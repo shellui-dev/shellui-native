@@ -728,6 +728,104 @@
             <ui:PrevNextNav x:Name="DemoPrevNext" PreviousLabel="Installation" NextLabel="Theming" Width="560" HorizontalAlignment="Left" Margin="0,12,0,0" />
             <TextBlock x:Name="PrevNextChoice" Classes="hint" Margin="0,8,0,0" Text="Page: Quick start." />
 
+            <TextBlock Classes="title" Text="Charts" />
+            <TextBlock Classes="hint" Text="Drawn by the components themselves, in the theme's chart colors. Hover a chart for its values." />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="900" HorizontalAlignment="Left" Margin="0,0,0,16">
+            <ui:Card Grid.Column="0">
+                <ui:CardHeader Title="Bar chart" Description="Two series side by side." />
+                <ui:CardContent>
+            <ui:BarChart x:Name="DemoBarChart" Labels="Jan, Feb, Mar, Apr, May, Jun" Description="Visitors by month, desktop and mobile" Height="260">
+            <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+            <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+            </ui:BarChart>
+                </ui:CardContent>
+            </ui:Card>
+            <ui:Card Grid.Column="1">
+                <ui:CardHeader Title="Stacked bars" Description="IsStacked puts the series on top of each other." />
+                <ui:CardContent>
+            <ui:BarChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsStacked="True" Height="260">
+            <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+            <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+            </ui:BarChart>
+                </ui:CardContent>
+            </ui:Card>
+            </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="900" HorizontalAlignment="Left" Margin="0,0,0,16">
+            <ui:Card Grid.Column="0">
+                <ui:CardHeader Title="Horizontal bars" Description="IsHorizontal lays the bars down; negative values go the other way." />
+                <ui:CardContent>
+            <ui:BarChart Labels="Chrome, Safari, Firefox, Edge, Other" IsHorizontal="True" ShowLegend="False" Height="260">
+            <ui:ChartSeries Name="Change" Values="12, -5, 8, -3, 4" />
+            </ui:BarChart>
+                </ui:CardContent>
+            </ui:Card>
+            <ui:Card Grid.Column="1">
+                <ui:CardHeader Title="Line chart" Description="Smooth by default, with a dot on every point here." />
+                <ui:CardContent>
+            <ui:LineChart x:Name="DemoLineChart" Labels="Jan, Feb, Mar, Apr, May, Jun" ShowDots="True" Height="260">
+            <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+            <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+            </ui:LineChart>
+                </ui:CardContent>
+            </ui:Card>
+            </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="900" HorizontalAlignment="Left" Margin="0,0,0,16">
+            <ui:Card Grid.Column="0">
+                <ui:CardHeader Title="Area chart" Description="Stacked, each series sits on the one before it." />
+                <ui:CardContent>
+            <ui:AreaChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsStacked="True" Height="260">
+            <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+            <ui:ChartSeries Name="Mobile" Values="80, 200, 120, 190, 130, 140" />
+            </ui:AreaChart>
+                </ui:CardContent>
+            </ui:Card>
+            <ui:Card Grid.Column="1">
+                <ui:CardHeader Title="Straight lines" Description="IsSmooth off, and a fixed value axis." />
+                <ui:CardContent>
+            <ui:AreaChart Labels="Jan, Feb, Mar, Apr, May, Jun" IsSmooth="False" Maximum="400" ValueFormat="0" Height="260">
+            <ui:ChartSeries Name="Desktop" Values="186, 305, 237, 73, 209, 214" />
+            </ui:AreaChart>
+                </ui:CardContent>
+            </ui:Card>
+            </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="900" HorizontalAlignment="Left" Margin="0,0,0,16">
+            <ui:Card Grid.Column="0">
+                <ui:CardHeader Title="Pie chart" Description="One slice per value, named by Labels." />
+                <ui:CardContent>
+            <ui:PieChart x:Name="DemoPieChart" Labels="Chrome, Safari, Firefox, Edge, Other" Height="260">
+            <ui:ChartSeries Values="275, 200, 187, 173, 90" />
+            </ui:PieChart>
+                </ui:CardContent>
+            </ui:Card>
+            <ui:Card Grid.Column="1">
+                <ui:CardHeader Title="Donut chart" Description="A pie with a hole for a value and a label." />
+                <ui:CardContent>
+            <ui:DonutChart Labels="Chrome, Safari, Firefox, Edge, Other" CenterValue="925" CenterLabel="Visitors" Height="260">
+            <ui:ChartSeries Values="275, 200, 187, 173, 90" />
+            </ui:DonutChart>
+                </ui:CardContent>
+            </ui:Card>
+            </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16" Width="900" HorizontalAlignment="Left" Margin="0,0,0,16">
+            <ui:Card Grid.Column="0">
+                <ui:CardHeader Title="Radar chart" Description="A spoke per category and a shape per series." />
+                <ui:CardContent>
+            <ui:RadarChart x:Name="DemoRadarChart" Labels="Speed, Power, Range, Comfort, Price, Safety" Height="280">
+            <ui:ChartSeries Name="Model A" Values="80, 65, 90, 70, 55, 85" />
+            <ui:ChartSeries Name="Model B" Values="60, 85, 70, 80, 75, 65" />
+            </ui:RadarChart>
+                </ui:CardContent>
+            </ui:Card>
+            <ui:Card Grid.Column="1">
+                <ui:CardHeader Title="Radial chart" Description="A ring per value, filling towards Maximum." />
+                <ui:CardContent>
+            <ui:RadialChart x:Name="DemoRadialChart" Labels="Move, Exercise, Stand" Maximum="100" CenterValue="72%" CenterLabel="Move" Height="260">
+            <ui:ChartSeries Values="72, 48, 90" />
+            </ui:RadialChart>
+                </ui:CardContent>
+            </ui:Card>
+            </Grid>
+
             <TextBlock Classes="title" Text="Theme tokens" />
             <TextBlock Classes="hint" Text="Every color is a token; the toggle swaps the light and dark palettes." />
             <WrapPanel x:Name="Swatches" />

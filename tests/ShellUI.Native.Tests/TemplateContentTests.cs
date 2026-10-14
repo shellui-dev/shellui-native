@@ -129,6 +129,13 @@ public class TemplateContentTests
     [InlineData("form")]
     [InlineData("image-viewer")]
     [InlineData("prev-next-nav")]
+    [InlineData("chart")]
+    [InlineData("bar-chart")]
+    [InlineData("line-chart")]
+    [InlineData("area-chart")]
+    [InlineData("pie-chart")]
+    [InlineData("radar-chart")]
+    [InlineData("radial-chart")]
     public void Ported_components_have_Avalonia_content(string name)
     {
         Assert.False(string.IsNullOrWhiteSpace(ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)));
