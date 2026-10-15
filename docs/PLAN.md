@@ -23,10 +23,10 @@ ShellUI Native brings the same beautiful, accessible, and customizable component
 > target. See [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) for the branch/phase breakdown.
 
 ### Phase 1: MAUI (Primary Focus)
-- **Target:** .NET MAUI (iOS, Android, Windows, macOS) on .NET 10
-- **Components:** 50+ native controls
-- **Status:** Released since `0.1.0-alpha.1`; `0.1.0-alpha.2` has 63 component families
-  (94 CLI targets), P0–P6 complete; remaining work tracked in
+- **Target:** .NET MAUI (Android, iOS, Mac Catalyst, Windows) and Avalonia 12 (Windows, macOS, Linux) on .NET 10
+- **Components:** 81 families, 112 CLI targets, each for MAUI and Avalonia
+- **Status:** Released since `0.1.0-alpha.1`; `0.2.0-beta.1` has 81 component families
+  (112 CLI targets), P0–P7 complete; remaining work tracked in
   [COMPONENTS_ROADMAP.md](./COMPONENTS_ROADMAP.md).
 
 ### Phase 2: Avalonia UI
@@ -147,7 +147,7 @@ dotnet tool install -g ShellUI.Native.CLI --prerelease
 ```bash
 shellui-native init     # Initialize project (creates shellui-native.json)
 shellui-native add      # Add components (copies to Components/UI/)
-shellui-native list     # List available components (94 targets)
+shellui-native list     # List available components (112 targets)
 shellui-native remove   # Remove components
 shellui-native update   # Update components to latest version
 ```

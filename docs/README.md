@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.nuget.org/packages/ShellUI.Native.CLI"><img src="https://img.shields.io/badge/CLI-v0.1.0--alpha.2-004880?style=flat-square&logo=nuget" alt="ShellUI.Native.CLI v0.1.0-alpha.2 on NuGet"></a>
+  <a href="https://www.nuget.org/packages/ShellUI.Native.CLI"><img src="https://img.shields.io/badge/CLI-v0.2.0--beta.1-004880?style=flat-square&logo=nuget" alt="ShellUI.Native.CLI v0.2.0-beta.1 on NuGet"></a>
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT license"></a>
 </p>
 

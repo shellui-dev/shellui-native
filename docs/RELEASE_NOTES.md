@@ -1,5 +1,83 @@
 # ShellUI Native Release Notes
 
+# ShellUI Native v0.2.0-beta.1 🧪
+
+> The first beta: 18 new components, among them charts, a data table and a command palette, each for .NET MAUI and Avalonia. Change events now report user input only, so read **Upgrading** before you update an existing app. Still a prerelease, so install with `--prerelease`. Report issues via [GitHub Issues](https://github.com/shellui-dev/shellui-native/issues).
+
+## 📦 Install or update
+
+```bash
+dotnet tool update -g ShellUI.Native.CLI --prerelease
+
+cd YourApp
+shellui-native init --yes
+shellui-native add button input card
+```
+
+Requires the .NET 10 SDK and a .NET MAUI or Avalonia 12 project. `init` detects which one it is.
+
+## ✨ New components
+
+For MAUI and Avalonia. 81 component families, 112 CLI targets in total.
+
+| Component | What it is |
+|---|---|
+| `button-group` | Buttons joined into one control. |
+| `input-group` | An input with an icon, text or view before or after it. |
+| `menubar` | A row of menus that open under their titles. |
+| `command` | A searchable list of grouped commands, inline or as a command palette. |
+| `navigation-menu` | A row of top-level links that open panels of links. |
+| `data-table` | A table filled from a list, with filter, sorting, selection and pages. |
+| `chat` | A message list with bubbles, a typing indicator and a message box. |
+| `form` | Fields with a label, description and error message. |
+| `image-viewer` | A thumbnail that opens the image over the page, with zoom. |
+| `prev-next-nav` | Previous and next page links for the foot of a page. |
+| `bar-chart`, `line-chart`, `area-chart`, `pie-chart`, `donut-chart`, `radar-chart`, `radial-chart` | Charts drawn by the components themselves, with no charting package: grouped, stacked or horizontal bars, smooth or straight lines, stacked areas, pies and donuts, radar shapes and progress rings. Each brings the shared `chart` core (series, axes, legend, tooltip, grow-in animation). The names are the same as in ShellUI for Blazor. |
+
+## ⚠️ Change events report user input only
+
+`Toggled`, `CheckedChanged`, `ValueChanged`, `SelectedIndexChanged`, `SelectedValueChanged`, `PageChanged`, `DateChanged`, `TimeChanged`, `ItemToggled` and the other value and selection events now fire only when the user changes the value (a click, tap, swipe or key), like Radix's `onValueChange`. Setting the property from code or a binding updates the control without raising them, so filling a form from data or syncing a sidebar with the router no longer looks like user input. To see every change, bind the property or watch it (`PropertyChanged` on MAUI, `GetObservable` on Avalonia).
+
+Methods meant for code are silent too: `MultiSelect.Toggle`, `TagInput.Add` / `Remove`, `DataTable.ClearSelection`, `DateRangePicker.Clear`, `Stepper.Next` / `Previous`, `Carousel.Next` / `Previous` and its auto-play, `Accordion.Toggle`, `Collapsible.Toggle`.
+
+Unchanged, still reporting every change: text fields' `TextChanged`, overlays' `OpenChanged` / `IsOpenChanged`, `ThemeChanged`, `FileUpload.FilesChanged` and `Sidebar.IsCollapsedChanged`.
+
+## 🧰 CLI
+
+- In a project that also uses ShellUI for Blazor (it has `shellui.json`), `init` puts the native components in `Components/Native/` with the namespace `YourApp.Components.Native`, so the two sets don't clash. The namespace now follows the `ComponentsPath` setting; the default `Components/UI` gives the same code as before. See [BLAZOR_HYBRID.md](https://github.com/shellui-dev/shellui-native/blob/main/docs/BLAZOR_HYBRID.md).
+- An unknown name gets suggestions: `shellui-native add donut` answers "Did you mean 'donut-chart'?".
+- `update shell` and `update --all` include the `shell` utility. `init` used to write `Shell.cs` without recording it, so `update` skipped it; projects set up by an older version are picked up from the file.
+
+## 🎨 Theme
+
+- Five chart colors, `Chart1` to `Chart5`, in both themes, converted from ShellUI's `--chart-1` to `--chart-5`.
+
+## 🛠️ Fixes and additions
+
+- `shell` builds in a MAUI Blazor Hybrid app; the app's `Components.Layout` namespace used to hide MAUI's `Layout` type (CS0118).
+- `SheetContent.MaxPanelWidth` sets how wide a left or right sheet gets (384 by default, never more than 75% of the window).
+- MAUI `ShellLabel` gains `HorizontalTextAlignment` and `LineBreakMode` (Avalonia's is a `TextBlock` and already has them).
+
+## ⬆️ Upgrading from alpha.2
+
+Installing the new tool doesn't change the components already in your project. `update` rewrites a component's file, so reapply any edits you made to it.
+
+- Before adding a chart, run `shellui-native update shell` (it holds the new chart colors and the Blazor Hybrid fix).
+- Before adding `button-group`, run `shellui-native update button`.
+- Your existing components keep their old event behaviour until you update them. To move everything at once, run `shellui-native update --all`; check handlers that relied on code-set values raising events.
+- Coming from alpha.1, also run `shellui-native update calendar` before adding `date-range-picker`.
+
+## ⚠️ Known limitations
+
+- The components were checked on Windows, for MAUI and Avalonia. CI builds the Avalonia demo on Linux, Windows and macOS, but it hasn't been run on macOS or Linux, or with touch. The new components build for Android, iOS and Mac Catalyst but haven't been run there.
+- On Windows, MAUI buttons and sidebar items can't be pressed through UI Automation (Narrator, test tools), [#25](https://github.com/shellui-dev/shellui-native/issues/25).
+- `file-upload`: on MAUI, dropping files works on Windows only. The platform file dialog and file drop have not been tested beyond the build on either platform.
+- iOS and Mac Catalyst build but have not been run on a device; Escape does not close overlays on Mac Catalyst yet.
+- Very large MAUI pages on Windows can hit WinUI's layout-pass limit (`Layout cycle detected`). Split the page or keep sections hidden until needed; see [COMPONENTS.md](https://github.com/shellui-dev/shellui-native/blob/main/docs/COMPONENTS.md#long-pages-on-windows).
+- The docs site (native.shellui.dev) is not live yet; see [COMPONENTS.md](https://github.com/shellui-dev/shellui-native/blob/main/docs/COMPONENTS.md) for usage.
+
+---
+
 # ShellUI Native v0.1.0-alpha.2 🧪
 
 > Avalonia support and five new components. Every component now has a .NET MAUI and an Avalonia version, installed by the same commands. Still a prerelease, so install with `--prerelease`. Report issues via [GitHub Issues](https://github.com/shellui-dev/shellui-native/issues).

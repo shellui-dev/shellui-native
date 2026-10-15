@@ -39,8 +39,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#23 merged since (charts in #23) | 114 registry entries (111 CLI targets, 80 families), each with MAUI and Avalonia content; 115 / 112 / 81 with `donut-chart` on `fix/pre-release-issues` |
-| `fix/pre-release-issues` | `main` | **Active** | Issues before `0.2.0-alpha.1`: change events report user input only (#24), sheet `MaxPanelWidth` (#26), `ShellLabel` alignment and line break (#27), native components beside ShellUI Blazor (#28), `donut-chart` as its own component (as in ShellUI), did-you-mean, a dependency audit test |
+| `main` | — | Released as `0.1.0-alpha.2`; PRs #17–#23 and #31 merged since | 115 registry entries (112 CLI targets, 81 families), each with MAUI and Avalonia content |
+| `chore/release-v0.2.0-beta.1` | `main` | **Active** | Version `0.2.0-beta.1`, release notes (change events report user input only, upgrade steps), docs counts, fresh-app checks |
 
 ---
 
@@ -435,6 +435,30 @@ First NuGet prerelease of `ShellUI.Native.CLI`, MAUI only.
 - [x] Every CLI target added alone to a fresh MAUI library, plus all together in a fresh MAUI app
 
 After merge: tag `v0.1.0-alpha.1` on `main` and push the tag.
+
+---
+
+## Release `0.2.0-beta.1` — `chore/release-v0.2.0-beta.1` (active)
+
+First beta of `ShellUI.Native.CLI`: 18 new components since `0.1.0-alpha.2` (button-group,
+input-group, menubar, command, navigation-menu, data-table, chat, form, image-viewer,
+prev-next-nav and the charts), the pre-release fixes from PR #31, and change events that report
+user input only.
+
+- [x] `Directory.Build.props` → `0.2.0` + `beta.1`; README badge (`prepare-release.ps1`)
+- [x] [RELEASE_NOTES.md](./RELEASE_NOTES.md) section: new components, the change-events rule,
+  CLI and theme additions, upgrade steps (`update shell`, `update button`, `update --all`)
+- [x] Counts in the roadmap and PLAN.md: 81 families, 112 CLI targets
+- [x] Each new component, plus `sheet` and `label`, alone in a fresh Avalonia and a fresh `dotnet new
+  maui` app (Windows target), and all 115 entries together in one app per platform: 0 warnings
+- [x] An app set up with `0.1.0-alpha.2` (`init`, button, calendar, card, switch) takes the new
+  components after `update shell button`, or `update --all`, and builds with 0 warnings. This found
+  that `update` skipped `shell` (init never recorded it); fixed on this branch
+- [x] The packed tool, installed from the `.nupkg`, outside the repo: `--version` is
+  `0.2.0-beta.1`, `list` shows `donut-chart`, and a fresh Avalonia and MAUI app with donut-chart,
+  data-table, command, button-group and switch build with 0 warnings
+
+After merge: tag `v0.2.0-beta.1` on `main` and push the tag.
 
 ---
 
