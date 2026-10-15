@@ -509,7 +509,8 @@ public static class ShellPortal
 
     public static void Detach(View view)
     {
-        if (view.Parent is Layout layout) layout.Children.Remove(view);
+        // Qualified: Blazor Hybrid apps have a <App>.Components.Layout namespace, which a bare Layout resolves to.
+        if (view.Parent is Microsoft.Maui.Controls.Layout layout) layout.Children.Remove(view);
         else if (view.Parent is ContentView host && host.Content == view) host.Content = null;
     }
 
@@ -521,7 +522,7 @@ public static class ShellPortal
         {
             switch (view)
             {
-                case Layout layout: layout.SafeAreaEdges = SafeAreaEdges.None; break;
+                case Microsoft.Maui.Controls.Layout layout: layout.SafeAreaEdges = SafeAreaEdges.None; break;
                 case ScrollView scroll: scroll.SafeAreaEdges = SafeAreaEdges.None; break;
                 case Border border: border.SafeAreaEdges = SafeAreaEdges.None; break;
                 case ContentView content: content.SafeAreaEdges = SafeAreaEdges.None; break;

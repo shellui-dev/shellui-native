@@ -253,4 +253,14 @@ public class TemplateContentTests
         Assert.Contains("MaxPanelWidthProperty", content);
         Assert.Contains("Math.Min(MaxPanelWidth", content);
     }
+
+    // A MAUI Blazor Hybrid app has a <App>.Components.Layout namespace (MainLayout.razor), and a
+    // bare `Layout` inside <App>.Components.* resolves to it (CS0118), so MAUI code names the type in full.
+    [Theory]
+    [MemberData(nameof(AllRegisteredComponents))]
+    public void MAUI_templates_name_the_Layout_type_in_full(string name)
+    {
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.MAUI)!;
+        Assert.DoesNotMatch(@"(\b(is|as|case|new)\s+|typeof\(|[<(,]\s*)Layout\b(?![.\w])", content);
+    }
 }
