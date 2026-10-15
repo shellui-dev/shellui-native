@@ -1496,7 +1496,7 @@ they take their colors from the theme: `Chart1` to `Chart5`, in order. Every cha
 a tooltip under the pointer (or the finger) and a grow-in animation.
 
 ```bash
-shellui-native add bar-chart line-chart area-chart pie-chart radar-chart radial-chart
+shellui-native add bar-chart line-chart area-chart pie-chart donut-chart radar-chart radial-chart
 ```
 
 Each chart installs `chart`, the shared core. The chart colors are new theme tokens: a project
@@ -1555,7 +1555,7 @@ A line per series with the space under it filled. **Properties:** `IsSmooth` (tr
 ### Pie Chart and Donut Chart
 The first series' values as slices, clockwise from twelve o'clock, named by `Labels` and colored
 from the chart colors in order. The tooltip shows a slice's value and its share. `DonutChart` is
-a pie with a hole, in the same template (`shellui-native add pie-chart`, or `add donut-chart`). **Properties:** `InnerRadius` (0 for a pie, 0.6 for a donut), `Gap` (degrees
+a pie with a hole, and its own component (`shellui-native add donut-chart`, which brings `pie-chart`). **Properties:** `InnerRadius` (0 for a pie, 0.6 for a donut), `Gap` (degrees
 between slices; 1), `ShowLabels` (the value outside each slice), `CenterValue`, `CenterLabel`
 (text in a donut's hole)
 
