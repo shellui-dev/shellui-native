@@ -17,7 +17,11 @@ public partial class Collapsible : VerticalStackLayout
         set => SetValue(OpenProperty, value);
     }
 
+    // User input only: setting Open, or calling Toggle / SetOpen, from code doesn't raise it.
     public event EventHandler<bool>? OpenChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Collapsible()
     {
@@ -29,10 +33,21 @@ public partial class Collapsible : VerticalStackLayout
 
     public void Toggle() => Open = !Open;
 
+    // A click or key on the trigger.
+    internal void ToggleByUser() => ByUser(Toggle);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void OnOpenChanged()
     {
         Refresh(animate: true);
-        OpenChanged?.Invoke(this, Open);
+        if (_byUser) OpenChanged?.Invoke(this, Open);
     }
 
     // The collapsible drives its content, so state never depends on when a child found its parent.

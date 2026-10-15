@@ -55,7 +55,11 @@ public partial class TimePicker : ContentView, IShellPopup
 
     public bool IsOpen { get; private set; }
 
+    // User input only: setting Time from code or a binding doesn't raise it.
     public event EventHandler? TimeChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const double CellHeight = 32;
     private const double CellSpacing = 2;
@@ -154,7 +158,7 @@ public partial class TimePicker : ContentView, IShellPopup
         var picker = (TimePicker)b;
         picker.UpdateText();
         picker.UpdateSelection();
-        picker.TimeChanged?.Invoke(picker, EventArgs.Empty);
+        if (picker._byUser) picker.TimeChanged?.Invoke(picker, EventArgs.Empty);
     }
 
     private void UpdateText()
@@ -241,12 +245,20 @@ public partial class TimePicker : ContentView, IShellPopup
 
     private bool IsPm => Time.Hours >= 12;
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void SetHour(int hour) =>
-        Time = new TimeSpan(Is24Hour ? hour : (hour % 12) + (IsPm ? 12 : 0), Time.Minutes, 0);
+        ByUser(() => Time = new TimeSpan(Is24Hour ? hour : (hour % 12) + (IsPm ? 12 : 0), Time.Minutes, 0));
 
-    private void SetMinute(int minute) => Time = new TimeSpan(Time.Hours, minute, 0);
+    private void SetMinute(int minute) => ByUser(() => Time = new TimeSpan(Time.Hours, minute, 0));
 
-    private void SetPeriod(int period) => Time = new TimeSpan((Time.Hours % 12) + (period == 1 ? 12 : 0), Time.Minutes, 0);
+    private void SetPeriod(int period) => ByUser(() => Time = new TimeSpan((Time.Hours % 12) + (period == 1 ? 12 : 0), Time.Minutes, 0));
 
     private void UpdateSelection()
     {

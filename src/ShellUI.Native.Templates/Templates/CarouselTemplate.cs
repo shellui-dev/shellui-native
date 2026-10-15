@@ -105,7 +105,12 @@ public partial class Carousel : ContentView
 
     public IList<IView> Slides => _track.Children;
 
+    // User input only (arrows, dots, swipes, keys): auto-play, Next / Previous and setting Position
+    // from code don't raise it.
     public event EventHandler<int>? PositionChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const string SlideAnimation = ""CarouselSlide"";
 
@@ -136,8 +141,8 @@ public partial class Carousel : ContentView
             BackgroundColor = Colors.Transparent
         };
 
-        _previous = Arrow(IconName.ChevronLeft, LayoutOptions.Start, ""Previous slide"", Previous);
-        _next = Arrow(IconName.ChevronRight, LayoutOptions.End, ""Next slide"", Next);
+        _previous = Arrow(IconName.ChevronLeft, LayoutOptions.Start, ""Previous slide"", () => ByUser(Previous));
+        _next = Arrow(IconName.ChevronRight, LayoutOptions.End, ""Next slide"", () => ByUser(Next));
         _dots = new HorizontalStackLayout
         {
             Spacing = 0,
@@ -155,6 +160,14 @@ public partial class Carousel : ContentView
 
     private int Count => _track.Children.Count;
     private int Current => Math.Clamp(Position, 0, Math.Max(0, Count - 1));
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public void Next()
     {
@@ -210,7 +223,7 @@ public partial class Carousel : ContentView
             // 8px dot in a 16px tap target.
             var target = new Grid { WidthRequest = 16, HeightRequest = 16, BackgroundColor = Colors.Transparent, Children = { dot } };
             var tap = new TapGestureRecognizer();
-            tap.Tapped += (_, _) => Position = index;
+            tap.Tapped += (_, _) => ByUser(() => Position = index);
             target.GestureRecognizers.Add(tap);
             _dots.Children.Add(target);
         }
@@ -225,7 +238,7 @@ public partial class Carousel : ContentView
         this.AbortAnimation(SlideAnimation);
         new Animation(v => { _offset = v; Render(); }, _offset, Current)
             .Commit(this, SlideAnimation, 16, 300, Easing.CubicOut);
-        PositionChanged?.Invoke(this, Current);
+        if (_byUser) PositionChanged?.Invoke(this, Current);
         // A manual move restarts the auto-play countdown.
         UpdateTimer();
     }
@@ -287,8 +300,8 @@ public partial class Carousel : ContentView
                 var moved = _dragX / width;
                 _dragX = 0;
                 var current = Current;
-                if (moved <= -0.2 && current < Count - 1) Position = current + 1;
-                else if (moved >= 0.2 && current > 0) Position = current - 1;
+                if (moved <= -0.2 && current < Count - 1) ByUser(() => Position = current + 1);
+                else if (moved >= 0.2 && current > 0) ByUser(() => Position = current - 1);
                 else
                 {
                     // Not far enough: settle back.
@@ -437,7 +450,12 @@ public class Carousel : Border
     [Content]
     public Controls Slides => _track.Children;
 
+    // User input only (arrows, dots, swipes, keys): auto-play, Next / Previous and setting Position
+    // from code don't raise it.
     public event EventHandler<int>? PositionChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Carousel()
     {
@@ -450,8 +468,8 @@ public class Carousel : Border
         _track.PointerReleased += OnTrackReleased;
         _track.PointerCaptureLost += (_, _) => EndDrag(cancelled: true);
 
-        _previous = Arrow(IconName.ChevronLeft, HorizontalAlignment.Left, ""Previous slide"", Previous);
-        _next = Arrow(IconName.ChevronRight, HorizontalAlignment.Right, ""Next slide"", Next);
+        _previous = Arrow(IconName.ChevronLeft, HorizontalAlignment.Left, ""Previous slide"", () => ByUser(Previous));
+        _next = Arrow(IconName.ChevronRight, HorizontalAlignment.Right, ""Next slide"", () => ByUser(Next));
         foreach (var arrow in new[] { _previous, _next })
         {
             arrow.PointerEntered += (_, _) => UpdateControls();
@@ -474,6 +492,14 @@ public class Carousel : Border
 
     private int Count => _track.Children.Count;
     private int Current => Math.Clamp(Position, 0, Math.Max(0, Count - 1));
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public void Next()
     {
@@ -514,8 +540,8 @@ public class Carousel : Border
     {
         base.OnKeyDown(e);
         if (e.Handled || e.Source is TextBox) return;
-        if (e.Key == Key.Left) Previous();
-        else if (e.Key == Key.Right) Next();
+        if (e.Key == Key.Left) ByUser(Previous);
+        else if (e.Key == Key.Right) ByUser(Next);
         else return;
         e.Handled = true;
     }
@@ -580,7 +606,7 @@ public class Carousel : Border
             target.PointerReleased += (_, e) =>
             {
                 if (e.InitialPressMouseButton != MouseButton.Left) return;
-                Position = index;
+                ByUser(() => Position = index);
                 e.Handled = true;
             };
             _dots.Children.Add(target);
@@ -596,7 +622,7 @@ public class Carousel : Border
     {
         UpdateControls();
         AnimateTo(Current, 300);
-        PositionChanged?.Invoke(this, Current);
+        if (_byUser) PositionChanged?.Invoke(this, Current);
         // A manual move restarts the auto-play countdown.
         UpdateTimer();
     }
@@ -705,8 +731,8 @@ public class Carousel : Border
         if (!wasDragging) return;
 
         var current = Current;
-        if (!cancelled && moved <= -0.2 && current < Count - 1) Position = current + 1;
-        else if (!cancelled && moved >= 0.2 && current > 0) Position = current - 1;
+        if (!cancelled && moved <= -0.2 && current < Count - 1) ByUser(() => Position = current + 1);
+        else if (!cancelled && moved >= 0.2 && current > 0) ByUser(() => Position = current - 1);
         // Not far enough: settle back.
         else AnimateTo(current, 200);
     }

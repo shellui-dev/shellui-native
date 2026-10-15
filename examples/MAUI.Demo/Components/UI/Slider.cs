@@ -35,7 +35,12 @@ public partial class Slider : ContentView
         set => SetValue(MaximumProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
+
+    // Set while Value, Minimum or Maximum is pushed into the platform slider, which reports
+    // those changes like a drag.
+    private bool _syncing;
 
     public Slider()
     {
@@ -46,22 +51,28 @@ public partial class Slider : ContentView
         _native.ValueChanged += (s, e) =>
         {
             Value = e.NewValue;
-            ValueChanged?.Invoke(this, e);
+            if (!_syncing) ValueChanged?.Invoke(this, e);
         };
         Content = _native;
     }
 
     private void SyncRange()
     {
+        var syncing = _syncing;
+        _syncing = true;
         // Widen before narrowing so Minimum never exceeds Maximum mid-update.
         if (Maximum > _native.Maximum) { _native.Maximum = Maximum; _native.Minimum = Minimum; }
         else { _native.Minimum = Minimum; _native.Maximum = Maximum; }
         SyncValue();
+        _syncing = syncing;
     }
 
     private void SyncValue()
     {
-        if (Math.Abs(_native.Value - Value) > 0.001)
-            _native.Value = Value;
+        if (Math.Abs(_native.Value - Value) <= 0.001) return;
+        var syncing = _syncing;
+        _syncing = true;
+        _native.Value = Value;
+        _syncing = syncing;
     }
 }

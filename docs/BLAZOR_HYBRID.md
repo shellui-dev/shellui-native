@@ -70,6 +70,16 @@ shellui-native init --yes
 shellui-native add button dialog
 ```
 
+Run `shellui init` first. Both libraries have a `Button` (and many other components with the same
+names), so they can't share a folder and namespace: when `shellui-native init` finds `shellui.json`,
+it puts the native components in `Components/Native/`, namespace `YourApp.Components.Native`, and
+leaves `Components/UI/` to ShellUI Blazor.
+
+If ShellUI Native was set up first, run `shellui-native init --force` after `shellui init`, reinstall
+your native components with `shellui-native add <names> --force`, and delete the old native `.cs`
+files from `Components/UI/`. The folder is the `ComponentsPath` setting in `shellui-native.json`;
+the namespace follows it.
+
 ## File Structure
 
 With both libraries installed:
@@ -77,11 +87,15 @@ With both libraries installed:
 ```
 YourHybridApp/
 ├── Components/
-│   ├── UI/                      # ShellUI Native (MAUI)
+│   ├── UI/                      # ShellUI Blazor (YourApp.Components.UI)
+│   │   ├── Button.razor
+│   │   └── ...
+│   ├── Native/                  # ShellUI Native (YourApp.Components.Native)
 │   │   ├── Button.cs
 │   │   ├── Variants/
 │   │   │   └── ButtonVariants.cs
 │   │   └── Shell.cs
+│   ├── Layout/                  # Your Blazor layout (MainLayout.razor)
 │   └── Pages/                   # Your Blazor pages
 │       └── Home.razor
 ├── wwwroot/
@@ -96,15 +110,19 @@ YourHybridApp/
 
 ### MainPage.xaml (Native MAUI)
 ```xml
-<ContentPage xmlns:ui="clr-namespace:YourApp.Components.UI">
-    <Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:components="clr-namespace:YourApp.Components"
+             xmlns:ui="clr-namespace:YourApp.Components.Native"
+             x:Class="YourApp.MainPage">
+    <Grid RowDefinitions="Auto,*">
         <!-- Native header -->
-        <ui:Button Grid.Row="0" Variant="Primary" Text="Native Button" />
+        <ui:Button Grid.Row="0" Text="Native Button" />
         
         <!-- Blazor content -->
         <BlazorWebView Grid.Row="1" HostPage="wwwroot/index.html">
             <BlazorWebView.RootComponents>
-                <RootComponent Selector="#app" ComponentType="{x:Type local:Routes}" />
+                <RootComponent Selector="#app" ComponentType="{x:Type components:Routes}" />
             </BlazorWebView.RootComponents>
         </BlazorWebView>
     </Grid>
@@ -117,7 +135,7 @@ YourHybridApp/
 
 <div class="p-4">
     <!-- This uses ShellUI Blazor components -->
-    <Button Variant="ButtonVariant.Primary">Blazor Button</Button>
+    <Button>Blazor Button</Button>
     
     <Card>
         <CardHeader>
@@ -136,7 +154,7 @@ YourHybridApp/
 
 2. **Add Native as Needed** - Only add ShellUI Native when you need truly native controls.
 
-3. **Keep Separate** - The two libraries have different file paths (`Components/UI/` vs Blazor components) and configs (`shellui-native.json` vs `shellui.json`).
+3. **Keep Separate** - The two libraries have their own folders and namespaces (`Components/UI/` for Blazor, `Components/Native/` for native) and configs (`shellui.json` vs `shellui-native.json`).
 
 4. **Consistent Design** - Both libraries share the same design tokens, so your app will look consistent even when mixing native and web components.
 

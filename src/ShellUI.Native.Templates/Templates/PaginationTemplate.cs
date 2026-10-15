@@ -68,7 +68,11 @@ public partial class Pagination : ContentView
         set => SetValue(ShowLabelsProperty, value);
     }
 
+    // User input only: setting Page from code or a binding doesn't raise it.
     public event EventHandler<int>? PageChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const double ItemSize = 36;
 
@@ -85,7 +89,18 @@ public partial class Pagination : ContentView
     private void OnPageChanged()
     {
         Rebuild();
-        PageChanged?.Invoke(this, Page);
+        if (_byUser) PageChanged?.Invoke(this, Page);
+    }
+
+    // A click or key on a page or an arrow.
+    private void GoTo(int page) => ByUser(() => Page = page);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     // Page is not clamped when set (XAML may set Page before TotalPages), only when shown.
@@ -112,10 +127,10 @@ public partial class Pagination : ContentView
     private void Rebuild()
     {
         _row.Children.Clear();
-        _row.Children.Add(NavItem(IconName.ChevronLeft, ""Previous"", iconFirst: true, enabled: Current > 1, () => Page = Current - 1));
+        _row.Children.Add(NavItem(IconName.ChevronLeft, ""Previous"", iconFirst: true, enabled: Current > 1, () => GoTo(Current - 1)));
         foreach (var page in VisiblePages())
             _row.Children.Add(page == 0 ? Ellipsis() : PageItem(page));
-        _row.Children.Add(NavItem(IconName.ChevronRight, ""Next"", iconFirst: false, enabled: Current < Total, () => Page = Current + 1));
+        _row.Children.Add(NavItem(IconName.ChevronRight, ""Next"", iconFirst: false, enabled: Current < Total, () => GoTo(Current + 1)));
     }
 
     private View PageItem(int page)
@@ -129,7 +144,7 @@ public partial class Pagination : ContentView
             VerticalTextAlignment = TextAlignment.Center
         };
         label.Token(Label.TextColorProperty, ShellToken.Foreground);
-        var item = Item(label, ItemSize, new Thickness(0), () => Page = page);
+        var item = Item(label, ItemSize, new Thickness(0), () => GoTo(page));
         item.MinimumWidthRequest = ItemSize;
         if (current)
         {
@@ -241,7 +256,7 @@ public class Pagination : Border
         PageProperty.Changed.AddClassHandler<Pagination>((p, _) =>
         {
             p.Rebuild();
-            p.PageChanged?.Invoke(p, p.Page);
+            if (p._byUser) p.PageChanged?.Invoke(p, p.Page);
         });
         TotalPagesProperty.Changed.AddClassHandler<Pagination>((p, _) => p.Rebuild());
         SiblingCountProperty.Changed.AddClassHandler<Pagination>((p, _) => p.Rebuild());
@@ -272,13 +287,28 @@ public class Pagination : Border
         set => SetValue(ShowLabelsProperty, value);
     }
 
+    // User input only: setting Page from code or a binding doesn't raise it.
     public event EventHandler<int>? PageChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Pagination()
     {
         Child = _row;
         HorizontalAlignment = HorizontalAlignment.Left;
         Rebuild();
+    }
+
+    // A click or key on a page or an arrow.
+    private void GoTo(int page) => ByUser(() => Page = page);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     // Page is not clamped when set (XAML may set Page before TotalPages), only when shown.
@@ -307,10 +337,10 @@ public class Pagination : Border
         // The rebuild replaces the focused item, so keyboard focus moves to the new current page.
         var hadFocus = _row.IsKeyboardFocusWithin;
         _row.Children.Clear();
-        _row.Children.Add(NavItem(IconName.ChevronLeft, ""Previous"", iconFirst: true, enabled: Current > 1, () => Page = Current - 1));
+        _row.Children.Add(NavItem(IconName.ChevronLeft, ""Previous"", iconFirst: true, enabled: Current > 1, () => GoTo(Current - 1)));
         foreach (var page in VisiblePages())
             _row.Children.Add(page == 0 ? Ellipsis() : PageItem(page));
-        _row.Children.Add(NavItem(IconName.ChevronRight, ""Next"", iconFirst: false, enabled: Current < Total, () => Page = Current + 1));
+        _row.Children.Add(NavItem(IconName.ChevronRight, ""Next"", iconFirst: false, enabled: Current < Total, () => GoTo(Current + 1)));
         if (hadFocus) _currentItem?.Focus(NavigationMethod.Tab);
     }
 
@@ -319,7 +349,7 @@ public class Pagination : Border
         var current = page == Current;
         var label = new TextBlock { Text = page.ToString(CultureInfo.CurrentCulture), FontSize = 14, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         label.Token(TextBlock.ForegroundProperty, ShellToken.Foreground);
-        var item = Item(label, ItemSize, new Thickness(0), current ? null : () => Page = page, focusable: true);
+        var item = Item(label, ItemSize, new Thickness(0), current ? null : () => GoTo(page), focusable: true);
         AutomationProperties.SetName(item, current ? $""Page {page}, current page"" : $""Go to page {page}"");
         if (current)
         {

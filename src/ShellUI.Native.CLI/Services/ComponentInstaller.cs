@@ -84,6 +84,15 @@ public static class ComponentInstaller
             AnsiConsole.MarkupLine($"[red]Failed: {string.Join(", ", failedComponents)}[/]");
     }
 
+    // " Did you mean 'x' or 'y'?" for an unknown name, or nothing when no name is close.
+    internal static string DidYouMean(string name)
+    {
+        var suggestions = ComponentRegistry.Suggest(name);
+        return suggestions.Count == 0
+            ? string.Empty
+            : $" [yellow]Did you mean {string.Join(" or ", suggestions.Select(s => $"'{s}'"))}?[/]";
+    }
+
     private static async Task InstallComponentWithDependenciesAsync(
         string componentName,
         ShellUINativeConfig config,
@@ -98,7 +107,7 @@ public static class ComponentInstaller
 
         if (!ComponentRegistry.Exists(componentName))
         {
-            AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]");
+            AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]{DidYouMean(componentName)}");
             failedComponents.Add(componentName);
             return;
         }
@@ -176,7 +185,7 @@ public static class ComponentInstaller
         }
 
         // Replace namespace placeholder
-        content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
+        content = TemplateText.Apply(content, projectInfo.RootNamespace, config.ComponentsPath);
 
         // Ensure directory exists
         var directory = Path.GetDirectoryName(componentPath);

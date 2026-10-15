@@ -71,7 +71,7 @@ public class Navbar : Border
         SelectedValueProperty.Changed.AddClassHandler<Navbar>((n, _) =>
         {
             n.Refresh();
-            n.SelectedValueChanged?.Invoke(n, n.SelectedValue);
+            if (n._byUser) n.SelectedValueChanged?.Invoke(n, n.SelectedValue);
         });
     }
 
@@ -121,7 +121,11 @@ public class Navbar : Border
     [Content]
     public Controls Items { get; } = new();
 
+    // User input only: setting SelectedValue from code or a binding doesn't raise it.
     public event EventHandler<string?>? SelectedValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Navbar()
     {
@@ -189,9 +193,17 @@ public class Navbar : Border
 
     private List<NavbarItem> ItemList => Items.OfType<NavbarItem>().ToList();
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     internal void Select(NavbarItem item)
     {
-        if (!string.IsNullOrEmpty(item.Value)) SelectedValue = item.Value;
+        if (!string.IsNullOrEmpty(item.Value)) ByUser(() => SelectedValue = item.Value);
         IsMenuOpen = false;
     }
 

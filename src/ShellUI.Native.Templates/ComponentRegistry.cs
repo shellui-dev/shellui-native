@@ -142,6 +142,7 @@ public static class ComponentRegistry
         { "line-chart", (LineChartTemplate.Metadata, LineChartTemplate.Contents) },
         { "area-chart", (AreaChartTemplate.Metadata, AreaChartTemplate.Contents) },
         { "pie-chart", (PieChartTemplate.Metadata, PieChartTemplate.Contents) },
+        { "donut-chart", (DonutChartTemplate.Metadata, DonutChartTemplate.Contents) },
         { "radar-chart", (RadarChartTemplate.Metadata, RadarChartTemplate.Contents) },
         { "radial-chart", (RadialChartTemplate.Metadata, RadialChartTemplate.Contents) }
     };
@@ -193,6 +194,41 @@ public static class ComponentRegistry
     public static bool Exists(string componentName)
     {
         return _templates.ContainsKey(componentName.ToLower());
+    }
+
+    // Up to `max` registered names close to an unknown `name`, closest first: a typo
+    // ("buton"), or a shared word ("chart-04", "chart-bar").
+    public static IReadOnlyList<string> Suggest(string name, int max = 3)
+    {
+        var key = name.ToLower();
+        var limit = Math.Max(2, key.Length / 3);
+        var words = key.Split('-', StringSplitOptions.RemoveEmptyEntries).Where(w => w.Length >= 3).ToList();
+        return _templates.Keys
+            .Select(candidate => (candidate, distance: Distance(key, candidate)))
+            .Where(c => c.distance <= limit || words.Any(c.candidate.Split('-').Contains))
+            .OrderBy(c => c.distance)
+            .ThenBy(c => c.candidate, StringComparer.Ordinal)
+            .Select(c => c.candidate)
+            .Take(max)
+            .ToList();
+    }
+
+    // Levenshtein edit distance.
+    private static int Distance(string a, string b)
+    {
+        var row = Enumerable.Range(0, b.Length + 1).ToArray();
+        for (var i = 1; i <= a.Length; i++)
+        {
+            var diagonal = row[0];
+            row[0] = i;
+            for (var j = 1; j <= b.Length; j++)
+            {
+                var above = row[j];
+                row[j] = Math.Min(Math.Min(row[j] + 1, row[j - 1] + 1), diagonal + (a[i - 1] == b[j - 1] ? 0 : 1));
+                diagonal = above;
+            }
+        }
+        return row[b.Length];
     }
 
     /* The family a compositional part belongs to (`dialog-trigger` → `dialog`), or null.

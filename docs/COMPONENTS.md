@@ -66,6 +66,24 @@ your background so the splash-to-app transition doesn't flash the template's pur
 
 ---
 
+## Change events
+
+Events that report a new value or selection (`Toggled`, `CheckedChanged`, `ValueChanged`,
+`SelectedIndexChanged`, `SelectedValueChanged`, `PageChanged`, `DateChanged`, `TimeChanged`,
+`ItemToggled` and the like) fire only for user input: a click, tap, swipe or key. Setting the
+property from code or a binding updates the control without raising them, like Radix's
+`onValueChange`, so filling a form from data or syncing a sidebar with the router doesn't look
+like the user did it. To see every change, bind the property or watch it (`PropertyChanged` on
+MAUI, `GetObservable` on Avalonia). The same goes for methods meant for code: `MultiSelect.Toggle`,
+`TagInput.Add` / `Remove`, `DataTable.ClearSelection`, `DateRangePicker.Clear`, `Stepper.Next` /
+`Previous`, `Carousel.Next` / `Previous` (and auto-play), `Accordion.Toggle`, `Collapsible.Toggle`.
+
+These still report every change: text fields' `TextChanged` (the platform's own event),
+`OpenChanged` / `IsOpenChanged` on overlays, `ThemeChanged`, `FileUpload.FilesChanged` (only the
+file picker changes it) and `Sidebar.IsCollapsedChanged` (only code collapses a sidebar).
+
+---
+
 ## Avalonia
 
 Every component on this page has an Avalonia version, installed by the same CLI commands
@@ -665,7 +683,7 @@ Typography with size, weight and color variants.
 shellui-native add label
 ```
 
-**Properties:** `Text`, `Size` (Xs…Xxxl), `Weight` (Light…Bold), `Variant` (Default, Muted, Destructive, Success, Warning)
+**Properties:** `Text`, `Size` (Xs…Xxxl), `Weight` (Light…Bold), `Variant` (Default, Muted, Destructive, Success, Warning), `HorizontalTextAlignment` and `LineBreakMode` (MAUI; `WordWrap` by default). On Avalonia `ShellLabel` is a `TextBlock`, so `TextAlignment` and `TextWrapping` do the same.
 
 ```xml
 <ui:ShellLabel Text="This username is already taken." Size="Sm" Variant="Destructive" />
@@ -1478,7 +1496,7 @@ they take their colors from the theme: `Chart1` to `Chart5`, in order. Every cha
 a tooltip under the pointer (or the finger) and a grow-in animation.
 
 ```bash
-shellui-native add bar-chart line-chart area-chart pie-chart radar-chart radial-chart
+shellui-native add bar-chart line-chart area-chart pie-chart donut-chart radar-chart radial-chart
 ```
 
 Each chart installs `chart`, the shared core. The chart colors are new theme tokens: a project
@@ -1537,7 +1555,7 @@ A line per series with the space under it filled. **Properties:** `IsSmooth` (tr
 ### Pie Chart and Donut Chart
 The first series' values as slices, clockwise from twelve o'clock, named by `Labels` and colored
 from the chart colors in order. The tooltip shows a slice's value and its share. `DonutChart` is
-a pie with a hole. **Properties:** `InnerRadius` (0 for a pie, 0.6 for a donut), `Gap` (degrees
+a pie with a hole, and its own component (`shellui-native add donut-chart`, which brings `pie-chart`). **Properties:** `InnerRadius` (0 for a pie, 0.6 for a donut), `Gap` (degrees
 between slices; 1), `ShowLabels` (the value outside each slice), `CenterValue`, `CenterLabel`
 (text in a donut's hole)
 
@@ -1601,7 +1619,7 @@ shellui-native add drawer
 shellui-native add sheet
 ```
 
-**Properties:** `Open` (also `SetOpen(bool)`) · **Events:** `OpenChanged` · Drawer/Sheet: `Side` (Left, Right, Top, Bottom)
+**Properties:** `Open` (also `SetOpen(bool)`) · **Events:** `OpenChanged` · Drawer/Sheet: `Side` (Left, Right, Top, Bottom) · `SheetContent.MaxPanelWidth`: how wide a left or right sheet gets (384 by default, shadcn's `sm:max-w-sm`; never more than 75% of the window)
 
 ```xml
 <ui:Dialog x:Name="EditDialog">

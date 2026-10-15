@@ -54,7 +54,12 @@ public partial class Slider : ContentView
         set => SetValue(MaximumProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
+
+    // Set while Value, Minimum or Maximum is pushed into the platform slider, which reports
+    // those changes like a drag.
+    private bool _syncing;
 
     public Slider()
     {
@@ -65,23 +70,29 @@ public partial class Slider : ContentView
         _native.ValueChanged += (s, e) =>
         {
             Value = e.NewValue;
-            ValueChanged?.Invoke(this, e);
+            if (!_syncing) ValueChanged?.Invoke(this, e);
         };
         Content = _native;
     }
 
     private void SyncRange()
     {
+        var syncing = _syncing;
+        _syncing = true;
         // Widen before narrowing so Minimum never exceeds Maximum mid-update.
         if (Maximum > _native.Maximum) { _native.Maximum = Maximum; _native.Minimum = Minimum; }
         else { _native.Minimum = Minimum; _native.Maximum = Maximum; }
         SyncValue();
+        _syncing = syncing;
     }
 
     private void SyncValue()
     {
-        if (Math.Abs(_native.Value - Value) > 0.001)
-            _native.Value = Value;
+        if (Math.Abs(_native.Value - Value) <= 0.001) return;
+        var syncing = _syncing;
+        _syncing = true;
+        _native.Value = Value;
+        _syncing = syncing;
     }
 }
 ",
@@ -126,7 +137,7 @@ public class Slider : Border
         ValueProperty.Changed.AddClassHandler<Slider>((s, e) =>
         {
             s.UpdateLayoutOfParts();
-            s.ValueChanged?.Invoke(s, (double)e.NewValue!);
+            if (s._byUser) s.ValueChanged?.Invoke(s, (double)e.NewValue!);
         });
         MinimumProperty.Changed.AddClassHandler<Slider>((s, _) => { s.CoerceValue(ValueProperty); s.UpdateLayoutOfParts(); });
         MaximumProperty.Changed.AddClassHandler<Slider>((s, _) => { s.CoerceValue(ValueProperty); s.UpdateLayoutOfParts(); });
@@ -157,7 +168,19 @@ public class Slider : Border
         set => SetValue(StepProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<double>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public Slider()
     {
@@ -200,7 +223,7 @@ public class Slider : Border
         var travel = Bounds.Width - ThumbSize;
         if (travel <= 0) return;
         var fraction = Math.Clamp((e.GetPosition(this).X - ThumbSize / 2) / travel, 0, 1);
-        Value = Minimum + fraction * (Maximum - Minimum);
+        ByUser(() => Value = Minimum + fraction * (Maximum - Minimum));
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -248,7 +271,7 @@ public class Slider : Border
             _ => null
         };
         if (target is not { } value) return;
-        Value = value;
+        ByUser(() => Value = value);
         e.Handled = true;
     }
 }

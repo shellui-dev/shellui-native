@@ -32,7 +32,11 @@ public partial class Accordion : VerticalStackLayout
     }
 
     // Fired when any item's open state changes: (value, isOpen).
+    // User input only: setting Value, or calling Toggle, from code doesn't raise it.
     public event EventHandler<(string Value, bool IsOpen)>? ItemToggled;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly HashSet<string> _openValues = new();
 
@@ -43,6 +47,20 @@ public partial class Accordion : VerticalStackLayout
     }
 
     public bool IsOpen(string value) => _openValues.Contains(value);
+
+    // Read by items, whose OpenChanged follows the same rule.
+    internal bool IsUserChange => _byUser;
+
+    // A click or key on a trigger.
+    internal void ToggleByUser(string value) => ByUser(() => Toggle(value));
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public void Toggle(string value)
     {
@@ -63,7 +81,7 @@ public partial class Accordion : VerticalStackLayout
         changed.Add((value, !wasOpen));
 
         Refresh(animate: true);
-        foreach (var change in changed) ItemToggled?.Invoke(this, change);
+        if (_byUser) foreach (var change in changed) ItemToggled?.Invoke(this, change);
     }
 
     private void OnValueChanged(string? value)

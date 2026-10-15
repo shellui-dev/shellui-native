@@ -84,7 +84,11 @@ public partial class DateRangePicker : ContentView, IShellPopup
     public bool IsOpen { get; private set; }
 
     // Raised when StartDate or EndDate changes.
+    // User input only: setting StartDate / EndDate, or calling Clear, from code doesn't raise it.
     public event EventHandler? RangeChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly Border _trigger;
     private readonly Label _text;
@@ -113,7 +117,7 @@ public partial class DateRangePicker : ContentView, IShellPopup
             _clearTapped = true;
             // Cleared on the next turn in case the tap never reaches the trigger.
             Dispatcher.Dispatch(() => _clearTapped = false);
-            Clear();
+            ByUser(Clear);
         };
         _clear.GestureRecognizers.Add(clearTap);
 
@@ -153,7 +157,7 @@ public partial class DateRangePicker : ContentView, IShellPopup
         ShellFocus.MakeFocusable(this, () => { if (IsEnabled) SetOpen(!IsOpen); });
 
         _calendar = new Calendar();
-        _calendar.DateSelected += (_, date) => Pick(date);
+        _calendar.DateSelected += (_, date) => ByUser(() => Pick(date));
 
         _panel = new Border
         {
@@ -194,6 +198,14 @@ public partial class DateRangePicker : ContentView, IShellPopup
 
     public void Close() => SetOpen(false);
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Clear()
     {
         StartDate = null;
@@ -218,7 +230,7 @@ public partial class DateRangePicker : ContentView, IShellPopup
     {
         UpdateTrigger();
         UpdateCalendar();
-        RangeChanged?.Invoke(this, EventArgs.Empty);
+        if (_byUser) RangeChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateCalendar()

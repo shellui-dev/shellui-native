@@ -60,7 +60,11 @@ public partial class Combobox : ContentView, IShellPopup
 
     public bool IsOpen { get; private set; }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<string>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const double ItemHeight = 32;
     private const double MaxListHeight = 240;
@@ -198,9 +202,17 @@ public partial class Combobox : ContentView, IShellPopup
 
     public void Close() => SetOpen(false);
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void Pick(string text)
     {
-        Value = text;
+        ByUser(() => Value = text);
         SetOpen(false);
     }
 
@@ -208,7 +220,7 @@ public partial class Combobox : ContentView, IShellPopup
     {
         UpdateTrigger();
         UpdateChecks();
-        ValueChanged?.Invoke(this, Value ?? string.Empty);
+        if (_byUser) ValueChanged?.Invoke(this, Value ?? string.Empty);
     }
 
     private void UpdateTrigger()

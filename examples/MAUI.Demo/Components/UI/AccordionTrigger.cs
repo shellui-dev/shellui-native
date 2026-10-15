@@ -54,7 +54,7 @@ public partial class AccordionTrigger : ShellTriggerView
         Content = _row;
     }
 
-    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.ToggleByUser();
 
     internal void SetOpen(bool open, bool animate)
     {

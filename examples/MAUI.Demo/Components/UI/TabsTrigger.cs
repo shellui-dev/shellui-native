@@ -58,7 +58,7 @@ public partial class TabsTrigger : ContentView
         SetActive(false);
     }
 
-    private void Select() => this.FindParentOfType<Tabs>()?.SetValue(Value);
+    private void Select() => this.FindParentOfType<Tabs>()?.SelectByUser(Value);
 
     internal void SetActive(bool active)
     {

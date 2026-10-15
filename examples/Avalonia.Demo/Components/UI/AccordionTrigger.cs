@@ -67,7 +67,7 @@ public class AccordionTrigger : ShellTriggerView
         HorizontalAlignment = HorizontalAlignment.Stretch;
     }
 
-    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.ToggleByUser();
 
     protected override void OnPointerEntered(PointerEventArgs e)
     {

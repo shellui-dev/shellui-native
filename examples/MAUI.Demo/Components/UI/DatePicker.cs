@@ -51,7 +51,19 @@ public partial class DatePicker : ContentView, IShellPopup
 
     public bool IsOpen { get; private set; }
 
+    // User input only: setting Date from code or a binding doesn't raise it.
     public event EventHandler<DateChangedEventArgs>? DateChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     private readonly Border _trigger;
     private readonly Label _text;
@@ -87,7 +99,7 @@ public partial class DatePicker : ContentView, IShellPopup
         _calendar = new Calendar { SelectedDate = Date };
         _calendar.DateSelected += (_, date) =>
         {
-            Date = date;
+            ByUser(() => Date = date);
             SetOpen(false);
         };
 
@@ -135,7 +147,7 @@ public partial class DatePicker : ContentView, IShellPopup
         var picker = (DatePicker)b;
         picker.UpdateText();
         picker._calendar.SelectedDate = (DateTime)n;
-        picker.DateChanged?.Invoke(picker, new DateChangedEventArgs((DateTime)o, (DateTime)n));
+        if (picker._byUser) picker.DateChanged?.Invoke(picker, new DateChangedEventArgs((DateTime)o, (DateTime)n));
     }
 
     private void UpdateText() => _text.Text = Date.ToString(Format, CultureInfo.CurrentCulture);

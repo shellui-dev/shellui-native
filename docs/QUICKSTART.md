@@ -31,7 +31,8 @@ shellui-native init --yes
 
 This will:
 - Detect your project type (MAUI, Avalonia, WinUI, or WPF — see [ARCHITECTURE.md § Platform Detection](./ARCHITECTURE.md#platform-detection))
-- Create the `Components/UI/` folder
+- Create the `Components/UI/` folder (`Components/Native/` when the project also has ShellUI for
+  Blazor, see [BLAZOR_HYBRID.md](./BLAZOR_HYBRID.md))
 - Install the `Shell.cs` utility
 - Create `shellui-native.json` configuration
 - Generate theme resources (MAUI)

@@ -170,4 +170,44 @@ public class ComponentRegistryTests
 
         Assert.All(ComponentRegistry.Components.Values, m => Assert.Equal(expected, m.Version));
     }
+
+    // The charts are added by the same names as in ShellUI (Blazor). Its chart-series,
+    // multi-series-chart, chart-variants and chart-styles are covered by the chart core here.
+    [Theory]
+    [InlineData("chart")]
+    [InlineData("bar-chart")]
+    [InlineData("line-chart")]
+    [InlineData("area-chart")]
+    [InlineData("pie-chart")]
+    [InlineData("donut-chart")]
+    [InlineData("radar-chart")]
+    [InlineData("radial-chart")]
+    public void Charts_use_ShellUI_names(string name)
+    {
+        Assert.True(ComponentRegistry.Exists(name), name);
+    }
+
+    [Fact]
+    public void Donut_chart_builds_on_the_pie_chart()
+    {
+        Assert.Contains("pie-chart", ComponentRegistry.GetMetadata("donut-chart")!.Dependencies);
+        Assert.Contains("class DonutChart : PieChart", ComponentRegistry.GetComponentContent("donut-chart", NativePlatform.Avalonia)!);
+    }
+
+    [Theory]
+    [InlineData("buton", "button")]
+    [InlineData("chart-bar", "bar-chart")]
+    [InlineData("chart-04", "chart")]
+    [InlineData("datepicker", "date-picker")]
+    public void Suggest_finds_close_names(string name, string expected)
+    {
+        Assert.Contains(expected, ComponentRegistry.Suggest(name));
+    }
+
+    [Fact]
+    public void Suggest_returns_at_most_three_and_nothing_for_unrelated_names()
+    {
+        Assert.True(ComponentRegistry.Suggest("chart").Count <= 3);
+        Assert.Empty(ComponentRegistry.Suggest("zzqqxx"));
+    }
 }

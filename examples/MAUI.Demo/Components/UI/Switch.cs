@@ -36,7 +36,11 @@ public partial class Switch : ContentView
         set => SetValue(LabelProperty, value);
     }
 
+    // User input only: setting IsToggled from code or a binding doesn't raise it.
     public event EventHandler<bool>? Toggled;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Switch()
     {
@@ -68,20 +72,28 @@ public partial class Switch : ContentView
 
         var row = new HorizontalStackLayout { Spacing = 8, Children = { _track, _label } };
         var tap = new TapGestureRecognizer();
-        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); IsToggled = !IsToggled; };
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); ByUser(() => IsToggled = !IsToggled); };
         row.GestureRecognizers.Add(tap);
-        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) IsToggled = !IsToggled; });
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) ByUser(() => IsToggled = !IsToggled); });
 
         Content = row;
         HorizontalOptions = LayoutOptions.Start;
         UpdateVisualState(animate: false);
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private static void OnIsToggledChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is not Switch control) return;
         control.UpdateVisualState(animate: true);
-        control.Toggled?.Invoke(control, (bool)newValue);
+        if (control._byUser) control.Toggled?.Invoke(control, (bool)newValue);
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)

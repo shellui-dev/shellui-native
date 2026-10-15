@@ -134,6 +134,7 @@ public class TemplateContentTests
     [InlineData("line-chart")]
     [InlineData("area-chart")]
     [InlineData("pie-chart")]
+    [InlineData("donut-chart")]
     [InlineData("radar-chart")]
     [InlineData("radial-chart")]
     public void Ported_components_have_Avalonia_content(string name)
@@ -230,5 +231,37 @@ public class TemplateContentTests
             ComponentRegistry.SupportsPlatform(name, NativePlatform.MAUI),
             $"Component '{name}' does not report MAUI as a supported platform. " +
             $"GetSupportedPlatforms returned: [{string.Join(", ", ComponentRegistry.GetSupportedPlatforms(name))}]");
+    }
+
+    // ShellLabel passes text alignment and wrapping through (issue #27). Avalonia's ShellLabel is a
+    // TextBlock, so TextAlignment and TextWrapping are already its own properties.
+    [Fact]
+    public void MAUI_label_exposes_text_alignment_and_line_break_mode()
+    {
+        var content = ComponentRegistry.GetComponentContent("label", NativePlatform.MAUI)!;
+        Assert.Contains("HorizontalTextAlignmentProperty", content);
+        Assert.Contains("LineBreakModeProperty", content);
+        Assert.Contains("class ShellLabel : TextBlock", ComponentRegistry.GetComponentContent("label", NativePlatform.Avalonia)!);
+    }
+
+    // Sheets can be wider than shadcn's 384px (issue #26).
+    [Theory]
+    [InlineData(NativePlatform.MAUI)]
+    [InlineData(NativePlatform.Avalonia)]
+    public void Sheet_content_has_a_max_panel_width(NativePlatform platform)
+    {
+        var content = ComponentRegistry.GetComponentContent("sheet-content", platform)!;
+        Assert.Contains("MaxPanelWidthProperty", content);
+        Assert.Contains("Math.Min(MaxPanelWidth", content);
+    }
+
+    // A MAUI Blazor Hybrid app has a <App>.Components.Layout namespace (MainLayout.razor), and a
+    // bare `Layout` inside <App>.Components.* resolves to it (CS0118), so MAUI code names the type in full.
+    [Theory]
+    [MemberData(nameof(AllRegisteredComponents))]
+    public void MAUI_templates_name_the_Layout_type_in_full(string name)
+    {
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.MAUI)!;
+        Assert.DoesNotMatch(@"(\b(is|as|case|new)\s+|typeof\(|[<(,]\s*)Layout\b(?![.\w])", content);
     }
 }

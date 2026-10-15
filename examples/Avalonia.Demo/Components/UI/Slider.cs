@@ -39,7 +39,7 @@ public class Slider : Border
         ValueProperty.Changed.AddClassHandler<Slider>((s, e) =>
         {
             s.UpdateLayoutOfParts();
-            s.ValueChanged?.Invoke(s, (double)e.NewValue!);
+            if (s._byUser) s.ValueChanged?.Invoke(s, (double)e.NewValue!);
         });
         MinimumProperty.Changed.AddClassHandler<Slider>((s, _) => { s.CoerceValue(ValueProperty); s.UpdateLayoutOfParts(); });
         MaximumProperty.Changed.AddClassHandler<Slider>((s, _) => { s.CoerceValue(ValueProperty); s.UpdateLayoutOfParts(); });
@@ -70,7 +70,19 @@ public class Slider : Border
         set => SetValue(StepProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<double>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public Slider()
     {
@@ -113,7 +125,7 @@ public class Slider : Border
         var travel = Bounds.Width - ThumbSize;
         if (travel <= 0) return;
         var fraction = Math.Clamp((e.GetPosition(this).X - ThumbSize / 2) / travel, 0, 1);
-        Value = Minimum + fraction * (Maximum - Minimum);
+        ByUser(() => Value = Minimum + fraction * (Maximum - Minimum));
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -161,7 +173,7 @@ public class Slider : Border
             _ => null
         };
         if (target is not { } value) return;
-        Value = value;
+        ByUser(() => Value = value);
         e.Handled = true;
     }
 }

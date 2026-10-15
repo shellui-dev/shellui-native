@@ -39,8 +39,8 @@ main   ← Phase 1 (PRs #1–#5), release 0.1.0-alpha.1 (PR #6), Phase 2 Avaloni
 
 | Branch | Base | Status | Purpose |
 |--------|------|--------|---------|
-| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#21 merged since | 97 registry entries (94 CLI targets, 63 families), each with MAUI and Avalonia content |
-| `feat/charts` | `main` | **Active** | chart core plus bar, line, area, pie / donut, radar and radial charts for MAUI and Avalonia (114 registry entries, 111 CLI targets, 80 families) |
+| `main` | — | Phase 1, Phase 2 and PR #14 merged; released as `0.1.0-alpha.2`; PRs #17–#23 merged since (charts in #23) | 114 registry entries (111 CLI targets, 80 families), each with MAUI and Avalonia content; 115 / 112 / 81 with `donut-chart` on `fix/pre-release-issues` |
+| `fix/pre-release-issues` | `main` | **Active** | Issues before `0.2.0-alpha.1`: change events report user input only (#24), sheet `MaxPanelWidth` (#26), `ShellLabel` alignment and line break (#27), native components beside ShellUI Blazor (#28), `donut-chart` as its own component (as in ShellUI), did-you-mean, a dependency audit test |
 
 ---
 
