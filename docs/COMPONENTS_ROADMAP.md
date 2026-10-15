@@ -2,9 +2,9 @@
 
 Prioritized list of components to create for ShellUI Native, aligned with [ShellUI Components](https://github.com/shellui/shell-ui) patterns. All components should follow **compositional patterns** using Dependencies (parent + sub-components) instead of monolithic ChildContent.
 
-Last revised: **2026-10-11** (second prerelease, `0.1.0-alpha.2`).
+Last revised: **2026-10-15** (`0.2.0-beta.1`).
 
-**Status at a glance:** P0–P7 ✅ done · `0.1.0-alpha.2`: 63 families, 94 CLI targets, each for MAUI and Avalonia · since then: button-group, input-group, menubar, command, navigation-menu, data-table, chat, form, image-viewer, prev-next-nav, charts.
+**Status at a glance:** P0–P7 ✅ done · `0.2.0-beta.1`: 81 families, 112 CLI targets, each for MAUI and Avalonia (`0.1.0-alpha.2` had 63 / 94; added since: button-group, input-group, menubar, command, navigation-menu, data-table, chat, form, image-viewer, prev-next-nav and the charts).
 
 ---
 
