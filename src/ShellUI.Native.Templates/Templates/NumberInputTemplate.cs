@@ -77,7 +77,11 @@ public partial class NumberInput : ContentView
         set => SetValue(PlaceholderProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<decimal?>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly Border _frame;
     private readonly Entry _entry;
@@ -159,10 +163,18 @@ public partial class NumberInput : ContentView
         {
             if (!IsEnabled) return;
             Commit();
-            Value = (Value ?? Minimum ?? 0) + direction * Step;
+            ByUser(() => Value = (Value ?? Minimum ?? 0) + direction * Step);
         };
         button.GestureRecognizers.Add(tap);
         return button;
+    }
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     private decimal? Clamp(decimal? value)
@@ -174,7 +186,9 @@ public partial class NumberInput : ContentView
     }
 
     // A typed number is clamped and kept, empty clears the value, anything else is reverted.
-    private void Commit()
+    private void Commit() => ByUser(CommitText);
+
+    private void CommitText()
     {
         var text = _entry.Text?.Trim();
         if (string.IsNullOrEmpty(text)) Value = null;
@@ -194,7 +208,7 @@ public partial class NumberInput : ContentView
     {
         UpdateText();
         UpdateButtons();
-        ValueChanged?.Invoke(this, Value);
+        if (_byUser) ValueChanged?.Invoke(this, Value);
     }
 
     private void UpdateText()
@@ -264,7 +278,7 @@ public class NumberInput : Border
         {
             n.UpdateText();
             n.UpdateButtons();
-            n.ValueChanged?.Invoke(n, n.Value);
+            if (n._byUser) n.ValueChanged?.Invoke(n, n.Value);
         });
         MinimumProperty.Changed.AddClassHandler<NumberInput>((n, _) => n.OnLimitsChanged());
         MaximumProperty.Changed.AddClassHandler<NumberInput>((n, _) => n.OnLimitsChanged());
@@ -302,7 +316,11 @@ public class NumberInput : Border
         set => SetValue(PlaceholderProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<decimal?>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public NumberInput()
     {
@@ -388,7 +406,15 @@ public class NumberInput : Border
     {
         if (!IsEffectivelyEnabled) return;
         Commit();
-        Value = (Value ?? Minimum ?? 0) + direction * Step;
+        ByUser(() => Value = (Value ?? Minimum ?? 0) + direction * Step);
+    }
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     private decimal? Clamp(decimal? value)
@@ -400,7 +426,9 @@ public class NumberInput : Border
     }
 
     // A typed number is clamped and kept, empty clears the value, anything else is reverted.
-    private void Commit()
+    private void Commit() => ByUser(CommitText);
+
+    private void CommitText()
     {
         var text = _textBox.Text?.Trim();
         if (string.IsNullOrEmpty(text)) Value = null;

@@ -42,7 +42,11 @@ public partial class Select : ContentView, IShellPopup
 
     public bool IsOpen { get; private set; }
 
+    // User input only: setting SelectedIndex from code or a binding doesn't raise it.
     public event EventHandler? SelectedIndexChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private ShellPopupHandle? _handle;
     private readonly Border _trigger;
@@ -124,12 +128,20 @@ public partial class Select : ContentView, IShellPopup
 
     public void Close() => SetOpen(false);
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private static void OnSelectedIndexChanged(BindableObject b, object o, object n)
     {
         var select = (Select)b;
         select.UpdateTrigger();
         select.UpdateItemStates();
-        select.SelectedIndexChanged?.Invoke(select, EventArgs.Empty);
+        if (select._byUser) select.SelectedIndexChanged?.Invoke(select, EventArgs.Empty);
     }
 
     private void UpdateTrigger()
@@ -180,7 +192,7 @@ public partial class Select : ContentView, IShellPopup
         pointer.PointerExited += (_, _) => { item.ClearValue(VisualElement.BackgroundColorProperty); item.BackgroundColor = Colors.Transparent; };
         item.GestureRecognizers.Add(pointer);
         var tap = new TapGestureRecognizer();
-        tap.Tapped += (_, _) => { SelectedIndex = index; SetOpen(false); };
+        tap.Tapped += (_, _) => { ByUser(() => SelectedIndex = index); SetOpen(false); };
         item.GestureRecognizers.Add(tap);
         return item;
     }

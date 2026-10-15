@@ -86,9 +86,13 @@ public partial class Stepper : ContentView
 
     public IList<StepperStep> Steps => _steps;
 
+    // User input only: setting CurrentStep, or calling Next / Previous, from code doesn't raise it.
     public event EventHandler<int>? CurrentStepChanged;
     // Raised by the Confirm button on the last step.
     public event EventHandler? Confirmed;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const double CircleSize = 32;
 
@@ -117,7 +121,7 @@ public partial class Stepper : ContentView
         _body = new ContentView { Margin = new Thickness(0, 24, 0, 0) };
 
         _previous = new Button { Variant = ButtonVariant.Outline, HorizontalOptions = LayoutOptions.Start };
-        _previous.Clicked += (_, _) => Previous();
+        _previous.Clicked += (_, _) => ByUser(Previous);
         _next = new Button { HorizontalOptions = LayoutOptions.End };
         _next.Clicked += (_, _) =>
         {
@@ -126,7 +130,7 @@ public partial class Stepper : ContentView
                 _highest = Math.Max(_highest, _steps.Count - 1);
                 Confirmed?.Invoke(this, EventArgs.Empty);
             }
-            else Next();
+            else ByUser(Next);
         };
         _navigation = new Grid { Margin = new Thickness(0, 24, 0, 0), Children = { _previous, _next } };
 
@@ -137,6 +141,14 @@ public partial class Stepper : ContentView
 
     private int Current => Math.Clamp(CurrentStep, 0, Math.Max(0, _steps.Count - 1));
     private bool IsLast => Current >= _steps.Count - 1;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public void Next()
     {
@@ -152,7 +164,7 @@ public partial class Stepper : ContentView
     {
         _highest = Math.Max(_highest, Current);
         UpdateState();
-        CurrentStepChanged?.Invoke(this, Current);
+        if (_byUser) CurrentStepChanged?.Invoke(this, Current);
     }
 
     private void Rebuild()
@@ -186,7 +198,7 @@ public partial class Stepper : ContentView
                 StrokeShape = new RoundRectangle { CornerRadius = CircleSize / 2 }
             };
             var tap = new TapGestureRecognizer();
-            tap.Tapped += (_, _) => { if (index <= _highest) CurrentStep = index; };
+            tap.Tapped += (_, _) => { if (index <= _highest) ByUser(() => CurrentStep = index); };
             circle.GestureRecognizers.Add(tap);
 
             // Lines run from each circle to the edges of its column, so neighbors meet.
@@ -411,14 +423,18 @@ public class Stepper : Border
     [Content]
     public Controls Steps => _body.Children;
 
+    // User input only: setting CurrentStep, or calling Next / Previous, from code doesn't raise it.
     public event EventHandler<int>? CurrentStepChanged;
     // Raised by the Confirm button on the last step.
     public event EventHandler? Confirmed;
 
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
     public Stepper()
     {
         _previous = new Button { Variant = ButtonVariant.Outline, HorizontalAlignment = HorizontalAlignment.Left };
-        _previous.Clicked += (_, _) => Previous();
+        _previous.Clicked += (_, _) => ByUser(Previous);
         _next = new Button { HorizontalAlignment = HorizontalAlignment.Right };
         _next.Clicked += (_, _) =>
         {
@@ -427,7 +443,7 @@ public class Stepper : Border
                 _highest = Math.Max(_highest, StepList.Count - 1);
                 Confirmed?.Invoke(this, EventArgs.Empty);
             }
-            else Next();
+            else ByUser(Next);
         };
         _navigation = new Panel { Margin = new Thickness(0, 24, 0, 0), Children = { _previous, _next } };
 
@@ -439,6 +455,14 @@ public class Stepper : Border
     private List<StepperStep> StepList => _body.Children.OfType<StepperStep>().ToList();
     private int Current => Math.Clamp(CurrentStep, 0, Math.Max(0, StepList.Count - 1));
     private bool IsLast => Current >= StepList.Count - 1;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public void Next()
     {
@@ -454,7 +478,7 @@ public class Stepper : Border
     {
         _highest = Math.Max(_highest, Current);
         UpdateState();
-        CurrentStepChanged?.Invoke(this, Current);
+        if (_byUser) CurrentStepChanged?.Invoke(this, Current);
     }
 
     private void Rebuild()
@@ -493,13 +517,13 @@ public class Stepper : Border
             circle.PointerReleased += (_, e) =>
             {
                 if (e.InitialPressMouseButton != MouseButton.Left || index > _highest) return;
-                CurrentStep = index;
+                ByUser(() => CurrentStep = index);
                 e.Handled = true;
             };
             circle.KeyDown += (_, e) =>
             {
                 if (e.Key is not (Key.Enter or Key.Space) || index > _highest) return;
-                CurrentStep = index;
+                ByUser(() => CurrentStep = index);
                 e.Handled = true;
             };
 

@@ -61,7 +61,11 @@ public partial class Checkbox : ContentView
         set => SetValue(HasErrorProperty, value);
     }
 
+    // User input only: setting IsChecked from code or a binding doesn't raise it.
     public event EventHandler<bool>? CheckedChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Checkbox()
     {
@@ -88,20 +92,28 @@ public partial class Checkbox : ContentView
         };
 
         var tap = new TapGestureRecognizer();
-        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); IsChecked = !IsChecked; };
+        tap.Tapped += (_, _) => { if (!IsEnabled) return; ShellFocus.FocusPressed(this); ByUser(() => IsChecked = !IsChecked); };
         row.GestureRecognizers.Add(tap);
-        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) IsChecked = !IsChecked; });
+        ShellFocus.MakeFocusable(this, () => { if (IsEnabled) ByUser(() => IsChecked = !IsChecked); });
 
         Content = row;
         HorizontalOptions = LayoutOptions.Start;
         UpdateVisualState();
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private static void OnIsCheckedChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is not Checkbox checkbox) return;
         checkbox.UpdateVisualState();
-        checkbox.CheckedChanged?.Invoke(checkbox, (bool)newValue);
+        if (checkbox._byUser) checkbox.CheckedChanged?.Invoke(checkbox, (bool)newValue);
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)
@@ -163,7 +175,7 @@ public class Checkbox : Border
         IsCheckedProperty.Changed.AddClassHandler<Checkbox>((c, e) =>
         {
             c.UpdateVisualState();
-            c.CheckedChanged?.Invoke(c, (bool)e.NewValue!);
+            if (c._byUser) c.CheckedChanged?.Invoke(c, (bool)e.NewValue!);
         });
         LabelProperty.Changed.AddClassHandler<Checkbox>((c, _) => c.UpdateLabel());
         HasErrorProperty.Changed.AddClassHandler<Checkbox>((c, _) => c.UpdateVisualState());
@@ -188,7 +200,11 @@ public class Checkbox : Border
         set => SetValue(HasErrorProperty, value);
     }
 
+    // User input only: setting IsChecked from code or a binding doesn't raise it.
     public event EventHandler<bool>? CheckedChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Checkbox()
     {
@@ -213,11 +229,19 @@ public class Checkbox : Border
         UpdateVisualState();
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         if (e.InitialPressMouseButton != MouseButton.Left || !IsEffectivelyEnabled) return;
-        IsChecked = !IsChecked;
+        ByUser(() => IsChecked = !IsChecked);
         e.Handled = true;
     }
 
@@ -225,7 +249,7 @@ public class Checkbox : Border
     {
         base.OnKeyDown(e);
         if (e.Key != Key.Space) return;
-        IsChecked = !IsChecked;
+        ByUser(() => IsChecked = !IsChecked);
         e.Handled = true;
     }
 

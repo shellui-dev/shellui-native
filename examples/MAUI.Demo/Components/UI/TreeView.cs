@@ -26,7 +26,22 @@ public partial class TreeView : ContentView
 
     public IList<IView> Items => _stack.Children;
 
+    // User input only: setting SelectedValue from code or a binding doesn't raise it.
     public event EventHandler<string?>? SelectedValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    // A click or key on a row.
+    internal void SelectByUser(string? value) => ByUser(() => SelectedValue = value);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     private readonly VerticalStackLayout _stack;
 
@@ -40,7 +55,7 @@ public partial class TreeView : ContentView
     private void OnSelectedValueChanged()
     {
         Refresh();
-        SelectedValueChanged?.Invoke(this, SelectedValue);
+        if (_byUser) SelectedValueChanged?.Invoke(this, SelectedValue);
     }
 
     // Items don't track the selection: the tree pushes it to every item under it.
@@ -170,7 +185,7 @@ public partial class TreeViewItem : ContentView
     {
         if (!IsEnabled) return;
         if (HasChildren) IsExpanded = !IsExpanded;
-        if (this.FindParentOfType<TreeView>() is { } tree) tree.SelectedValue = EffectiveValue;
+        if (this.FindParentOfType<TreeView>() is { } tree) tree.SelectByUser(EffectiveValue);
     }
 
     internal void ApplySelection(string? selected)

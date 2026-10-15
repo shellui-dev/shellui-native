@@ -76,7 +76,11 @@ public partial class Toggle : ContentView, IShellFocusable
         set => SetValue(SizeProperty, value);
     }
 
+    // User input only: setting IsPressed from code or a binding doesn't raise it.
     public event EventHandler<bool>? PressedChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly Border _border;
     private readonly Icon _icon;
@@ -122,13 +126,21 @@ public partial class Toggle : ContentView, IShellFocusable
 
     private void Press()
     {
-        if (IsEnabled) IsPressed = !IsPressed;
+        if (IsEnabled) ByUser(() => IsPressed = !IsPressed);
+    }
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     private void OnPressedChanged()
     {
         UpdateVisualState();
-        PressedChanged?.Invoke(this, IsPressed);
+        if (_byUser) PressedChanged?.Invoke(this, IsPressed);
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)
@@ -217,7 +229,7 @@ public class Toggle : Border, IShellFocusable
         IsPressedProperty.Changed.AddClassHandler<Toggle>((t, _) =>
         {
             t.UpdateVisualState();
-            t.PressedChanged?.Invoke(t, t.IsPressed);
+            if (t._byUser) t.PressedChanged?.Invoke(t, t.IsPressed);
         });
         TextProperty.Changed.AddClassHandler<Toggle>((t, _) => t.UpdateVisualState());
         IconProperty.Changed.AddClassHandler<Toggle>((t, _) => t.UpdateVisualState());
@@ -256,7 +268,11 @@ public class Toggle : Border, IShellFocusable
         set => SetValue(SizeProperty, value);
     }
 
+    // User input only: setting IsPressed from code or a binding doesn't raise it.
     public event EventHandler<bool>? PressedChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Toggle()
     {
@@ -289,11 +305,19 @@ public class Toggle : Border, IShellFocusable
         UpdateVisualState();
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         if (e.InitialPressMouseButton != MouseButton.Left || !IsEffectivelyEnabled) return;
-        IsPressed = !IsPressed;
+        ByUser(() => IsPressed = !IsPressed);
         e.Handled = true;
     }
 
@@ -301,7 +325,7 @@ public class Toggle : Border, IShellFocusable
     {
         base.OnKeyDown(e);
         if (e.Key is not (Key.Enter or Key.Space) || !IsEffectivelyEnabled) return;
-        IsPressed = !IsPressed;
+        ByUser(() => IsPressed = !IsPressed);
         e.Handled = true;
     }
 

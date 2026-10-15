@@ -79,7 +79,11 @@ public partial class Combobox : ContentView, IShellPopup
 
     public bool IsOpen { get; private set; }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<string>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const double ItemHeight = 32;
     private const double MaxListHeight = 240;
@@ -217,9 +221,17 @@ public partial class Combobox : ContentView, IShellPopup
 
     public void Close() => SetOpen(false);
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void Pick(string text)
     {
-        Value = text;
+        ByUser(() => Value = text);
         SetOpen(false);
     }
 
@@ -227,7 +239,7 @@ public partial class Combobox : ContentView, IShellPopup
     {
         UpdateTrigger();
         UpdateChecks();
-        ValueChanged?.Invoke(this, Value ?? string.Empty);
+        if (_byUser) ValueChanged?.Invoke(this, Value ?? string.Empty);
     }
 
     private void UpdateTrigger()
@@ -360,7 +372,7 @@ public class Combobox : Border
         {
             c.UpdateTrigger();
             c.UpdateChecks();
-            c.ValueChanged?.Invoke(c, c.Value ?? string.Empty);
+            if (c._byUser) c.ValueChanged?.Invoke(c, c.Value ?? string.Empty);
         });
         ItemsSourceProperty.Changed.AddClassHandler<Combobox>((c, _) => c.RebuildItems());
         PlaceholderProperty.Changed.AddClassHandler<Combobox>((c, _) => c.UpdateTrigger());
@@ -401,7 +413,11 @@ public class Combobox : Border
 
     public bool IsOpen => _popup.IsOpen;
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<string>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Combobox()
     {
@@ -517,9 +533,17 @@ public class Combobox : Border
         e.Handled = true;
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void Pick(string text)
     {
-        Value = text;
+        ByUser(() => Value = text);
         SetOpen(false);
     }
 

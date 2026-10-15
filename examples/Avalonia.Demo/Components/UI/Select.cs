@@ -38,7 +38,7 @@ public class Select : Border
         {
             s.UpdateTrigger();
             s.UpdateItemStates();
-            s.SelectedIndexChanged?.Invoke(s, EventArgs.Empty);
+            if (s._byUser) s.SelectedIndexChanged?.Invoke(s, EventArgs.Empty);
         });
         ItemsSourceProperty.Changed.AddClassHandler<Select>((s, _) => s.RebuildItems());
         PlaceholderProperty.Changed.AddClassHandler<Select>((s, _) => s.UpdateTrigger());
@@ -68,7 +68,19 @@ public class Select : Border
 
     public bool IsOpen => _popup.IsOpen;
 
+    // User input only: setting SelectedIndex from code or a binding doesn't raise it.
     public event EventHandler? SelectedIndexChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public Select()
     {
@@ -176,7 +188,7 @@ public class Select : Border
         item.PointerExited += (_, _) => { item.ClearToken(BackgroundProperty); item.Background = Brushes.Transparent; };
         item.PointerReleased += (_, e) =>
         {
-            SelectedIndex = index;
+            ByUser(() => SelectedIndex = index);
             SetOpen(false);
             e.Handled = true;
         };

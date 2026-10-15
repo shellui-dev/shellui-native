@@ -93,7 +93,11 @@ public class MultiSelect : Border
 
     public bool IsOpen => _popup.IsOpen;
 
+    // User input only: setting Values, or calling Toggle, from code doesn't raise it.
     public event EventHandler<IReadOnlyList<string>>? ValuesChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public MultiSelect()
     {
@@ -200,6 +204,17 @@ public class MultiSelect : Border
     public void Close() => SetOpen(false);
 
     // Adds the option when it isn't picked, removes it when it is.
+    // A click, a tap or Enter on a row, or the Ã— on a chip.
+    private void ToggleByUser(string text) => ByUser(() => Toggle(text));
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Toggle(string text)
     {
         // A new list each time, so a two-way binding sees the change.
@@ -221,7 +236,7 @@ public class MultiSelect : Border
     {
         if (e.Key == Key.Enter)
         {
-            if (_active >= 0) Toggle(_rows[_active].Text);
+            if (_active >= 0) ToggleByUser(_rows[_active].Text);
         }
         else if (e.Key == Key.Down) MoveActive(1);
         else if (e.Key == Key.Up) MoveActive(-1);
@@ -240,7 +255,7 @@ public class MultiSelect : Border
     {
         RebuildChips();
         UpdateChecks();
-        ValuesChanged?.Invoke(this, Current);
+        if (_byUser) ValuesChanged?.Invoke(this, Current);
     }
 
     private void RebuildChips()
@@ -266,7 +281,7 @@ public class MultiSelect : Border
         remove.PointerReleased += (_, e) =>
         {
             if (e.InitialPressMouseButton != MouseButton.Left) return;
-            if (IsEffectivelyEnabled) Toggle(value);
+            if (IsEffectivelyEnabled) ToggleByUser(value);
             e.Handled = true;
         };
 
@@ -318,7 +333,7 @@ public class MultiSelect : Border
         item.PointerReleased += (_, e) =>
         {
             if (e.InitialPressMouseButton != MouseButton.Left) return;
-            Toggle(text);
+            ToggleByUser(text);
             e.Handled = true;
         };
 

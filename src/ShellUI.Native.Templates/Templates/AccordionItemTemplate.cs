@@ -34,6 +34,7 @@ public partial class AccordionItem : ContentView
     }
 
     public bool IsOpen { get; private set; }
+    // User input only, like the accordion's ItemToggled.
     public event EventHandler<bool>? OpenChanged;
 
     private readonly VerticalStackLayout _stack;
@@ -51,6 +52,8 @@ public partial class AccordionItem : ContentView
 
     public void Toggle() => this.FindParentOfType<Accordion>()?.Toggle(Value);
 
+    internal void ToggleByUser() => this.FindParentOfType<Accordion>()?.ToggleByUser(Value);
+
     internal void SetDividerVisible(bool visible) => _divider.IsVisible = visible;
 
     internal void ApplyOpen(bool open, bool animate)
@@ -61,7 +64,7 @@ public partial class AccordionItem : ContentView
             trigger.SetOpen(open, animate);
         foreach (var content in this.FindDescendantsOfType<AccordionContent>(e => e is AccordionItem))
             content.Apply(open, animate);
-        if (changed) OpenChanged?.Invoke(this, open);
+        if (changed && this.FindParentOfType<Accordion>() is { IsUserChange: true }) OpenChanged?.Invoke(this, open);
     }
 }
 ",
@@ -92,6 +95,7 @@ public class AccordionItem : Border
 
     public bool IsOpen { get; private set; }
 
+    // User input only, like the accordion's ItemToggled.
     public event EventHandler<bool>? OpenChanged;
 
     public AccordionItem()
@@ -101,6 +105,8 @@ public class AccordionItem : Border
     }
 
     public void Toggle() => this.FindParentOfType<Accordion>()?.Toggle(Value ?? string.Empty);
+
+    internal void ToggleByUser() => this.FindParentOfType<Accordion>()?.ToggleByUser(Value ?? string.Empty);
 
     internal void SetDividerVisible(bool visible) => _divider.IsVisible = visible;
 
@@ -112,7 +118,7 @@ public class AccordionItem : Border
             trigger.SetOpen(open, animate);
         foreach (var content in this.FindDescendantsOfType<AccordionContent>(e => e is AccordionItem))
             content.Apply(open, animate);
-        if (changed) OpenChanged?.Invoke(this, open);
+        if (changed && this.FindParentOfType<Accordion>() is { IsUserChange: true }) OpenChanged?.Invoke(this, open);
     }
 }
 "

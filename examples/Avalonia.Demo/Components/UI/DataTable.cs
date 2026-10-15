@@ -151,7 +151,11 @@ public class DataTable : Border
         set => _filter.Text = value;
     }
 
+    // User input only: ClearSelection and changes from code don't raise it.
     public event EventHandler<IReadOnlyList<object>>? SelectionChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     // Raised with the row's item.
     public event EventHandler<object>? RowTapped;
@@ -220,6 +224,14 @@ public class DataTable : Border
         Refresh();
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void ClearSelection()
     {
         if (_selected.Count == 0) return;
@@ -259,7 +271,7 @@ public class DataTable : Border
                 if (_rendering) return;
                 if (isChecked) _selected.UnionWith(_view);
                 else _selected.ExceptWith(_view);
-                OnSelectionChanged();
+                ByUser(OnSelectionChanged);
             };
             header.Children.Add(all);
             _allCheck = all;
@@ -286,7 +298,7 @@ public class DataTable : Border
                     if (_rendering) return;
                     if (isChecked) _selected.Add(item);
                     else _selected.Remove(item);
-                    OnSelectionChanged();
+                    ByUser(OnSelectionChanged);
                 };
                 row.Children.Add(check);
             }
@@ -334,7 +346,7 @@ public class DataTable : Border
     private void OnSelectionChanged()
     {
         ShowSelectionState();
-        SelectionChanged?.Invoke(this, SelectedItems);
+        if (_byUser) SelectionChanged?.Invoke(this, SelectedItems);
     }
 
     // h-11 px-4 font-medium text-muted-foreground; a sortable header also shows its direction

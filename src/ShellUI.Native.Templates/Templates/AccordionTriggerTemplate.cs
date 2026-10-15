@@ -73,7 +73,7 @@ public partial class AccordionTrigger : ShellTriggerView
         Content = _row;
     }
 
-    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.ToggleByUser();
 
     internal void SetOpen(bool open, bool animate)
     {
@@ -161,7 +161,7 @@ public class AccordionTrigger : ShellTriggerView
         HorizontalAlignment = HorizontalAlignment.Stretch;
     }
 
-    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<AccordionItem>()?.ToggleByUser();
 
     protected override void OnPointerEntered(PointerEventArgs e)
     {

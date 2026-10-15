@@ -102,7 +102,11 @@ public class DateRangePicker : Border
     public bool IsOpen => _popup.IsOpen;
 
     // Raised when StartDate or EndDate changes.
+    // User input only: setting StartDate / EndDate, or calling Clear, from code doesn't raise it.
     public event EventHandler? RangeChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public DateRangePicker()
     {
@@ -119,7 +123,7 @@ public class DateRangePicker : Border
         _clear.PointerReleased += (_, e) =>
         {
             if (e.InitialPressMouseButton != MouseButton.Left) return;
-            if (IsEffectivelyEnabled) Clear();
+            if (IsEffectivelyEnabled) ByUser(Clear);
             e.Handled = true;
         };
         Grid.SetColumn(_clear, 2);
@@ -149,7 +153,7 @@ public class DateRangePicker : Border
         };
 
         _calendar = new Calendar();
-        _calendar.DateSelected += (_, date) => Pick(date);
+        _calendar.DateSelected += (_, date) => ByUser(() => Pick(date));
         var panel = new Border
         {
             Child = _calendar,
@@ -186,6 +190,14 @@ public class DateRangePicker : Border
 
     public void Close() => SetOpen(false);
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Clear()
     {
         StartDate = null;
@@ -218,7 +230,7 @@ public class DateRangePicker : Border
     {
         UpdateTrigger();
         UpdateCalendar();
-        RangeChanged?.Invoke(this, EventArgs.Empty);
+        if (_byUser) RangeChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateCalendar()

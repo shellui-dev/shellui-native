@@ -66,7 +66,7 @@ public class Sidebar : Border
         SelectedValueProperty.Changed.AddClassHandler<Sidebar>((s, _) =>
         {
             s.Refresh();
-            s.SelectedValueChanged?.Invoke(s, s.SelectedValue);
+            if (s._byUser) s.SelectedValueChanged?.Invoke(s, s.SelectedValue);
         });
         ExpandedWidthProperty.Changed.AddClassHandler<Sidebar>((s, _) => s.SnapWidth());
         CollapsedWidthProperty.Changed.AddClassHandler<Sidebar>((s, _) => s.SnapWidth());
@@ -122,7 +122,11 @@ public class Sidebar : Border
     public Controls Groups => _groups.Children;
 
     public event EventHandler<bool>? IsCollapsedChanged;
+    // User input only: setting SelectedValue from code or a binding doesn't raise it.
     public event EventHandler<string?>? SelectedValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Sidebar()
     {
@@ -148,6 +152,17 @@ public class Sidebar : Border
     }
 
     public void Toggle() => IsCollapsed = !IsCollapsed;
+
+    // A click or key on an item.
+    internal void SelectByUser(string? value) => ByUser(() => SelectedValue = value);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     // The width animates only once the sidebar is on screen, so it doesn't slide in at startup.
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -352,7 +367,7 @@ public class SidebarItem : Border, IShellFocusable
     public void Press()
     {
         if (!IsEffectivelyEnabled) return;
-        if (!string.IsNullOrEmpty(Value) && this.FindParentOfType<Sidebar>() is { } sidebar) sidebar.SelectedValue = Value;
+        if (!string.IsNullOrEmpty(Value) && this.FindParentOfType<Sidebar>() is { } sidebar) sidebar.SelectByUser(Value);
         Clicked?.Invoke(this, EventArgs.Empty);
     }
 

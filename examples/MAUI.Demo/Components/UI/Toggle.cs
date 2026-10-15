@@ -57,7 +57,11 @@ public partial class Toggle : ContentView, IShellFocusable
         set => SetValue(SizeProperty, value);
     }
 
+    // User input only: setting IsPressed from code or a binding doesn't raise it.
     public event EventHandler<bool>? PressedChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly Border _border;
     private readonly Icon _icon;
@@ -103,13 +107,21 @@ public partial class Toggle : ContentView, IShellFocusable
 
     private void Press()
     {
-        if (IsEnabled) IsPressed = !IsPressed;
+        if (IsEnabled) ByUser(() => IsPressed = !IsPressed);
+    }
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
     }
 
     private void OnPressedChanged()
     {
         UpdateVisualState();
-        PressedChanged?.Invoke(this, IsPressed);
+        if (_byUser) PressedChanged?.Invoke(this, IsPressed);
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)

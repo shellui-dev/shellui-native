@@ -87,7 +87,7 @@ public partial class RadioGroupItem : ContentView
         HorizontalOptions = LayoutOptions.Start;
     }
 
-    private void Select() => this.FindParentOfType<RadioGroup>()?.SetValue(Value);
+    private void Select() => this.FindParentOfType<RadioGroup>()?.SelectByUser(Value);
 
     internal void SetChecked(bool isChecked)
     {
@@ -196,7 +196,7 @@ public class RadioGroupItem : Border
         e.Handled = true;
     }
 
-    private void Select() => this.FindParentOfType<RadioGroup>()?.SetValue(Value);
+    private void Select() => this.FindParentOfType<RadioGroup>()?.SelectByUser(Value);
 
     internal void SetChecked(bool isChecked)
     {

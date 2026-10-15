@@ -17,7 +17,7 @@ public class RadioGroup : StackPanel
         ValueProperty.Changed.AddClassHandler<RadioGroup>((g, e) =>
         {
             g.RefreshItems();
-            g.ValueChanged?.Invoke(g, (string?)e.NewValue ?? string.Empty);
+            if (g._byUser) g.ValueChanged?.Invoke(g, (string?)e.NewValue ?? string.Empty);
         });
     }
 
@@ -27,7 +27,11 @@ public class RadioGroup : StackPanel
         set => SetValue(ValueProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<string>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public RadioGroup()
     {
@@ -36,6 +40,17 @@ public class RadioGroup : StackPanel
     }
 
     public void SetValue(string? value) => Value = value;
+
+    // A click or key on an item.
+    internal void SelectByUser(string? value) => ByUser(() => Value = value);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     // Items inside a nested panel may arrive after this group's own children.
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)

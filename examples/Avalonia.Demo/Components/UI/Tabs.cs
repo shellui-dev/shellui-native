@@ -24,7 +24,7 @@ public class Tabs : StackPanel
         ValueProperty.Changed.AddClassHandler<Tabs>((t, e) =>
         {
             t.Refresh(animate: t.IsLoaded);
-            t.ValueChanged?.Invoke(t, ((string?)e.OldValue ?? string.Empty, (string?)e.NewValue ?? string.Empty));
+            if (t._byUser) t.ValueChanged?.Invoke(t, ((string?)e.OldValue ?? string.Empty, (string?)e.NewValue ?? string.Empty));
         });
     }
 
@@ -35,7 +35,11 @@ public class Tabs : StackPanel
     }
 
     // (oldValue, newValue)
+    // User input only: setting Value from code or a binding doesn't raise it.
     public event EventHandler<(string Old, string New)>? ValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Tabs()
     {
@@ -44,6 +48,17 @@ public class Tabs : StackPanel
     }
 
     public void SetValue(string? value) => Value = value;
+
+    // A click or key on a trigger.
+    internal void SelectByUser(string? value) => ByUser(() => Value = value);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {

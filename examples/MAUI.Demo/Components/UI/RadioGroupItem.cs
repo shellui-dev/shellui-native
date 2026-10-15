@@ -68,7 +68,7 @@ public partial class RadioGroupItem : ContentView
         HorizontalOptions = LayoutOptions.Start;
     }
 
-    private void Select() => this.FindParentOfType<RadioGroup>()?.SetValue(Value);
+    private void Select() => this.FindParentOfType<RadioGroup>()?.SelectByUser(Value);
 
     internal void SetChecked(bool isChecked)
     {

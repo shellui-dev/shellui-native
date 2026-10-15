@@ -56,8 +56,12 @@ public partial class ToggleGroup : ContentView
 
     public IList<IView> Items => _row.Children;
 
+    // User input only: setting Value or Values from code or a binding doesn't raise them.
     public event EventHandler<string?>? ValueChanged;
     public event EventHandler<IReadOnlyList<string>>? ValuesChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private readonly HorizontalStackLayout _row;
 
@@ -73,7 +77,18 @@ public partial class ToggleGroup : ContentView
     public bool IsPressed(string value) =>
         Multiple ? Values?.Contains(value) == true : Value == value;
 
-    internal void Toggle(string value)
+    // A click or key on an item.
+    internal void Toggle(string value) => ByUser(() => ToggleValue(value));
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
+    private void ToggleValue(string value)
     {
         if (!IsEnabled) return;
         if (Multiple)
@@ -92,7 +107,7 @@ public partial class ToggleGroup : ContentView
     private void OnValueChanged()
     {
         Refresh();
-        ValueChanged?.Invoke(this, Value);
+        if (_byUser) ValueChanged?.Invoke(this, Value);
     }
 
     private void OnValuesReplaced(object? oldValue, object? newValue)
@@ -105,7 +120,7 @@ public partial class ToggleGroup : ContentView
     private void OnValuesMutated(object? sender, NotifyCollectionChangedEventArgs? e)
     {
         Refresh();
-        ValuesChanged?.Invoke(this, (Values ?? Array.Empty<string>()).ToList());
+        if (_byUser) ValuesChanged?.Invoke(this, (Values ?? Array.Empty<string>()).ToList());
     }
 
     // Items don't track the group's state: the group pushes it to them.

@@ -68,7 +68,11 @@ public class TagInput : Border
         set => SetValue(AllowDuplicatesProperty, value);
     }
 
+    // User input only: setting Tags, or calling Add / Remove, from code doesn't raise it.
     public event EventHandler<IReadOnlyList<string>>? TagsChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public TagInput()
     {
@@ -90,7 +94,7 @@ public class TagInput : Border
             }
             else if (e.Key == Key.Back && string.IsNullOrEmpty(_textBox.Text) && Current.Count > 0)
             {
-                Remove(Current[^1]);
+                ByUser(() => Remove(Current[^1]));
                 e.Handled = true;
             }
         }, RoutingStrategies.Tunnel);
@@ -124,6 +128,14 @@ public class TagInput : Border
 
     private IReadOnlyList<string> Current => (IReadOnlyList<string>?)Tags?.ToList() ?? Array.Empty<string>();
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Add(string tag)
     {
         var text = tag.Trim();
@@ -141,7 +153,9 @@ public class TagInput : Border
         if (next.Remove(tag)) Tags = next;
     }
 
-    private void AddFromText()
+    private void AddFromText() => ByUser(AddTypedText);
+
+    private void AddTypedText()
     {
         var text = _textBox.Text ?? string.Empty;
         _textBox.Text = string.Empty;
@@ -159,7 +173,7 @@ public class TagInput : Border
     private void OnTagsMutated(object? sender, NotifyCollectionChangedEventArgs? e)
     {
         Rebuild();
-        TagsChanged?.Invoke(this, Current);
+        if (_byUser) TagsChanged?.Invoke(this, Current);
     }
 
     private void Rebuild()
@@ -185,7 +199,7 @@ public class TagInput : Border
         remove.PointerReleased += (_, e) =>
         {
             if (e.InitialPressMouseButton != MouseButton.Left) return;
-            if (IsEffectivelyEnabled) Remove(tag);
+            if (IsEffectivelyEnabled) ByUser(() => Remove(tag));
             e.Handled = true;
         };
 

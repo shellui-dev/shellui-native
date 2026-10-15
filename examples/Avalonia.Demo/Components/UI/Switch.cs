@@ -36,7 +36,7 @@ public class Switch : Border
         IsToggledProperty.Changed.AddClassHandler<Switch>((s, e) =>
         {
             s.UpdateVisualState();
-            s.Toggled?.Invoke(s, (bool)e.NewValue!);
+            if (s._byUser) s.Toggled?.Invoke(s, (bool)e.NewValue!);
         });
         LabelProperty.Changed.AddClassHandler<Switch>((s, _) => s.UpdateLabel());
         IsEnabledProperty.Changed.AddClassHandler<Switch>((s, _) => s.Opacity = s.IsEnabled ? 1.0 : 0.5);
@@ -54,7 +54,11 @@ public class Switch : Border
         set => SetValue(LabelProperty, value);
     }
 
+    // User input only: setting IsToggled from code or a binding doesn't raise it.
     public event EventHandler<bool>? Toggled;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public Switch()
     {
@@ -95,11 +99,19 @@ public class Switch : Border
         };
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         if (e.InitialPressMouseButton != MouseButton.Left || !IsEffectivelyEnabled) return;
-        IsToggled = !IsToggled;
+        ByUser(() => IsToggled = !IsToggled);
         e.Handled = true;
     }
 
@@ -107,7 +119,7 @@ public class Switch : Border
     {
         base.OnKeyDown(e);
         if (e.Key is not (Key.Space or Key.Enter)) return;
-        IsToggled = !IsToggled;
+        ByUser(() => IsToggled = !IsToggled);
         e.Handled = true;
     }
 

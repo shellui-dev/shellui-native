@@ -67,7 +67,11 @@ public partial class TagInput : ContentView
         set => SetValue(AllowDuplicatesProperty, value);
     }
 
+    // User input only: setting Tags, or calling Add / Remove, from code doesn't raise it.
     public event EventHandler<IReadOnlyList<string>>? TagsChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private static readonly char[] Separators = { ',', ';', '\n', '\t' };
 
@@ -127,6 +131,14 @@ public partial class TagInput : ContentView
 
     private IReadOnlyList<string> Current => (IReadOnlyList<string>?)Tags?.ToList() ?? Array.Empty<string>();
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Add(string tag)
     {
         var text = tag.Trim();
@@ -161,7 +173,9 @@ public partial class TagInput : ContentView
         });
     }
 
-    private void AddFromEntry()
+    private void AddFromEntry() => ByUser(AddEntryText);
+
+    private void AddEntryText()
     {
         var text = _entry.Text ?? string.Empty;
         _entry.Text = string.Empty;
@@ -179,7 +193,7 @@ public partial class TagInput : ContentView
     private void OnTagsMutated(object? sender, NotifyCollectionChangedEventArgs? e)
     {
         Rebuild();
-        TagsChanged?.Invoke(this, Current);
+        if (_byUser) TagsChanged?.Invoke(this, Current);
     }
 
     private void Rebuild()
@@ -207,7 +221,7 @@ public partial class TagInput : ContentView
         pointer.PointerExited += (_, _) => close.Token = ShellToken.MutedForeground;
         remove.GestureRecognizers.Add(pointer);
         var tap = new TapGestureRecognizer();
-        tap.Tapped += (_, _) => { if (IsEnabled) Remove(tag); };
+        tap.Tapped += (_, _) => { if (IsEnabled) ByUser(() => Remove(tag)); };
         remove.GestureRecognizers.Add(tap);
 
         var chip = new Border
@@ -306,7 +320,11 @@ public class TagInput : Border
         set => SetValue(AllowDuplicatesProperty, value);
     }
 
+    // User input only: setting Tags, or calling Add / Remove, from code doesn't raise it.
     public event EventHandler<IReadOnlyList<string>>? TagsChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public TagInput()
     {
@@ -328,7 +346,7 @@ public class TagInput : Border
             }
             else if (e.Key == Key.Back && string.IsNullOrEmpty(_textBox.Text) && Current.Count > 0)
             {
-                Remove(Current[^1]);
+                ByUser(() => Remove(Current[^1]));
                 e.Handled = true;
             }
         }, RoutingStrategies.Tunnel);
@@ -362,6 +380,14 @@ public class TagInput : Border
 
     private IReadOnlyList<string> Current => (IReadOnlyList<string>?)Tags?.ToList() ?? Array.Empty<string>();
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     public void Add(string tag)
     {
         var text = tag.Trim();
@@ -379,7 +405,9 @@ public class TagInput : Border
         if (next.Remove(tag)) Tags = next;
     }
 
-    private void AddFromText()
+    private void AddFromText() => ByUser(AddTypedText);
+
+    private void AddTypedText()
     {
         var text = _textBox.Text ?? string.Empty;
         _textBox.Text = string.Empty;
@@ -397,7 +425,7 @@ public class TagInput : Border
     private void OnTagsMutated(object? sender, NotifyCollectionChangedEventArgs? e)
     {
         Rebuild();
-        TagsChanged?.Invoke(this, Current);
+        if (_byUser) TagsChanged?.Invoke(this, Current);
     }
 
     private void Rebuild()
@@ -423,7 +451,7 @@ public class TagInput : Border
         remove.PointerReleased += (_, e) =>
         {
             if (e.InitialPressMouseButton != MouseButton.Left) return;
-            if (IsEffectivelyEnabled) Remove(tag);
+            if (IsEffectivelyEnabled) ByUser(() => Remove(tag));
             e.Handled = true;
         };
 

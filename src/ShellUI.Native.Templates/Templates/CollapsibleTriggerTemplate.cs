@@ -24,7 +24,7 @@ public static class CollapsibleTriggerTemplate
 // Toggles the enclosing Collapsible. Wrap a Button or any view (a row, an icon, a label).
 public partial class CollapsibleTrigger : ShellTriggerView
 {
-    protected override void OnActivated() => this.FindParentOfType<Collapsible>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<Collapsible>()?.ToggleByUser();
 }
 ",
         [NativePlatform.Avalonia] = @"namespace YourProjectNamespace.Components.UI;
@@ -32,7 +32,7 @@ public partial class CollapsibleTrigger : ShellTriggerView
 // Toggles the enclosing Collapsible. Wrap a Button or any control (a row, an icon, a label).
 public class CollapsibleTrigger : ShellTriggerView
 {
-    protected override void OnActivated() => this.FindParentOfType<Collapsible>()?.Toggle();
+    protected override void OnActivated() => this.FindParentOfType<Collapsible>()?.ToggleByUser();
 }
 "
     };

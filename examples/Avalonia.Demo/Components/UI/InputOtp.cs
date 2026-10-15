@@ -71,9 +71,13 @@ public class InputOtp : Border
         set => SetValue(HasErrorProperty, value);
     }
 
+    // User input only: setting Value from code or a binding doesn't raise ValueChanged or Completed.
     public event EventHandler<string>? ValueChanged;
     // Raised when every slot is filled.
     public event EventHandler<string>? Completed;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     public InputOtp()
     {
@@ -90,7 +94,7 @@ public class InputOtp : Border
                 _textBox.Text = value;
                 _textBox.CaretIndex = value.Length;
             }
-            Value = value;
+            ByUser(() => Value = value);
         };
         _textBox.GotFocus += (_, _) =>
         {
@@ -150,6 +154,14 @@ public class InputOtp : Border
         OnValueChanged();
     }
 
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void OnValueChanged()
     {
         var value = Sanitize(Value);
@@ -164,6 +176,7 @@ public class InputOtp : Border
             _textBox.CaretIndex = value.Length;
         }
         UpdateSlots();
+        if (!_byUser) return;
         ValueChanged?.Invoke(this, value);
         if (value.Length == Length && Length > 0) Completed?.Invoke(this, value);
     }

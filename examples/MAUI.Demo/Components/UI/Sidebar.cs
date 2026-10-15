@@ -92,7 +92,11 @@ public partial class Sidebar : ContentView
     public IList<IView> Groups => _groups.Children;
 
     public event EventHandler<bool>? IsCollapsedChanged;
+    // User input only: setting SelectedValue from code or a binding doesn't raise it.
     public event EventHandler<string?>? SelectedValueChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
 
     private const string WidthAnimation = "SidebarWidth";
 
@@ -129,6 +133,17 @@ public partial class Sidebar : ContentView
 
     public void Toggle() => IsCollapsed = !IsCollapsed;
 
+    // A click or key on an item.
+    internal void SelectByUser(string? value) => ByUser(() => SelectedValue = value);
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
+
     private void OnCollapsedChanged()
     {
         Refresh();
@@ -139,7 +154,7 @@ public partial class Sidebar : ContentView
     private void OnSelectedValueChanged()
     {
         Refresh();
-        SelectedValueChanged?.Invoke(this, SelectedValue);
+        if (_byUser) SelectedValueChanged?.Invoke(this, SelectedValue);
     }
 
     private void ApplyWidth(bool animate)
@@ -326,7 +341,7 @@ public partial class SidebarItem : ContentView
     private void Press()
     {
         if (!IsEnabled) return;
-        if (!string.IsNullOrEmpty(Value) && this.FindParentOfType<Sidebar>() is { } sidebar) sidebar.SelectedValue = Value;
+        if (!string.IsNullOrEmpty(Value) && this.FindParentOfType<Sidebar>() is { } sidebar) sidebar.SelectByUser(Value);
         Clicked?.Invoke(this, EventArgs.Empty);
     }
 

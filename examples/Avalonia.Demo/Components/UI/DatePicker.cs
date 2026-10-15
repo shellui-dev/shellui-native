@@ -38,7 +38,7 @@ public class DatePicker : Border
         {
             p.UpdateText();
             p._calendar.SelectedDate = (DateTime)e.NewValue!;
-            p.DateChanged?.Invoke(p, (DateTime)e.NewValue!);
+            if (p._byUser) p.DateChanged?.Invoke(p, (DateTime)e.NewValue!);
         });
         MinimumDateProperty.Changed.AddClassHandler<DatePicker>((p, e) => p._calendar.MinimumDate = (DateTime?)e.NewValue);
         MaximumDateProperty.Changed.AddClassHandler<DatePicker>((p, e) => p._calendar.MaximumDate = (DateTime?)e.NewValue);
@@ -73,7 +73,19 @@ public class DatePicker : Border
     public bool IsOpen => _popup.IsOpen;
 
     // The new date.
+    // User input only: setting Date from code or a binding doesn't raise it.
     public event EventHandler<DateTime>? DateChanged;
+
+    // Set while user input changes the value, so change events report user input only.
+    private bool _byUser;
+
+    private void ByUser(Action change)
+    {
+        var outer = _byUser;
+        _byUser = true;
+        try { change(); }
+        finally { _byUser = outer; }
+    }
 
     public DatePicker()
     {
@@ -101,7 +113,7 @@ public class DatePicker : Border
         _calendar = new Calendar { SelectedDate = Date };
         _calendar.DateSelected += (_, date) =>
         {
-            Date = date;
+            ByUser(() => Date = date);
             SetOpen(false);
         };
         var panel = new Border
