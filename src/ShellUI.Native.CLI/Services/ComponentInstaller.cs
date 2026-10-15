@@ -32,8 +32,11 @@ public static class ComponentInstaller
 
         // Parse comma-separated components; a part installs its whole family
         var componentList = new List<string>();
-        foreach (var comp in components.SelectMany(c => c.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
+        foreach (var requested in components.SelectMany(c => c.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
         {
+            var comp = ComponentRegistry.Resolve(requested);
+            if (comp != requested.ToLower())
+                AnsiConsole.MarkupLine($"[dim]'{requested}' is in '{comp}', installing '{comp}'[/]");
             var family = ComponentRegistry.GetFamily(comp);
             if (family != null)
                 AnsiConsole.MarkupLine($"[dim]'{comp}' is part of '{family}', installing '{family}'[/]");
@@ -84,6 +87,15 @@ public static class ComponentInstaller
             AnsiConsole.MarkupLine($"[red]Failed: {string.Join(", ", failedComponents)}[/]");
     }
 
+    // " Did you mean 'x' or 'y'?" for an unknown name, or nothing when no name is close.
+    internal static string DidYouMean(string name)
+    {
+        var suggestions = ComponentRegistry.Suggest(name);
+        return suggestions.Count == 0
+            ? string.Empty
+            : $" [yellow]Did you mean {string.Join(" or ", suggestions.Select(s => $"'{s}'"))}?[/]";
+    }
+
     private static async Task InstallComponentWithDependenciesAsync(
         string componentName,
         ShellUINativeConfig config,
@@ -98,7 +110,7 @@ public static class ComponentInstaller
 
         if (!ComponentRegistry.Exists(componentName))
         {
-            AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]");
+            AnsiConsole.MarkupLine($"[red]Component '{componentName}' not found[/]{DidYouMean(componentName)}");
             failedComponents.Add(componentName);
             return;
         }

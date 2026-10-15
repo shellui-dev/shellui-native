@@ -170,4 +170,38 @@ public class ComponentRegistryTests
 
         Assert.All(ComponentRegistry.Components.Values, m => Assert.Equal(expected, m.Version));
     }
+
+    [Theory]
+    [InlineData("donut-chart", "pie-chart")]
+    [InlineData("Donut-Chart", "pie-chart")]
+    [InlineData("button", "button")]
+    [InlineData("not-a-component", "not-a-component")]
+    public void Resolve_maps_aliases_to_their_template(string name, string expected)
+    {
+        Assert.Equal(expected, ComponentRegistry.Resolve(name));
+    }
+
+    [Fact]
+    public void Every_alias_points_to_a_registered_component()
+    {
+        foreach (var name in new[] { "donut-chart" })
+            Assert.True(ComponentRegistry.Exists(ComponentRegistry.Resolve(name)), name);
+    }
+
+    [Theory]
+    [InlineData("buton", "button")]
+    [InlineData("chart-bar", "bar-chart")]
+    [InlineData("chart-04", "chart")]
+    [InlineData("datepicker", "date-picker")]
+    public void Suggest_finds_close_names(string name, string expected)
+    {
+        Assert.Contains(expected, ComponentRegistry.Suggest(name));
+    }
+
+    [Fact]
+    public void Suggest_returns_at_most_three_and_nothing_for_unrelated_names()
+    {
+        Assert.True(ComponentRegistry.Suggest("chart").Count <= 3);
+        Assert.Empty(ComponentRegistry.Suggest("zzqqxx"));
+    }
 }

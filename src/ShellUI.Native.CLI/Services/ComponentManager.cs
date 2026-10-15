@@ -87,12 +87,12 @@ public static class ComponentManager
 
         var removedCount = 0;
 
-        foreach (var componentName in components)
+        foreach (var componentName in components.Select(ComponentRegistry.Resolve))
         {
             var metadata = ComponentRegistry.GetMetadata(componentName);
             if (metadata == null)
             {
-                AnsiConsole.MarkupLine($"[yellow]Component '{componentName}' not found in registry[/]");
+                AnsiConsole.MarkupLine($"[yellow]Component '{componentName}' not found in registry[/]{ComponentInstaller.DidYouMean(componentName)}");
                 continue;
             }
 
@@ -147,7 +147,7 @@ public static class ComponentManager
         }
         else
         {
-            componentsToUpdate = components;
+            componentsToUpdate = components.Select(ComponentRegistry.Resolve);
         }
 
         var updatedCount = 0;
@@ -157,7 +157,7 @@ public static class ComponentManager
             var metadata = ComponentRegistry.GetMetadata(componentName);
             if (metadata == null)
             {
-                AnsiConsole.MarkupLine($"[yellow]Component '{componentName}' not found in registry[/]");
+                AnsiConsole.MarkupLine($"[yellow]Component '{componentName}' not found in registry[/]{ComponentInstaller.DidYouMean(componentName)}");
                 continue;
             }
 
