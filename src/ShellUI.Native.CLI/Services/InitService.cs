@@ -55,26 +55,33 @@ public static class InitService
             AnsiConsole.MarkupLine("[yellow]Platform not detected, defaulting to MAUI[/]");
         }
 
+        // ShellUI (Blazor) already uses Components/UI and <App>.Components.UI; its Button.razor and our
+        // Button.cs would be the same class.
+        var besideBlazor = File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "shellui.json"));
+        var componentsFolder = besideBlazor ? TemplateText.BesideBlazorComponentsPath : TemplateText.DefaultComponentsPath;
+        var componentsNamespace = TemplateText.ComponentsNamespace(projectInfo.RootNamespace, componentsFolder);
+        if (besideBlazor)
+            AnsiConsole.MarkupLine($"[green]✓ Found ShellUI (Blazor):[/] native components go to {componentsFolder}/ ({Markup.Escape(componentsNamespace)}) so the two sets don't clash");
+
         await LogoLoader.RunAsync("Setting up ShellUI Native...", async status =>
             {
-                // Create Components/UI folder
                 status("Creating component folders...");
-                var componentsPath = Path.Combine(Directory.GetCurrentDirectory(), "Components", "UI");
+                var componentsPath = Path.Combine(Directory.GetCurrentDirectory(), componentsFolder);
                 var variantsPath = Path.Combine(componentsPath, "Variants");
                 Directory.CreateDirectory(componentsPath);
                 Directory.CreateDirectory(variantsPath);
-                AnsiConsole.MarkupLine($"[green]✓ Created:[/] Components/UI/");
+                AnsiConsole.MarkupLine($"[green]✓ Created:[/] {componentsFolder}/");
 
                 // Install Shell utilities
                 status("Installing Shell utilities...");
-                await InstallShellUtilityAsync(projectInfo, componentsPath);
+                await InstallShellUtilityAsync(projectInfo, componentsPath, componentsFolder);
 
                 // Create configuration file
                 status("Creating configuration...");
                 var config = new ShellUINativeConfig
                 {
                     Style = style,
-                    ComponentsPath = "Components/UI",
+                    ComponentsPath = componentsFolder,
                     TargetPlatform = projectInfo.Platform,
                     Theme = new ThemeConfig
                     {
@@ -103,8 +110,8 @@ public static class InitService
         AnsiConsole.MarkupLine("\n[blue]Next steps:[/]");
         if (projectInfo.Platform == NativePlatform.Avalonia)
         {
-            AnsiConsole.MarkupLine("  [dim]1. Load the theme in App.Initialize, after AvaloniaXamlLoader.Load(this):[/] Components.UI.ShellTheme.EnsureInitialized();");
-            AnsiConsole.MarkupLine($"  [dim]2. Use the components in XAML:[/] xmlns:ui=\"using:{Markup.Escape(projectInfo.RootNamespace)}.Components.UI\"");
+            AnsiConsole.MarkupLine($"  [dim]1. Load the theme in App.Initialize, after AvaloniaXamlLoader.Load(this):[/] {Markup.Escape(componentsNamespace)}.ShellTheme.EnsureInitialized();");
+            AnsiConsole.MarkupLine($"  [dim]2. Use the components in XAML:[/] xmlns:ui=\"using:{Markup.Escape(componentsNamespace)}\"");
             AnsiConsole.MarkupLine("  [dim]3. Add components:[/] shellui-native add theme-toggle");
         }
         else
@@ -114,7 +121,7 @@ public static class InitService
         }
     }
 
-    private static async Task InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath)
+    private static async Task InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath, string componentsFolder)
     {
         if (!ComponentRegistry.SupportsPlatform("shell", projectInfo.Platform))
         {
@@ -127,7 +134,7 @@ public static class InitService
         var content = ComponentRegistry.GetComponentContent("shell", projectInfo.Platform);
         if (content == null) return;
 
-        content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
+        content = TemplateText.Apply(content, projectInfo.RootNamespace, componentsFolder);
 
         var filePath = Path.Combine(componentsPath, "Shell.cs");
         await File.WriteAllTextAsync(filePath, content);

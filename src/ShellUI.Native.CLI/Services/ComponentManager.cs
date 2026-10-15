@@ -185,7 +185,7 @@ public static class ComponentManager
             var content = ComponentRegistry.GetComponentContent(componentName, config.TargetPlatform);
             if (content == null) continue;
 
-            content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
+            content = TemplateText.Apply(content, projectInfo.RootNamespace, config.ComponentsPath);
 
             var componentPath = Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, metadata.FilePath);
             File.WriteAllText(componentPath, content);

@@ -176,7 +176,7 @@ public static class ComponentInstaller
         }
 
         // Replace namespace placeholder
-        content = content.Replace("YourProjectNamespace", projectInfo.RootNamespace);
+        content = TemplateText.Apply(content, projectInfo.RootNamespace, config.ComponentsPath);
 
         // Ensure directory exists
         var directory = Path.GetDirectoryName(componentPath);
