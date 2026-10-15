@@ -26,6 +26,17 @@ namespace YourProjectNamespace.Components.UI;
 [ContentProperty(nameof(Children))]
 public partial class SheetContent : ContentView, IShellOverlayContent
 {
+    // Widest a left or right sheet gets (384 is sm:max-w-sm); it never covers more than 75% of the window.
+    public static readonly BindableProperty MaxPanelWidthProperty =
+        BindableProperty.Create(nameof(MaxPanelWidth), typeof(double), typeof(SheetContent), 384d,
+            propertyChanged: (b, o, n) => { if (((SheetContent)b)._root.Width > 0) ((SheetContent)b).ApplySide(); });
+
+    public double MaxPanelWidth
+    {
+        get => (double)GetValue(MaxPanelWidthProperty);
+        set => SetValue(MaxPanelWidthProperty, value);
+    }
+
     private readonly BoxView _backdrop;
     private readonly Border _panel;
     private readonly VerticalStackLayout _body;
@@ -102,7 +113,7 @@ public partial class SheetContent : ContentView, IShellOverlayContent
             SheetSide.Right => LayoutOptions.End,
             _ => LayoutOptions.Fill
         };
-        _panel.WidthRequest = vertical ? Math.Min(384, _root.Width * 0.75) : -1;
+        _panel.WidthRequest = vertical ? Math.Min(MaxPanelWidth, _root.Width * 0.75) : -1;
         // The panel runs under the system bars; its content doesn't.
         var safe = ShellPortal.GetSafeInsets(_root);
         _panel.Padding = new Thickness(
@@ -163,6 +174,21 @@ namespace YourProjectNamespace.Components.UI;
 // close button top-right, slides in from its side over a dimmed backdrop. XAML children go to Items.
 public class SheetContent : Border, IShellOverlayContent
 {
+    // Widest a left or right sheet gets (384 is sm:max-w-sm); it never covers more than 75% of the window.
+    public static readonly StyledProperty<double> MaxPanelWidthProperty =
+        AvaloniaProperty.Register<SheetContent, double>(nameof(MaxPanelWidth), 384);
+
+    static SheetContent()
+    {
+        MaxPanelWidthProperty.Changed.AddClassHandler<SheetContent>((c, _) => { if (c.Bounds.Width > 0) c.ApplySide(); });
+    }
+
+    public double MaxPanelWidth
+    {
+        get => GetValue(MaxPanelWidthProperty);
+        set => SetValue(MaxPanelWidthProperty, value);
+    }
+
     private readonly Border _backdrop;
     private readonly Border _panel;
     private readonly StackPanel _body = new() { Spacing = 16, Margin = new Thickness(0, 0, 24, 0) };
@@ -241,7 +267,7 @@ public class SheetContent : Border, IShellOverlayContent
             SheetSide.Right => HorizontalAlignment.Right,
             _ => HorizontalAlignment.Stretch
         };
-        _panel.Width = vertical ? Math.Min(384, Bounds.Width * 0.75) : double.NaN;
+        _panel.Width = vertical ? Math.Min(MaxPanelWidth, Bounds.Width * 0.75) : double.NaN;
     }
 
     // translate() that puts the panel just past its edge; invariant, so it parses in any culture.

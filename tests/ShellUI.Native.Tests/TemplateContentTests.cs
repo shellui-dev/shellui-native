@@ -242,4 +242,15 @@ public class TemplateContentTests
         Assert.Contains("LineBreakModeProperty", content);
         Assert.Contains("class ShellLabel : TextBlock", ComponentRegistry.GetComponentContent("label", NativePlatform.Avalonia)!);
     }
+
+    // Sheets can be wider than shadcn's 384px (issue #26).
+    [Theory]
+    [InlineData(NativePlatform.MAUI)]
+    [InlineData(NativePlatform.Avalonia)]
+    public void Sheet_content_has_a_max_panel_width(NativePlatform platform)
+    {
+        var content = ComponentRegistry.GetComponentContent("sheet-content", platform)!;
+        Assert.Contains("MaxPanelWidthProperty", content);
+        Assert.Contains("Math.Min(MaxPanelWidth", content);
+    }
 }

@@ -7,6 +7,17 @@ namespace MAUI.Demo.Components.UI;
 [ContentProperty(nameof(Children))]
 public partial class SheetContent : ContentView, IShellOverlayContent
 {
+    // Widest a left or right sheet gets (384 is sm:max-w-sm); it never covers more than 75% of the window.
+    public static readonly BindableProperty MaxPanelWidthProperty =
+        BindableProperty.Create(nameof(MaxPanelWidth), typeof(double), typeof(SheetContent), 384d,
+            propertyChanged: (b, o, n) => { if (((SheetContent)b)._root.Width > 0) ((SheetContent)b).ApplySide(); });
+
+    public double MaxPanelWidth
+    {
+        get => (double)GetValue(MaxPanelWidthProperty);
+        set => SetValue(MaxPanelWidthProperty, value);
+    }
+
     private readonly BoxView _backdrop;
     private readonly Border _panel;
     private readonly VerticalStackLayout _body;
@@ -83,7 +94,7 @@ public partial class SheetContent : ContentView, IShellOverlayContent
             SheetSide.Right => LayoutOptions.End,
             _ => LayoutOptions.Fill
         };
-        _panel.WidthRequest = vertical ? Math.Min(384, _root.Width * 0.75) : -1;
+        _panel.WidthRequest = vertical ? Math.Min(MaxPanelWidth, _root.Width * 0.75) : -1;
         // The panel runs under the system bars; its content doesn't.
         var safe = ShellPortal.GetSafeInsets(_root);
         _panel.Padding = new Thickness(

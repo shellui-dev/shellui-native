@@ -15,6 +15,21 @@ namespace AvaloniaDemo.Components.UI;
 // close button top-right, slides in from its side over a dimmed backdrop. XAML children go to Items.
 public class SheetContent : Border, IShellOverlayContent
 {
+    // Widest a left or right sheet gets (384 is sm:max-w-sm); it never covers more than 75% of the window.
+    public static readonly StyledProperty<double> MaxPanelWidthProperty =
+        AvaloniaProperty.Register<SheetContent, double>(nameof(MaxPanelWidth), 384);
+
+    static SheetContent()
+    {
+        MaxPanelWidthProperty.Changed.AddClassHandler<SheetContent>((c, _) => { if (c.Bounds.Width > 0) c.ApplySide(); });
+    }
+
+    public double MaxPanelWidth
+    {
+        get => GetValue(MaxPanelWidthProperty);
+        set => SetValue(MaxPanelWidthProperty, value);
+    }
+
     private readonly Border _backdrop;
     private readonly Border _panel;
     private readonly StackPanel _body = new() { Spacing = 16, Margin = new Thickness(0, 0, 24, 0) };
@@ -93,7 +108,7 @@ public class SheetContent : Border, IShellOverlayContent
             SheetSide.Right => HorizontalAlignment.Right,
             _ => HorizontalAlignment.Stretch
         };
-        _panel.Width = vertical ? Math.Min(384, Bounds.Width * 0.75) : double.NaN;
+        _panel.Width = vertical ? Math.Min(MaxPanelWidth, Bounds.Width * 0.75) : double.NaN;
     }
 
     // translate() that puts the panel just past its edge; invariant, so it parses in any culture.
