@@ -41,9 +41,6 @@ public partial class MainPage : ContentPage
             TagList.Children.Add(new Separator());
             TagList.Children.Add(new Label { Text = tag, FontSize = 14 }.Token(Label.TextColorProperty, ShellToken.Foreground));
         }
-
-        // Filling the samples above raised their change events; start with the hint instead.
-        Report("Interact with a component to see its events here.");
     }
 
     private void Report(string message) => StatusLabel.Text = message;
