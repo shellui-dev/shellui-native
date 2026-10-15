@@ -231,4 +231,15 @@ public class TemplateContentTests
             $"Component '{name}' does not report MAUI as a supported platform. " +
             $"GetSupportedPlatforms returned: [{string.Join(", ", ComponentRegistry.GetSupportedPlatforms(name))}]");
     }
+
+    // ShellLabel passes text alignment and wrapping through (issue #27). Avalonia's ShellLabel is a
+    // TextBlock, so TextAlignment and TextWrapping are already its own properties.
+    [Fact]
+    public void MAUI_label_exposes_text_alignment_and_line_break_mode()
+    {
+        var content = ComponentRegistry.GetComponentContent("label", NativePlatform.MAUI)!;
+        Assert.Contains("HorizontalTextAlignmentProperty", content);
+        Assert.Contains("LineBreakModeProperty", content);
+        Assert.Contains("class ShellLabel : TextBlock", ComponentRegistry.GetComponentContent("label", NativePlatform.Avalonia)!);
+    }
 }

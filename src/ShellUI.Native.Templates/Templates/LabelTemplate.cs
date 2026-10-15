@@ -40,6 +40,14 @@ public partial class ShellLabel : ContentView
         BindableProperty.Create(nameof(Variant), typeof(LabelVariant), typeof(ShellLabel),
             LabelVariant.Default, propertyChanged: OnVisualPropertyChanged);
 
+    public static readonly BindableProperty HorizontalTextAlignmentProperty =
+        BindableProperty.Create(nameof(HorizontalTextAlignment), typeof(TextAlignment), typeof(ShellLabel),
+            TextAlignment.Start, propertyChanged: (b, o, n) => ((ShellLabel)b)._label.HorizontalTextAlignment = (TextAlignment)n);
+
+    public static readonly BindableProperty LineBreakModeProperty =
+        BindableProperty.Create(nameof(LineBreakMode), typeof(LineBreakMode), typeof(ShellLabel),
+            LineBreakMode.WordWrap, propertyChanged: (b, o, n) => ((ShellLabel)b)._label.LineBreakMode = (LineBreakMode)n);
+
     private readonly Label _label;
 
     public string Text
@@ -64,6 +72,19 @@ public partial class ShellLabel : ContentView
     {
         get => (LabelVariant)GetValue(VariantProperty);
         set => SetValue(VariantProperty, value);
+    }
+
+    public TextAlignment HorizontalTextAlignment
+    {
+        get => (TextAlignment)GetValue(HorizontalTextAlignmentProperty);
+        set => SetValue(HorizontalTextAlignmentProperty, value);
+    }
+
+    // WordWrap by default, like MAUI's Label; TailTruncation keeps one line with an ellipsis.
+    public LineBreakMode LineBreakMode
+    {
+        get => (LineBreakMode)GetValue(LineBreakModeProperty);
+        set => SetValue(LineBreakModeProperty, value);
     }
 
     public ShellLabel()
