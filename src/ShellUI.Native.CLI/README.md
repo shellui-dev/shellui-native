@@ -35,7 +35,7 @@ shellui-native init --yes
 shellui-native add button input card
 ```
 
-Components are written to `Components/UI/` as plain C# files you own. `init` detects whether the project is MAUI or Avalonia and installs that platform's version of each component.
+Components are written to `Components/UI/` as plain C# files you own (`Components/Native/` in a project that also uses ShellUI for Blazor). `init` detects whether the project is MAUI or Avalonia and installs that platform's version of each component.
 
 ## More Information
 
