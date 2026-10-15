@@ -143,7 +143,12 @@ public static class ComponentManager
 
         if (all || components.Length == 0)
         {
-            componentsToUpdate = config.InstalledComponents.Select(c => c.Name);
+            var names = config.InstalledComponents.Select(c => c.Name).ToList();
+            // Before 0.2.0, init wrote Shell.cs without recording it; update it first, like a new project.
+            if (!names.Contains("shell") && ComponentRegistry.GetMetadata("shell") is { } shell &&
+                File.Exists(Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, shell.FilePath)))
+                names.Insert(0, "shell");
+            componentsToUpdate = names;
         }
         else
         {
@@ -161,7 +166,7 @@ public static class ComponentManager
                 continue;
             }
 
-            var installed = config.InstalledComponents.FirstOrDefault(c => c.Name == componentName);
+            var installed = FindInstalled(config, componentName, metadata);
             if (installed == null)
             {
                 AnsiConsole.MarkupLine($"[yellow]Component '{componentName}' is not installed[/]");
@@ -203,5 +208,17 @@ public static class ComponentManager
         File.WriteAllText(configPath, updatedJson);
 
         AnsiConsole.MarkupLine($"\n[dim]Updated {updatedCount} component(s)[/]");
+    }
+
+    // The config entry for an installed component. A file an older CLI wrote without recording it
+    // (init's Shell.cs before 0.2.0) counts as installed at an unknown version, so it gets updated.
+    private static InstalledComponent? FindInstalled(ShellUINativeConfig config, string name, ComponentMetadata metadata)
+    {
+        var installed = config.InstalledComponents.FirstOrDefault(c => c.Name == name);
+        if (installed != null) return installed;
+        if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), config.ComponentsPath, metadata.FilePath))) return null;
+        installed = new InstalledComponent { Name = name, Version = "unknown", Platform = config.TargetPlatform };
+        config.InstalledComponents.Add(installed);
+        return installed;
     }
 }

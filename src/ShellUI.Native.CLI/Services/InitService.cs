@@ -74,7 +74,7 @@ public static class InitService
 
                 // Install Shell utilities
                 status("Installing Shell utilities...");
-                await InstallShellUtilityAsync(projectInfo, componentsPath, componentsFolder);
+                var shellInstalled = await InstallShellUtilityAsync(projectInfo, componentsPath, componentsFolder);
 
                 // Create configuration file
                 status("Creating configuration...");
@@ -90,6 +90,15 @@ public static class InitService
                         SyncWithShellUI = true
                     }
                 };
+
+                // Recorded like any component, so `update shell` and `update --all` include it.
+                if (shellInstalled)
+                    config.InstalledComponents.Add(new InstalledComponent
+                    {
+                        Name = "shell",
+                        Version = ComponentRegistry.GetMetadata("shell")!.Version,
+                        Platform = projectInfo.Platform
+                    });
 
                 var json = JsonSerializer.Serialize(config, new JsonSerializerOptions
                 {
@@ -121,24 +130,25 @@ public static class InitService
         }
     }
 
-    private static async Task InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath, string componentsFolder)
+    private static async Task<bool> InstallShellUtilityAsync(ProjectInfo projectInfo, string componentsPath, string componentsFolder)
     {
         if (!ComponentRegistry.SupportsPlatform("shell", projectInfo.Platform))
         {
             AnsiConsole.MarkupLine(
                 $"[yellow]Shell utility has no template for {projectInfo.Platform} yet — skipping.[/] " +
                 $"[dim]Add components once per-platform templates land.[/]");
-            return;
+            return false;
         }
 
         var content = ComponentRegistry.GetComponentContent("shell", projectInfo.Platform);
-        if (content == null) return;
+        if (content == null) return false;
 
         content = TemplateText.Apply(content, projectInfo.RootNamespace, componentsFolder);
 
         var filePath = Path.Combine(componentsPath, "Shell.cs");
         await File.WriteAllTextAsync(filePath, content);
         AnsiConsole.MarkupLine($"[green]✓ Installed:[/] Shell.cs");
+        return true;
     }
 
     private static async Task CreateThemeResourcesAsync()
