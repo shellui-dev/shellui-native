@@ -171,21 +171,27 @@ public class ComponentRegistryTests
         Assert.All(ComponentRegistry.Components.Values, m => Assert.Equal(expected, m.Version));
     }
 
+    // The charts are added by the same names as in ShellUI (Blazor). Its chart-series,
+    // multi-series-chart, chart-variants and chart-styles are covered by the chart core here.
     [Theory]
-    [InlineData("donut-chart", "pie-chart")]
-    [InlineData("Donut-Chart", "pie-chart")]
-    [InlineData("button", "button")]
-    [InlineData("not-a-component", "not-a-component")]
-    public void Resolve_maps_aliases_to_their_template(string name, string expected)
+    [InlineData("chart")]
+    [InlineData("bar-chart")]
+    [InlineData("line-chart")]
+    [InlineData("area-chart")]
+    [InlineData("pie-chart")]
+    [InlineData("donut-chart")]
+    [InlineData("radar-chart")]
+    [InlineData("radial-chart")]
+    public void Charts_use_ShellUI_names(string name)
     {
-        Assert.Equal(expected, ComponentRegistry.Resolve(name));
+        Assert.True(ComponentRegistry.Exists(name), name);
     }
 
     [Fact]
-    public void Every_alias_points_to_a_registered_component()
+    public void Donut_chart_builds_on_the_pie_chart()
     {
-        foreach (var name in new[] { "donut-chart" })
-            Assert.True(ComponentRegistry.Exists(ComponentRegistry.Resolve(name)), name);
+        Assert.Contains("pie-chart", ComponentRegistry.GetMetadata("donut-chart")!.Dependencies);
+        Assert.Contains("class DonutChart : PieChart", ComponentRegistry.GetComponentContent("donut-chart", NativePlatform.Avalonia)!);
     }
 
     [Theory]

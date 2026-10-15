@@ -134,6 +134,7 @@ public class TemplateContentTests
     [InlineData("line-chart")]
     [InlineData("area-chart")]
     [InlineData("pie-chart")]
+    [InlineData("donut-chart")]
     [InlineData("radar-chart")]
     [InlineData("radial-chart")]
     public void Ported_components_have_Avalonia_content(string name)

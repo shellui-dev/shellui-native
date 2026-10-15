@@ -142,14 +142,9 @@ public static class ComponentRegistry
         { "line-chart", (LineChartTemplate.Metadata, LineChartTemplate.Contents) },
         { "area-chart", (AreaChartTemplate.Metadata, AreaChartTemplate.Contents) },
         { "pie-chart", (PieChartTemplate.Metadata, PieChartTemplate.Contents) },
+        { "donut-chart", (DonutChartTemplate.Metadata, DonutChartTemplate.Contents) },
         { "radar-chart", (RadarChartTemplate.Metadata, RadarChartTemplate.Contents) },
         { "radial-chart", (RadialChartTemplate.Metadata, RadialChartTemplate.Contents) }
-    };
-
-    // Names people try for a component that lives in another template.
-    private static readonly Dictionary<string, string> _aliases = new()
-    {
-        { "donut-chart", "pie-chart" }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
@@ -201,13 +196,6 @@ public static class ComponentRegistry
         return _templates.ContainsKey(componentName.ToLower());
     }
 
-    // The registry name for `name`: the template an alias points to, or `name` itself.
-    public static string Resolve(string name)
-    {
-        var key = name.ToLower();
-        return _aliases.TryGetValue(key, out var target) ? target : key;
-    }
-
     // Up to `max` registered names close to an unknown `name`, closest first: a typo
     // ("buton"), or a shared word ("chart-04", "chart-bar").
     public static IReadOnlyList<string> Suggest(string name, int max = 3)
@@ -215,7 +203,7 @@ public static class ComponentRegistry
         var key = name.ToLower();
         var limit = Math.Max(2, key.Length / 3);
         var words = key.Split('-', StringSplitOptions.RemoveEmptyEntries).Where(w => w.Length >= 3).ToList();
-        return _templates.Keys.Concat(_aliases.Keys)
+        return _templates.Keys
             .Select(candidate => (candidate, distance: Distance(key, candidate)))
             .Where(c => c.distance <= limit || words.Any(c.candidate.Split('-').Contains))
             .OrderBy(c => c.distance)

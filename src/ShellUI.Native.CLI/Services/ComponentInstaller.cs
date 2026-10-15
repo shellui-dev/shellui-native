@@ -32,11 +32,8 @@ public static class ComponentInstaller
 
         // Parse comma-separated components; a part installs its whole family
         var componentList = new List<string>();
-        foreach (var requested in components.SelectMany(c => c.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
+        foreach (var comp in components.SelectMany(c => c.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
         {
-            var comp = ComponentRegistry.Resolve(requested);
-            if (comp != requested.ToLower())
-                AnsiConsole.MarkupLine($"[dim]'{requested}' is in '{comp}', installing '{comp}'[/]");
             var family = ComponentRegistry.GetFamily(comp);
             if (family != null)
                 AnsiConsole.MarkupLine($"[dim]'{comp}' is part of '{family}', installing '{family}'[/]");

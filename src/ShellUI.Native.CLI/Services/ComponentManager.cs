@@ -87,7 +87,7 @@ public static class ComponentManager
 
         var removedCount = 0;
 
-        foreach (var componentName in components.Select(ComponentRegistry.Resolve))
+        foreach (var componentName in components)
         {
             var metadata = ComponentRegistry.GetMetadata(componentName);
             if (metadata == null)
@@ -147,7 +147,7 @@ public static class ComponentManager
         }
         else
         {
-            componentsToUpdate = components.Select(ComponentRegistry.Resolve);
+            componentsToUpdate = components;
         }
 
         var updatedCount = 0;

@@ -9,13 +9,10 @@ namespace AvaloniaDemo.Components.UI;
 
 // Pie chart — the first series' values as slices, clockwise from twelve o'clock, named by
 // Labels and colored from the theme's chart colors in order. The hovered slice stands out and
-// shows its value and share. DonutChart is the same with a hole for a value and a label.
+// shows its value and share. For a pie with a hole, see DonutChart (donut-chart).
 //   <ui:PieChart Labels="Chrome, Safari, Firefox, Edge, Other" Height="260">
 //       <ui:ChartSeries Values="275, 200, 187, 173, 90" />
 //   </ui:PieChart>
-//   <ui:DonutChart Labels="Chrome, Safari, Firefox" CenterValue="662" CenterLabel="Visitors" Height="260">
-//       <ui:ChartSeries Values="275, 200, 187" />
-//   </ui:DonutChart>
 public class PieChart : ChartBase
 {
     // The hole, as a share of the radius: 0 is a pie, 0.6 a donut.
@@ -139,14 +136,5 @@ public class PieChart : ChartBase
         {
             (Palette(index), LabelAt(index), $"{Format(values[index])} ({share.ToString("P0", CultureInfo.CurrentCulture)})")
         });
-    }
-}
-
-// A pie with a hole — InnerRadius starts at 0.6, with CenterValue and CenterLabel in the middle.
-public class DonutChart : PieChart
-{
-    public DonutChart()
-    {
-        InnerRadius = 0.6;
     }
 }
