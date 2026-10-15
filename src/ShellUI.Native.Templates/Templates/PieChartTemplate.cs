@@ -8,11 +8,11 @@ public static class PieChartTemplate
     {
         Name = "pie-chart",
         DisplayName = "Pie Chart",
-        Description = "Pie and donut charts",
+        Description = "Slices of a whole, clockwise from twelve o'clock",
         Category = ComponentCategory.DataDisplay,
         FilePath = "PieChart.cs",
         Dependencies = new List<string> { "shell", "chart" },
-        Tags = new List<string> { "chart", "pie", "donut", "share" }
+        Tags = new List<string> { "chart", "pie", "share" }
     };
 
     public static IReadOnlyDictionary<NativePlatform, string> Contents { get; } = new Dictionary<NativePlatform, string>
