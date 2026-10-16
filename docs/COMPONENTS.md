@@ -144,6 +144,7 @@ Same names, properties and variants as MAUI, except:
 | Menubar | Tap a title to open its menu | Titles are tab stops: Enter / Space / Down open a menu and Left / Right move between titles; in a menu Up / Down move and Enter picks; children are collected in `Menus` and `Items` |
 | Resizable | Drag a divider | Dividers are also tab stops: the arrow keys move them 16px; the pointer shows a resize cursor |
 | Navbar | Links and the menu button react to taps | They are also tab stops (Enter / Space); children are collected in `Items` |
+| BottomNav | Items react to taps (and Enter / Space on Windows); an item's XAML content is its `IconContent` | Items are also tab stops: Enter / Space pick one and Left / Right move to the next destination; set `IconContent` as a property element (`<ui:BottomNavItem.IconContent>`) |
 | Sidebar | Width animates on collapse | Same, with items as tab stops; children are collected in `Groups` and `Items` |
 | DateRangePicker | Tap the trigger | Also Enter / Space / Down on the focused trigger; Escape closes the panel |
 | FileUpload | `Files` are `FileResult`; `FileTypes` is a `FilePickerFileType`; drop works on Windows only | `Files` are `IStorageFile`; `FileTypes` is a list of `FilePickerFileType` (e.g. `FilePickerFileTypes.ImageAll`); drop works wherever Avalonia supports it; Enter / Space open the picker |
@@ -979,6 +980,55 @@ never collapses), `IsMenuOpen` (two-way) · **Events:** `SelectedValueChanged`
         <ui:Button Icon="Search" Size="Icon" Variant="Ghost" />
     </ui:Navbar.Actions>
 </ui:Navbar>
+```
+
+---
+
+### BottomNav
+Mobile tab bar pinned to the bottom of the screen, the phone take on a sidebar: icon tabs with
+short labels, count badges and dots, and optionally a round action button in the middle. Put it
+in the last row of the page. ShellUI for Blazor has no bottom nav, so this one is native only.
+
+```bash
+shellui-native add bottom-nav
+```
+
+**Variants:** `Default` (64px bar, border on top; a line slides to the active item), `Pill`
+(80px; a pill grows behind the active icon, as in Material 3), `Floating` (an inset rounded bar
+with a shadow; a filled pill slides behind the active icon, with the label under it, so long
+labels stay readable), `Lifted` (the active icon rises into a ringed circle over the bar's top
+edge, and the circle slides from item to item), `Expanding` (a compact floating capsule of
+icons; the active one widens into a pill with its label). Switching items animates in about
+200 ms, and a press scales the icon in slightly. A badge on an active pill or circle takes its
+color as its ring.
+
+**Properties (BottomNav):** `SelectedValue` (two-way), `Variant`, `Labels` (`Always`, `Active`:
+only the active item shows its label and the others center their icon, `Never`; `Expanding`
+always labels the active item only), `ActiveToken` (the active color in `Default`; `Foreground`
+by default, e.g. `Primary` for a brand-colored bar), `ShowIndicator` (true), `BottomInset` (space
+for the home indicator: the full-width bars fill it with their color, the floating ones sit
+above it; by default it follows the safe area under the bar on phones, so only set it to
+override), `ScrollSource` (a scroll view: scrolling it down slides the bar away, scrolling up
+brings it back; put the bar over the content so the content can use the space), `IsHidden`
+(two-way; hide or show it from code) · **Events:** `SelectedValueChanged`
+
+**Properties (BottomNavItem):** `Text`, `Value`, `Icon`, `ActiveIcon` (shown while active),
+`IconContent` (any view instead of the icon, such as an `Avatar`), `Badge` (a count, e.g. "3" or
+"99+"), `Dot`, `Prominent` (a round action button; in a full-width bar it rises above the edge;
+it raises `Clicked` and never becomes the selected item), `IsEnabled` · **Events:** `Clicked`
+(on every press, also on the active item, e.g. to scroll to the top) · **Methods:** `Press()`
+
+```xml
+<ui:BottomNav SelectedValue="{Binding Page}" Variant="Floating" Labels="Active">
+    <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+    <ui:BottomNavItem Value="inbox" Icon="Inbox" Text="Inbox" Badge="3" />
+    <ui:BottomNavItem Icon="Plus" Text="New" Prominent="True" Clicked="OnNew" />
+    <ui:BottomNavItem Value="me" Text="Me" Dot="True">
+        <ui:BottomNavItem.IconContent>
+            <ui:Avatar Fallback="SS" Size="Sm" />
+        </ui:BottomNavItem.IconContent>
+    </ui:BottomNavItem>
+</ui:BottomNav>
 ```
 
 ---

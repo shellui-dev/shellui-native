@@ -220,6 +220,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | aspect-ratio ✅ | — | Done 2026-10-05 |
 | wrap-layout ✅ | — | Done 2026-10-05 — wrapping layout used by tag-input and the demo's button rows |
 | theme-toggle ✅ | P7 | Done — `ThemeToggle` component |
+| **bottom-nav** ✅ | — | Done 2026-10-16, MAUI and Avalonia — native only (ShellUI for Blazor has none): Default, Pill, Floating, Lifted and Expanding styles, badges and dots, a raised action button, avatar items, hide on scroll, the safe area under the bar |
 
 ---
 

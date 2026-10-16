@@ -220,4 +220,74 @@ public class ChangeEventTests
         Assert.Equal(2, select.SelectedIndex);
         Assert.False(select.IsOpen);
     }
+
+    [AvaloniaTheory]
+    [InlineData(BottomNavVariant.Default)]
+    [InlineData(BottomNavVariant.Pill)]
+    [InlineData(BottomNavVariant.Floating)]
+    [InlineData(BottomNavVariant.Lifted)]
+    [InlineData(BottomNavVariant.Expanding)]
+    public void BottomNav_reports_taps_and_arrow_keys_not_code(BottomNavVariant variant)
+    {
+        var home = new BottomNavItem { Value = "home", Icon = IconName.House, Text = "Home" };
+        var inbox = new BottomNavItem { Value = "inbox", Icon = IconName.Inbox, Text = "Inbox", Badge = "3" };
+        var pay = new BottomNavItem { Icon = IconName.Plus, Text = "Pay", Prominent = true };
+        var me = new BottomNavItem { Value = "me", Icon = IconName.User, Text = "Me" };
+        var nav = new BottomNav { Variant = variant, SelectedValue = "home", Items = { home, inbox, pay, me } };
+        var window = Ui.Show(nav, width: 390, height: 300);
+        var raised = 0;
+        var paid = 0;
+        nav.SelectedValueChanged += (_, _) => raised++;
+        pay.Clicked += (_, _) => paid++;
+
+        nav.SelectedValue = "me";
+        Assert.Equal(0, raised);
+        Assert.True(me.IsActive);
+
+        Ui.Wait(250); // the capsule resizes to the new active item
+
+        Ui.Click(window, inbox);
+        Assert.Equal(1, raised);
+        Assert.Equal("inbox", nav.SelectedValue);
+        Assert.True(inbox.IsActive);
+        Assert.False(me.IsActive);
+        Ui.Wait(250);
+
+        // The raised action is pressed, not selected.
+        Ui.Click(window, pay);
+        Assert.Equal(1, paid);
+        Assert.Equal(1, raised);
+        Assert.Equal("inbox", nav.SelectedValue);
+
+        // Right skips the action and lands on the next destination.
+        inbox.Focus();
+        Ui.Press(window, Key.Right);
+        Assert.Equal(2, raised);
+        Assert.Equal("me", nav.SelectedValue);
+    }
+
+    [AvaloniaFact]
+    public void BottomNav_hides_while_its_scroll_source_scrolls_down()
+    {
+        var scroll = new ScrollViewer { Content = new Border { Height = 2000 } };
+        var nav = new BottomNav { ScrollSource = scroll, SelectedValue = "home", Items = { new BottomNavItem { Value = "home", Icon = IconName.House, Text = "Home" } } };
+        var window = Ui.Show(new Grid { Height = 400, Children = { scroll, nav } }, width: 390, height: 400);
+
+        // No safe area on the desktop: the bar is just its 64 px.
+        Assert.Equal(64, nav.Bounds.Height);
+
+        scroll.Offset = new Vector(0, 200);
+        Ui.Settle();
+        Assert.True(nav.IsHidden);
+        Assert.False(nav.IsHitTestVisible);
+
+        scroll.Offset = new Vector(0, 150);
+        Ui.Settle();
+        Assert.False(nav.IsHidden);
+
+        nav.IsHidden = true;
+        scroll.Offset = new Vector(0, 0);
+        Ui.Settle();
+        Assert.False(nav.IsHidden);
+    }
 }
