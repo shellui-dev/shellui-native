@@ -37,6 +37,8 @@ shellui-native add button input card
 
 Components are written to `Components/UI/` as plain C# files you own (`Components/Native/` in a project that also uses ShellUI for Blazor). `init` detects whether the project is MAUI or Avalonia and installs that platform's version of each component.
 
+Blocks are ready-made screens built from components, numbered like ShellUI's `dashboard-01`: `shellui-native add bottom-nav-01` writes `Components/Blocks/BottomNav01.cs` and installs the components it uses. Available: `bottom-nav-01` to `bottom-nav-05` (app shells with a bottom tab bar) and `edge-menu-01` (a page with a tool dock on its edge).
+
 ## More Information
 
 - [Component reference](https://github.com/shellui-dev/shellui-native/blob/main/docs/COMPONENTS.md)

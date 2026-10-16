@@ -1880,6 +1880,40 @@ this, showing one category of components at a time.
 
 ---
 
+## Blocks
+
+Blocks are ready-made screens built from the components, numbered like ShellUI's `dashboard-01`.
+`add` writes one file you own to `Components/Blocks/` (namespace `<App>.Components.Blocks`, next to
+`Components/UI` or `Components/Native`) and installs the components it uses. Each block is a
+plain view in C#: use it as a page's content and edit it like any other code.
+
+| Block | What it is | Uses |
+|---|---|---|
+| `bottom-nav-01` | App shell: tab bar with a raised Pay button in the middle and an avatar tab (a wallet app) | bottom-nav, avatar |
+| `bottom-nav-02` | App shell: Material 3 tab bar, a pill behind the active icon | bottom-nav |
+| `bottom-nav-03` | App shell: floating tab bar over the page that hides while it scrolls; only the active tab is labelled | bottom-nav |
+| `bottom-nav-04` | App shell: compact capsule; the active tab widens into a pill with its label | bottom-nav |
+| `bottom-nav-05` | App shell: the active tab rises into a circle over the bar; the bar hides on scroll | bottom-nav |
+| `edge-menu-01` | A page with a solid dock of tools on its right edge that dims the page while open | edge-menu |
+
+```bash
+shellui-native add bottom-nav-01
+```
+
+```csharp
+// MAUI (Avalonia: the same, with Control instead of View)
+var shell = new BottomNav01();
+shell.Pages["home"] = new HomeView();      // one view per tab Value
+shell.Pages["cards"] = new CardsView();
+shell.ActionClicked += (_, _) => StartPayment();
+Content = shell;
+```
+
+The bottom-nav blocks expose `Pages` (a view per tab `Value`), `Nav` (the `BottomNav`, to change
+items or the selection; call `Show(value)` after setting `Nav.SelectedValue` from code) and, in
+01, `ActionClicked`. `edge-menu-01` exposes `Page` (the view under the menu), `Menu` and
+`ToolPicked` (the picked tile's `Value`).
+
 ## Adding Components
 
 ```bash

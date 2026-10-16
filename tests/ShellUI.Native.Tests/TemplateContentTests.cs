@@ -147,7 +147,10 @@ public class TemplateContentTests
     public void Avalonia_template_is_Avalonia_code_with_the_namespace_placeholder(string name)
     {
         var content = ComponentRegistry.GetComponentContent(name, NativePlatform.Avalonia)!;
-        Assert.Contains("namespace YourProjectNamespace.Components.UI", content); // .Variants for button-variants
+        // Blocks live next to the components and use them; .Variants for button-variants.
+        Assert.Contains(ComponentRegistry.GetMetadata(name)!.Category == ComponentCategory.Block
+            ? "namespace YourProjectNamespace.Components.Blocks"
+            : "namespace YourProjectNamespace.Components.UI", content);
         // Small parts (Dialog, triggers) need no Avalonia using, so check for MAUI types instead.
         Assert.DoesNotContain("Microsoft.Maui", content);
         Assert.DoesNotContain("BindableProperty", content);
