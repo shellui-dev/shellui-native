@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="using:AvaloniaDemo.Components.UI"
+        xmlns:blocks="using:AvaloniaDemo.Components.Blocks"
         x:Class="AvaloniaDemo.MainWindow"
         Title="ShellUI Native (Avalonia)"
         Icon="/Assets/icon.ico"
@@ -721,6 +722,47 @@
                 </Border>
             </WrapPanel>
             <TextBlock x:Name="EdgeMenuChoice" Classes="hint" Text="Open a menu and pick a tool." />
+
+            <TextBlock Classes="title" Text="Blocks" />
+            <TextBlock Classes="hint" Text="Ready-made screens you own as a file: shellui-native add bottom-nav-01 (and -02 to -05, edge-menu-01)." />
+            <WrapPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="bottom-nav-01" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:BottomNav01 />
+                    </Border>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="bottom-nav-02" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:BottomNav02 />
+                    </Border>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="bottom-nav-03" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:BottomNav03 />
+                    </Border>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="bottom-nav-04" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:BottomNav04 />
+                    </Border>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="bottom-nav-05" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:BottomNav05 />
+                    </Border>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="0,0,16,16">
+                    <TextBlock Text="edge-menu-01" FontSize="13" FontFamily="Consolas, monospace" Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                    <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}" Width="300" Height="520">
+                        <blocks:EdgeMenu01 />
+                    </Border>
+                </StackPanel>
+            </WrapPanel>
 
             <TextBlock Classes="title" Text="Groups and menus" />
             <TextBlock Classes="hint" Text="Button group, input group and menubar." />

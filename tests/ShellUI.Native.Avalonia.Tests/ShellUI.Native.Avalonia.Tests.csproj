@@ -12,8 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The component sources the CLI ships (the templates are synced from these files). -->
+    <!-- The component and block sources the CLI ships (the templates are synced from these files). -->
     <Compile Include="..\..\examples\Avalonia.Demo\Components\UI\**\*.cs" Link="Components\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\examples\Avalonia.Demo\Components\Blocks\**\*.cs" Link="Blocks\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

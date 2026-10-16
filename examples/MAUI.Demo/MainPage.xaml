@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:ui="clr-namespace:MAUI.Demo.Components.UI"
+             xmlns:blocks="clr-namespace:MAUI.Demo.Components.Blocks"
              x:Class="MAUI.Demo.MainPage"
              Shell.NavBarIsVisible="False"
              Title="ShellUI Native"
@@ -766,6 +767,48 @@
                             </ui:EdgeMenu>
                         </Grid>
                     </Border>
+                </FlexLayout>
+
+                <!-- Blocks -->
+                <Label Text="Blocks" Style="{StaticResource SectionTitle}" />
+                <Label Text="Ready-made screens you own as a file: shellui-native add bottom-nav-01 (and -02 to -05, edge-menu-01)." Style="{StaticResource Muted}" FontSize="13" />
+                <FlexLayout Wrap="Wrap" Direction="Row">
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="bottom-nav-01" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:BottomNav01 />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="bottom-nav-02" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:BottomNav02 />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="bottom-nav-03" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:BottomNav03 />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="bottom-nav-04" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:BottomNav04 />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="bottom-nav-05" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:BottomNav05 />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="6" Margin="0,0,16,16">
+                        <Label Text="edge-menu-01" FontSize="13" FontFamily="Consolas" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                        <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12" WidthRequest="300" HeightRequest="520">
+                            <blocks:EdgeMenu01 />
+                        </Border>
+                    </VerticalStackLayout>
                 </FlexLayout>
 
                 <!-- Resizable -->

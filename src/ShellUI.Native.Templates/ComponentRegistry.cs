@@ -146,7 +146,15 @@ public static class ComponentRegistry
         { "pie-chart", (PieChartTemplate.Metadata, PieChartTemplate.Contents) },
         { "donut-chart", (DonutChartTemplate.Metadata, DonutChartTemplate.Contents) },
         { "radar-chart", (RadarChartTemplate.Metadata, RadarChartTemplate.Contents) },
-        { "radial-chart", (RadialChartTemplate.Metadata, RadialChartTemplate.Contents) }
+        { "radial-chart", (RadialChartTemplate.Metadata, RadialChartTemplate.Contents) },
+
+        // Blocks: numbered presets built from components, installed to Components/Blocks
+        { "bottom-nav-01", (BottomNav01Template.Metadata, BottomNav01Template.Contents) },
+        { "bottom-nav-02", (BottomNav02Template.Metadata, BottomNav02Template.Contents) },
+        { "bottom-nav-03", (BottomNav03Template.Metadata, BottomNav03Template.Contents) },
+        { "bottom-nav-04", (BottomNav04Template.Metadata, BottomNav04Template.Contents) },
+        { "bottom-nav-05", (BottomNav05Template.Metadata, BottomNav05Template.Contents) },
+        { "edge-menu-01", (EdgeMenu01Template.Metadata, EdgeMenu01Template.Contents) }
     };
 
     // Metadata-only view for callers that don't need the per-platform payload.
