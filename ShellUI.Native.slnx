@@ -18,6 +18,7 @@
     <Project Path="src/ShellUI.Native.Templates/ShellUI.Native.Templates.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ShellUI.Native.Avalonia.Tests/ShellUI.Native.Avalonia.Tests.csproj" />
     <Project Path="tests/ShellUI.Native.Tests/ShellUI.Native.Tests.csproj" />
   </Folder>
 </Solution>

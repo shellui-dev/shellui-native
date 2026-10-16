@@ -85,3 +85,7 @@ jobs:
 
     - name: Build Avalonia Demo
       run: dotnet build examples/Avalonia.Demo/AvaloniaDemo.csproj --configuration Release
+
+    # Renders every component and drives them with mouse and keyboard, headless (no display needed)
+    - name: Run Avalonia headless tests
+      run: dotnet test tests/ShellUI.Native.Avalonia.Tests/ShellUI.Native.Avalonia.Tests.csproj --configuration Release
