@@ -583,6 +583,107 @@
             </Border>
             <TextBlock x:Name="LayoutChoice" Classes="hint" Margin="0,8,0,0" Text="Pick a link or a page, or drag a divider." />
 
+            <TextBlock Classes="title" Text="Bottom navigation" />
+            <TextBlock Classes="hint" Text="Mobile tab bars: Default (with a raised action), Pill, Floating, Expanding and Lifted (it hides as you scroll)." />
+            <WrapPanel>
+                <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                        Background="{DynamicResource ShellUIMutedBrush}" Width="320" Height="240" Margin="0,0,16,16">
+                    <Grid RowDefinitions="*,Auto">
+                        <StackPanel Margin="16" Spacing="8">
+                            <TextBlock x:Name="BottomNavDefaultPage" Text="Home" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            <Border Height="12" Width="180" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                            <Border Height="12" Width="120" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                        </StackPanel>
+                        <ui:BottomNav x:Name="BottomNavDefault" Grid.Row="1" SelectedValue="home" ActiveToken="Primary">
+                            <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                            <ui:BottomNavItem Value="cards" Icon="CreditCard" Text="Cards" />
+                            <ui:BottomNavItem x:Name="BottomNavPay" Icon="Plus" Text="Pay" Prominent="True" />
+                            <ui:BottomNavItem Value="alerts" Icon="Bell" Text="Alerts" Badge="5" />
+                            <ui:BottomNavItem Value="me" Text="Me" Dot="True">
+                                <ui:BottomNavItem.IconContent>
+                                    <ui:Avatar Fallback="SS" Size="Sm" />
+                                </ui:BottomNavItem.IconContent>
+                            </ui:BottomNavItem>
+                        </ui:BottomNav>
+                    </Grid>
+                </Border>
+                <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                        Background="{DynamicResource ShellUIMutedBrush}" Width="320" Height="240" Margin="0,0,16,16">
+                    <Grid RowDefinitions="*,Auto">
+                        <StackPanel Margin="16" Spacing="8">
+                            <TextBlock x:Name="BottomNavPillPage" Text="Home" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            <Border Height="12" Width="180" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                            <Border Height="12" Width="120" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                        </StackPanel>
+                        <ui:BottomNav x:Name="BottomNavPill" Grid.Row="1" Variant="Pill" SelectedValue="home">
+                            <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                            <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                            <ui:BottomNavItem Value="saved" Icon="Heart" Text="Saved" />
+                            <ui:BottomNavItem Value="settings" Icon="Settings" Text="Settings" />
+                        </ui:BottomNav>
+                    </Grid>
+                </Border>
+                <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                        Background="{DynamicResource ShellUIMutedBrush}" Width="320" Height="240" Margin="0,0,16,16">
+                    <Grid RowDefinitions="*,Auto">
+                        <StackPanel Margin="16" Spacing="8">
+                            <TextBlock x:Name="BottomNavFloatingPage" Text="Inbox" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            <Border Height="12" Width="180" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                            <Border Height="12" Width="120" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                        </StackPanel>
+                        <ui:BottomNav x:Name="BottomNavFloating" Grid.Row="1" Variant="Floating" Labels="Active" SelectedValue="inbox">
+                            <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                            <ui:BottomNavItem Value="inbox" Icon="Inbox" Text="Inbox" Badge="3" />
+                            <ui:BottomNavItem Value="messages" Icon="MessageCircle" Text="Messages" Dot="True" />
+                            <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                        </ui:BottomNav>
+                    </Grid>
+                </Border>
+                <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                        Background="{DynamicResource ShellUIMutedBrush}" Width="320" Height="240" Margin="0,0,16,16">
+                    <Grid RowDefinitions="*,Auto">
+                        <StackPanel Margin="16" Spacing="8">
+                            <TextBlock x:Name="BottomNavExpandingPage" Text="Home" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                            <Border Height="12" Width="180" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                            <Border Height="12" Width="120" HorizontalAlignment="Left" CornerRadius="6" Background="{DynamicResource ShellUIBorderBrush}" />
+                        </StackPanel>
+                        <ui:BottomNav x:Name="BottomNavExpanding" Grid.Row="1" Variant="Expanding" SelectedValue="home">
+                            <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                            <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                            <ui:BottomNavItem Value="saved" Icon="Heart" Text="Saved" />
+                            <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                        </ui:BottomNav>
+                    </Grid>
+                </Border>
+                <Border BorderThickness="1" CornerRadius="12" ClipToBounds="True" BorderBrush="{DynamicResource ShellUIBorderBrush}"
+                        Background="{DynamicResource ShellUIMutedBrush}" Width="320" Height="240" Margin="0,0,16,16">
+                    <Grid>
+                        <ScrollViewer x:Name="BottomNavScroll">
+                            <StackPanel Margin="16,16,16,100" Spacing="8">
+                                <TextBlock x:Name="BottomNavLiftedPage" Text="Home" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource ShellUIForegroundBrush}" />
+                                <TextBlock Text="Scroll down: the bar slides away. Scroll up: it comes back." TextWrapping="Wrap" FontSize="13"
+                                           Foreground="{DynamicResource ShellUIMutedForegroundBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                                <Border Height="44" CornerRadius="8" Background="{DynamicResource ShellUIBorderBrush}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ui:BottomNav x:Name="BottomNavLifted" Variant="Lifted" SelectedValue="home" ScrollSource="{Binding #BottomNavScroll}">
+                            <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                            <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                            <ui:BottomNavItem Value="alerts" Icon="Bell" Text="Notifications" Badge="12" />
+                            <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                        </ui:BottomNav>
+                    </Grid>
+                </Border>
+            </WrapPanel>
+            <TextBlock x:Name="BottomNavChoice" Classes="hint" Text="Tap a tab, or the raised Pay button." />
+
             <TextBlock Classes="title" Text="Groups and menus" />
             <TextBlock Classes="hint" Text="Button group, input group and menubar." />
             <StackPanel Orientation="Horizontal" Spacing="16">

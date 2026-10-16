@@ -147,6 +147,13 @@ public partial class MainWindow : Window
         };
         SidebarToggle.Clicked += (_, _) => DemoSidebar.Toggle();
         SidebarLogOut.Clicked += (_, _) => LayoutChoice.Text = "Sidebar: Log out.";
+        foreach (var (nav, page) in new[] { (BottomNavDefault, BottomNavDefaultPage), (BottomNavPill, BottomNavPillPage), (BottomNavFloating, BottomNavFloatingPage), (BottomNavExpanding, BottomNavExpandingPage), (BottomNavLifted, BottomNavLiftedPage) })
+            nav.SelectedValueChanged += (_, value) =>
+            {
+                page.Text = string.IsNullOrEmpty(value) ? string.Empty : char.ToUpperInvariant(value[0]) + value.Substring(1);
+                BottomNavChoice.Text = $"{nav.Variant}: {value}.";
+            };
+        BottomNavPay.Clicked += (_, _) => BottomNavChoice.Text = "Pay pressed (an action, not a tab).";
         DemoResizable.Resized += (_, _) =>
             LayoutChoice.Text = $"Resizable: first panel is {ResizableFirst.Size / DemoResizable.Panels.OfType<ResizablePanel>().Sum(p => p.Size):P0} of the width.";
 

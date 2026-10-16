@@ -88,6 +88,8 @@ NEW = {
                   ["resizable", "split", "panels", "layout"]),
     "Navbar": ("navbar", "Navbar", "Top navigation bar that collapses its links into a menu", "Navigation",
                ["navbar", "navigation", "header", "menu"]),
+    "BottomNav": ("bottom-nav", "Bottom Nav", "Mobile tab bar: icon tabs with badges, a raised action and four styles", "Navigation",
+                  ["bottom-nav", "tab-bar", "navigation", "mobile", "tabs"]),
     "Sidebar": ("sidebar", "Sidebar", "App sidebar with groups and items that collapses to an icon rail", "Navigation",
                 ["sidebar", "navigation", "menu", "layout"]),
     "ButtonGroup": ("button-group", "Button Group", "Buttons joined into one control", "Form",

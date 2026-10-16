@@ -627,6 +627,108 @@
                     </Grid>
                 </Border>
 
+                <!-- Bottom navigation -->
+                <Label Text="Bottom navigation" Style="{StaticResource SectionTitle}" />
+                <FlexLayout Wrap="Wrap" Direction="Row">
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIMuted}" WidthRequest="320" HeightRequest="240" Margin="0,0,16,16">
+                        <Grid RowDefinitions="*,Auto">
+                            <VerticalStackLayout Padding="16" Spacing="8">
+                                <Label x:Name="BottomNavDefaultPage" Text="Home" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <BoxView HeightRequest="12" WidthRequest="180" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                                <BoxView HeightRequest="12" WidthRequest="120" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                            </VerticalStackLayout>
+                            <ui:BottomNav x:Name="BottomNavDefault" Grid.Row="1" SelectedValue="home" ActiveToken="Primary"
+                                          SelectedValueChanged="OnBottomNavChanged">
+                                <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                                <ui:BottomNavItem Value="cards" Icon="CreditCard" Text="Cards" />
+                                <ui:BottomNavItem Icon="Plus" Text="Pay" Prominent="True" Clicked="OnBottomNavPay" />
+                                <ui:BottomNavItem Value="alerts" Icon="Bell" Text="Alerts" Badge="5" />
+                                <ui:BottomNavItem Value="me" Text="Me" Dot="True">
+                                    <ui:Avatar Fallback="SS" Size="Sm" />
+                                </ui:BottomNavItem>
+                            </ui:BottomNav>
+                        </Grid>
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIMuted}" WidthRequest="320" HeightRequest="240" Margin="0,0,16,16">
+                        <Grid RowDefinitions="*,Auto">
+                            <VerticalStackLayout Padding="16" Spacing="8">
+                                <Label x:Name="BottomNavPillPage" Text="Home" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <BoxView HeightRequest="12" WidthRequest="180" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                                <BoxView HeightRequest="12" WidthRequest="120" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                            </VerticalStackLayout>
+                            <ui:BottomNav x:Name="BottomNavPill" Grid.Row="1" Variant="Pill" SelectedValue="home"
+                                          SelectedValueChanged="OnBottomNavChanged">
+                                <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                                <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                                <ui:BottomNavItem Value="saved" Icon="Heart" Text="Saved" />
+                                <ui:BottomNavItem Value="settings" Icon="Settings" Text="Settings" />
+                            </ui:BottomNav>
+                        </Grid>
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIMuted}" WidthRequest="320" HeightRequest="240" Margin="0,0,16,16">
+                        <Grid RowDefinitions="*,Auto">
+                            <VerticalStackLayout Padding="16" Spacing="8">
+                                <Label x:Name="BottomNavFloatingPage" Text="Inbox" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <BoxView HeightRequest="12" WidthRequest="180" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                                <BoxView HeightRequest="12" WidthRequest="120" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                            </VerticalStackLayout>
+                            <ui:BottomNav x:Name="BottomNavFloating" Grid.Row="1" Variant="Floating" Labels="Active" SelectedValue="inbox"
+                                          SelectedValueChanged="OnBottomNavChanged">
+                                <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                                <ui:BottomNavItem Value="inbox" Icon="Inbox" Text="Inbox" Badge="3" />
+                                <ui:BottomNavItem Value="messages" Icon="MessageCircle" Text="Messages" Dot="True" />
+                                <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                            </ui:BottomNav>
+                        </Grid>
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIMuted}" WidthRequest="320" HeightRequest="240" Margin="0,0,16,16">
+                        <Grid RowDefinitions="*,Auto">
+                            <VerticalStackLayout Padding="16" Spacing="8">
+                                <Label x:Name="BottomNavExpandingPage" Text="Home" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <BoxView HeightRequest="12" WidthRequest="180" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                                <BoxView HeightRequest="12" WidthRequest="120" HorizontalOptions="Start" CornerRadius="6" Color="{DynamicResource ShellUIBorder}" />
+                            </VerticalStackLayout>
+                            <ui:BottomNav x:Name="BottomNavExpanding" Grid.Row="1" Variant="Expanding" SelectedValue="home"
+                                          SelectedValueChanged="OnBottomNavChanged">
+                                <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                                <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                                <ui:BottomNavItem Value="saved" Icon="Heart" Text="Saved" />
+                                <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                            </ui:BottomNav>
+                        </Grid>
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIMuted}" WidthRequest="320" HeightRequest="240" Margin="0,0,16,16">
+                        <Grid>
+                            <ScrollView x:Name="BottomNavScroll">
+                                <VerticalStackLayout Padding="16,16,16,100" Spacing="8">
+                                    <Label x:Name="BottomNavLiftedPage" Text="Home" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                    <Label Text="Scroll down: the bar slides away. Scroll up: it comes back." FontSize="13" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                    <BoxView HeightRequest="44" CornerRadius="8" Color="{DynamicResource ShellUIBorder}" />
+                                </VerticalStackLayout>
+                            </ScrollView>
+                            <ui:BottomNav x:Name="BottomNavLifted" Variant="Lifted" SelectedValue="home"
+                                          ScrollSource="{x:Reference BottomNavScroll}" SelectedValueChanged="OnBottomNavChanged">
+                                <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+                                <ui:BottomNavItem Value="search" Icon="Search" Text="Search" />
+                                <ui:BottomNavItem Value="alerts" Icon="Bell" Text="Notifications" Badge="12" />
+                                <ui:BottomNavItem Value="profile" Icon="User" Text="Profile" />
+                            </ui:BottomNav>
+                        </Grid>
+                    </Border>
+                </FlexLayout>
+
                 <!-- Resizable -->
                 <Label Text="Resizable" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8"

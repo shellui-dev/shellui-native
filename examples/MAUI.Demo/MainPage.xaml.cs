@@ -204,6 +204,18 @@ public partial class MainPage : ContentPage
         SidebarPage.Text = value is null ? string.Empty : char.ToUpperInvariant(value[0]) + value[1..];
         Report($"Sidebar: {value}");
     }
+    private void OnBottomNavChanged(object? sender, string? value)
+    {
+        if (sender is not BottomNav nav) return;
+        var page = nav == BottomNavDefault ? BottomNavDefaultPage
+            : nav == BottomNavPill ? BottomNavPillPage
+            : nav == BottomNavFloating ? BottomNavFloatingPage
+            : nav == BottomNavLifted ? BottomNavLiftedPage
+            : BottomNavExpandingPage;
+        page.Text = string.IsNullOrEmpty(value) ? string.Empty : char.ToUpperInvariant(value[0]) + value[1..];
+        Report($"{nav.Variant}: {value}");
+    }
+    private void OnBottomNavPay(object? sender, EventArgs e) => Report("Pay pressed (an action, not a tab)");
     private void OnSidebarToggle(object? sender, EventArgs e) => SidebarDemo.Toggle();
     private void OnSidebarCollapsed(object? sender, bool collapsed)
     {
