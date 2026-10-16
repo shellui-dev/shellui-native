@@ -135,7 +135,9 @@ public static class ShellTheme
     public const double RadiusMd = 6;
     public const double RadiusLg = 8;
 
-    private static bool _initialized;
+    // The app the palettes were published to. A new Application (e.g. one per headless test)
+    // gets them too.
+    private static Application? _initialized;
 
     // Raised when a palette is published or the theme variant changes, for anything resources
     // can't reach (e.g. a BoxShadow).
@@ -161,10 +163,9 @@ public static class ShellTheme
 
     public static void EnsureInitialized()
     {
-        if (_initialized) return;
         var app = Application.Current;
-        if (app is null) return;
-        _initialized = true;
+        if (app is null || ReferenceEquals(app, _initialized)) return;
+        _initialized = app;
         app.ActualThemeVariantChanged += (_, _) => ThemeChanged?.Invoke(null, EventArgs.Empty);
         Apply();
     }
