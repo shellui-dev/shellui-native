@@ -144,6 +144,7 @@ Same names, properties and variants as MAUI, except:
 | Menubar | Tap a title to open its menu | Titles are tab stops: Enter / Space / Down open a menu and Left / Right move between titles; in a menu Up / Down move and Enter picks; children are collected in `Menus` and `Items` |
 | Resizable | Drag a divider | Dividers are also tab stops: the arrow keys move them 16px; the pointer shows a resize cursor |
 | Navbar | Links and the menu button react to taps | They are also tab stops (Enter / Space); children are collected in `Items` |
+| EdgeMenu | Handle and tiles react to taps (and Enter / Space on Windows); back closes it on Android | Handle and tiles are tab stops: Enter / Space toggle or pick, Up / Down move between tiles; focus goes to the first tile on open and back to the handle on close |
 | BottomNav | Items react to taps (and Enter / Space on Windows); an item's XAML content is its `IconContent` | Items are also tab stops: Enter / Space pick one and Left / Right move to the next destination; set `IconContent` as a property element (`<ui:BottomNavItem.IconContent>`) |
 | Sidebar | Width animates on collapse | Same, with items as tab stops; children are collected in `Groups` and `Items` |
 | DateRangePicker | Tap the trigger | Also Enter / Space / Down on the focused trigger; Escape closes the panel |
@@ -1029,6 +1030,40 @@ it raises `Clicked` and never becomes the selected item), `IsEnabled` · **Event
         </ui:BottomNavItem.IconContent>
     </ui:BottomNavItem>
 </ui:BottomNav>
+```
+
+---
+
+### EdgeMenu
+A menu docked to a screen edge: a small handle that slides out a rail of icon tiles, for tools and
+shortcuts that shouldn't take a tab in the bottom nav. Put it over the page, in the same cell
+after the content; only the handle and the open rail take input, so the page stays usable while
+it is closed. A tap outside, Escape (back on Android), the handle or a tile closes it.
+
+```bash
+shellui-native add edge-menu
+```
+
+**Variants:** `Default` (bg-popover, border, shadow; tiles turn bg-accent on hover and when
+selected), `Solid` (bg-primary with primary-foreground tiles, like a dark dock).
+
+**Properties (EdgeMenu):** `IsOpen` (two-way), `Side` (`Right`, `Left`), `Position` (where the
+handle sits along the edge: 0 top, 0.5 middle, 1 bottom), `Variant`, `Dim` (darkens the page while
+open), `CloseOnSelect` (true), `SelectedValue` (two-way; optional, tiles can be plain actions) ·
+**Events:** `IsOpenChanged` (every open and close, like the other overlays), `SelectedValueChanged`
+(user input only) · **Methods:** `Open()`, `Close()`, `Toggle()`
+
+**Properties (EdgeMenuItem):** `Icon`, `Text`, `Value`, `IsEnabled` · **Events:** `Clicked` ·
+**Methods:** `Press()`
+
+```xml
+<Grid>
+    <ScrollView>...</ScrollView>
+    <ui:EdgeMenu Side="Right" Position="0.4" Variant="Solid" Dim="True">
+        <ui:EdgeMenuItem Icon="Calendar" Text="Calendar" Clicked="OnCalendar" />
+        <ui:EdgeMenuItem Icon="Camera" Text="Camera" Clicked="OnCamera" />
+    </ui:EdgeMenu>
+</Grid>
 ```
 
 ---

@@ -729,6 +729,45 @@
                     </Border>
                 </FlexLayout>
 
+                <!-- Edge menu -->
+                <Label Text="Edge menu" Style="{StaticResource SectionTitle}" />
+                <FlexLayout Wrap="Wrap" Direction="Row">
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIBackground}" WidthRequest="320" HeightRequest="440" Margin="0,0,16,16">
+                        <Grid>
+                            <VerticalStackLayout Padding="16" Spacing="8">
+                                <Label x:Name="EdgeMenuRightPage" Text="Notes" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <Label Text="Tap the handle on the edge." FontSize="13" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                            </VerticalStackLayout>
+                            <ui:EdgeMenu x:Name="EdgeMenuRight" Position="0.4" SelectedValue="notes"
+                                         SelectedValueChanged="OnEdgeMenuChanged" IsOpenChanged="OnEdgeMenuOpenChanged">
+                                <ui:EdgeMenuItem Icon="Settings" Text="Settings" Value="settings" />
+                                <ui:EdgeMenuItem Icon="FileText" Text="Notes" Value="notes" />
+                                <ui:EdgeMenuItem Icon="Calendar" Text="Calendar" Value="calendar" />
+                                <ui:EdgeMenuItem Icon="Image" Text="Images" Value="images" />
+                                <ui:EdgeMenuItem Icon="Camera" Text="Camera" Value="camera" />
+                            </ui:EdgeMenu>
+                        </Grid>
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{DynamicResource ShellUIBackground}" WidthRequest="320" HeightRequest="440" Margin="0,0,16,16">
+                        <Grid>
+                            <VerticalStackLayout Padding="44,16,16,16" Spacing="8">
+                                <Label x:Name="EdgeMenuLeftPage" Text="Notes" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
+                                <Label Text="Tap the handle on the edge." FontSize="13" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                            </VerticalStackLayout>
+                            <ui:EdgeMenu x:Name="EdgeMenuLeft" Side="Left" Variant="Solid" Dim="True" Position="0.6" SelectedValue="notes"
+                                         SelectedValueChanged="OnEdgeMenuChanged" IsOpenChanged="OnEdgeMenuOpenChanged">
+                                <ui:EdgeMenuItem Icon="Settings" Text="Settings" Value="settings" />
+                                <ui:EdgeMenuItem Icon="FileText" Text="Notes" Value="notes" />
+                                <ui:EdgeMenuItem Icon="Calendar" Text="Calendar" Value="calendar" />
+                                <ui:EdgeMenuItem Icon="Image" Text="Images" Value="images" />
+                                <ui:EdgeMenuItem Icon="Camera" Text="Camera" Value="camera" />
+                            </ui:EdgeMenu>
+                        </Grid>
+                    </Border>
+                </FlexLayout>
+
                 <!-- Resizable -->
                 <Label Text="Resizable" Style="{StaticResource SectionTitle}" />
                 <Border StrokeThickness="1" Stroke="{DynamicResource ShellUIBorderBrush}" StrokeShape="RoundRectangle 8"
