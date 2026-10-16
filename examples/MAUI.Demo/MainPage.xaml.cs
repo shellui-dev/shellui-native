@@ -216,6 +216,15 @@ public partial class MainPage : ContentPage
         Report($"{nav.Variant}: {value}");
     }
     private void OnBottomNavPay(object? sender, EventArgs e) => Report("Pay pressed (an action, not a tab)");
+    private void OnEdgeMenuChanged(object? sender, string? value)
+    {
+        if (sender is not EdgeMenu menu) return;
+        var page = menu == EdgeMenuRight ? EdgeMenuRightPage : EdgeMenuLeftPage;
+        page.Text = string.IsNullOrEmpty(value) ? string.Empty : char.ToUpperInvariant(value[0]) + value[1..];
+        Report($"Edge menu ({menu.Side}): {value}");
+    }
+    private void OnEdgeMenuOpenChanged(object? sender, bool open) =>
+        Report($"Edge menu ({(sender as EdgeMenu)?.Side}) {(open ? "opened" : "closed")}");
     private void OnSidebarToggle(object? sender, EventArgs e) => SidebarDemo.Toggle();
     private void OnSidebarCollapsed(object? sender, bool collapsed)
     {

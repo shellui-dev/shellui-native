@@ -154,6 +154,15 @@ public partial class MainWindow : Window
                 BottomNavChoice.Text = $"{nav.Variant}: {value}.";
             };
         BottomNavPay.Clicked += (_, _) => BottomNavChoice.Text = "Pay pressed (an action, not a tab).";
+        foreach (var (menu, page) in new[] { (EdgeMenuRight, EdgeMenuRightPage), (EdgeMenuLeft, EdgeMenuLeftPage) })
+        {
+            menu.SelectedValueChanged += (_, value) =>
+            {
+                page.Text = string.IsNullOrEmpty(value) ? string.Empty : char.ToUpperInvariant(value[0]) + value.Substring(1);
+                EdgeMenuChoice.Text = $"Edge menu ({menu.Side}): {value}.";
+            };
+            menu.IsOpenChanged += (_, open) => EdgeMenuChoice.Text = $"Edge menu ({menu.Side}) {(open ? "opened" : "closed")}.";
+        }
         DemoResizable.Resized += (_, _) =>
             LayoutChoice.Text = $"Resizable: first panel is {ResizableFirst.Size / DemoResizable.Panels.OfType<ResizablePanel>().Sum(p => p.Size):P0} of the width.";
 

@@ -125,6 +125,7 @@ public static class ComponentRegistry
         { "resizable", (ResizableTemplate.Metadata, ResizableTemplate.Contents) },
         { "navbar", (NavbarTemplate.Metadata, NavbarTemplate.Contents) },
         { "bottom-nav", (BottomNavTemplate.Metadata, BottomNavTemplate.Contents) },
+        { "edge-menu", (EdgeMenuTemplate.Metadata, EdgeMenuTemplate.Contents) },
         { "sidebar", (SidebarTemplate.Metadata, SidebarTemplate.Contents) },
         { "date-range-picker", (DateRangePickerTemplate.Metadata, DateRangePickerTemplate.Contents) },
         { "file-upload", (FileUploadTemplate.Metadata, FileUploadTemplate.Contents) },
