@@ -14,6 +14,10 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEMO = os.path.join(ROOT, "examples", "MAUI.Demo", "Components", "UI")
 AVALONIA_DEMO = os.path.join(ROOT, "examples", "Avalonia.Demo", "Components", "UI")
+# Blocks (numbered presets built from components) sit next to the components folder, in
+# Components/Blocks, so their templates install to ../Blocks/<Name>.cs.
+DEMO_BLOCKS = os.path.join(ROOT, "examples", "MAUI.Demo", "Components", "Blocks")
+AVALONIA_BLOCKS = os.path.join(ROOT, "examples", "Avalonia.Demo", "Components", "Blocks")
 TPL = os.path.join(ROOT, "src", "ShellUI.Native.Templates", "Templates")
 
 # New templates that don't exist yet: name -> (registry key, display, description, category, tags)
@@ -88,6 +92,22 @@ NEW = {
                   ["resizable", "split", "panels", "layout"]),
     "Navbar": ("navbar", "Navbar", "Top navigation bar that collapses its links into a menu", "Navigation",
                ["navbar", "navigation", "header", "menu"]),
+    "EdgeMenu": ("edge-menu", "Edge Menu", "A handle on a screen edge that slides out a rail of tool tiles", "Navigation",
+                 ["edge-menu", "dock", "side-menu", "tools", "mobile"]),
+    "BottomNav01": ("bottom-nav-01", "Bottom Nav 01", "App shell: tab bar with a raised Pay button and an avatar tab", "Block",
+                    ["block", "bottom-nav", "tab-bar", "mobile", "shell"]),
+    "BottomNav02": ("bottom-nav-02", "Bottom Nav 02", "App shell: Material 3 tab bar with a pill behind the active icon", "Block",
+                    ["block", "bottom-nav", "tab-bar", "mobile", "material"]),
+    "BottomNav03": ("bottom-nav-03", "Bottom Nav 03", "App shell: floating tab bar that hides while the page scrolls", "Block",
+                    ["block", "bottom-nav", "tab-bar", "mobile", "floating"]),
+    "BottomNav04": ("bottom-nav-04", "Bottom Nav 04", "App shell: compact capsule; the active tab widens with its label", "Block",
+                    ["block", "bottom-nav", "tab-bar", "mobile", "capsule"]),
+    "BottomNav05": ("bottom-nav-05", "Bottom Nav 05", "App shell: the active tab rises into a circle; the bar hides on scroll", "Block",
+                    ["block", "bottom-nav", "tab-bar", "mobile", "lifted"]),
+    "EdgeMenu01": ("edge-menu-01", "Edge Menu 01", "A page with a solid dock of tools on its right edge", "Block",
+                   ["block", "edge-menu", "dock", "tools", "mobile"]),
+    "BottomNav": ("bottom-nav", "Bottom Nav", "Mobile tab bar: icon tabs with badges, a raised action and four styles", "Navigation",
+                  ["bottom-nav", "tab-bar", "navigation", "mobile", "tabs"]),
     "Sidebar": ("sidebar", "Sidebar", "App sidebar with groups and items that collapses to an icon rail", "Navigation",
                 ["sidebar", "navigation", "menu", "layout"]),
     "ButtonGroup": ("button-group", "Button Group", "Buttons joined into one control", "Form",
@@ -148,6 +168,12 @@ EXTRA_DEPS = {
     "RadialChart": ["chart"],
     "TagInput": ["wrap-layout"],
     "MultiSelect": ["wrap-layout"],
+    "BottomNav01": ["bottom-nav", "avatar"],
+    "BottomNav02": ["bottom-nav"],
+    "BottomNav03": ["bottom-nav"],
+    "BottomNav04": ["bottom-nav"],
+    "BottomNav05": ["bottom-nav"],
+    "EdgeMenu01": ["edge-menu"],
 }
 
 SHELL_API = re.compile(r"\bShellTheme\b|\.Token\(|\bShellToken\b|\bShellFocus\b|\bShellPlatform\b|\bShellPopups\b|"
@@ -165,6 +191,7 @@ DEPS_LINE = re.compile(r'^(\s*)Dependencies = new List<string>(?:\s*\{([^}]*)\})
 def to_template_content(source: str, demo_namespace: str = "MAUI.Demo") -> str:
     source = source.replace("\r\n", "\n")
     source = source.replace(f"{demo_namespace}.Components.UI", "YourProjectNamespace.Components.UI")
+    source = source.replace(f"{demo_namespace}.Components.Blocks", "YourProjectNamespace.Components.Blocks")
     if demo_namespace in source:
         raise SystemExit("demo-specific namespace left in source")
     # The closing quote sits on its own line after the block, so drop the trailing newline.
@@ -188,7 +215,7 @@ def compute_deps(name: str, source: str, existing: list[str]) -> list[str]:
     return shared + rest
 
 
-def new_template(name: str, content: str, deps: list[str]) -> str:
+def new_template(name: str, content: str, deps: list[str], file_path: str) -> str:
     key, display, desc, category, tags = NEW[name]
     dep_list = "new List<string>()" if not deps else "new List<string> { " + ", ".join(f'"{d}"' for d in deps) + " }"
     tag_list = ", ".join(f'"{t}"' for t in tags)
@@ -203,7 +230,7 @@ def new_template(name: str, content: str, deps: list[str]) -> str:
         f'        DisplayName = "{display}",\n'
         f'        Description = "{desc}",\n'
         f"        Category = ComponentCategory.{category},\n"
-        f'        FilePath = "{name}.cs",\n'
+        f'        FilePath = "{file_path}",\n'
         f"        Dependencies = {dep_list},\n"
         f"        Tags = new List<string> {{ {tag_list} }}\n"
         "    };\n\n"
@@ -217,8 +244,9 @@ def new_template(name: str, content: str, deps: list[str]) -> str:
 
 def main() -> None:
     changed = []
-    for dirpath, _, files in os.walk(DEMO):
-        for file in sorted(files):
+    sources = [(d, f, "") for d, _, fs in os.walk(DEMO) for f in sorted(fs)]
+    sources += [(d, f, "../Blocks/") for d, _, fs in os.walk(DEMO_BLOCKS) for f in sorted(fs)]
+    for dirpath, file, prefix in sources:
             if not file.endswith(".cs"):
                 continue
             name = file[:-3]
@@ -231,7 +259,7 @@ def main() -> None:
                     print(f"SKIP (no template, not declared new): {name}")
                     continue
                 deps = compute_deps(name, source, [])
-                open(tpl_path, "w", encoding="utf-8", newline="\n").write(new_template(name, content, deps))
+                open(tpl_path, "w", encoding="utf-8", newline="\n").write(new_template(name, content, deps, f"{prefix}{name}.cs"))
                 changed.append(f"NEW  {name} deps={deps}")
                 continue
 
@@ -267,7 +295,7 @@ def main() -> None:
 def sync_avalonia() -> list[str]:
     changed = []
     # Walks subfolders too (Variants/ButtonVariants.cs), like the MAUI pass.
-    files = sorted((d, f) for d, _, fs in os.walk(AVALONIA_DEMO) for f in fs if f.endswith(".cs"))
+    files = sorted((d, f) for root in (AVALONIA_DEMO, AVALONIA_BLOCKS) for d, _, fs in os.walk(root) for f in fs if f.endswith(".cs"))
     for dirpath, file in files:
         name = file[:-3]
         source = open(os.path.join(dirpath, file), encoding="utf-8-sig").read()

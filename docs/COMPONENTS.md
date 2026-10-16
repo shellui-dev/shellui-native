@@ -144,6 +144,8 @@ Same names, properties and variants as MAUI, except:
 | Menubar | Tap a title to open its menu | Titles are tab stops: Enter / Space / Down open a menu and Left / Right move between titles; in a menu Up / Down move and Enter picks; children are collected in `Menus` and `Items` |
 | Resizable | Drag a divider | Dividers are also tab stops: the arrow keys move them 16px; the pointer shows a resize cursor |
 | Navbar | Links and the menu button react to taps | They are also tab stops (Enter / Space); children are collected in `Items` |
+| EdgeMenu | Handle and tiles react to taps (and Enter / Space on Windows); back closes it on Android | Handle and tiles are tab stops: Enter / Space toggle or pick, Up / Down move between tiles; focus goes to the first tile on open and back to the handle on close |
+| BottomNav | Items react to taps (and Enter / Space on Windows); an item's XAML content is its `IconContent` | Items are also tab stops: Enter / Space pick one and Left / Right move to the next destination; set `IconContent` as a property element (`<ui:BottomNavItem.IconContent>`) |
 | Sidebar | Width animates on collapse | Same, with items as tab stops; children are collected in `Groups` and `Items` |
 | DateRangePicker | Tap the trigger | Also Enter / Space / Down on the focused trigger; Escape closes the panel |
 | FileUpload | `Files` are `FileResult`; `FileTypes` is a `FilePickerFileType`; drop works on Windows only | `Files` are `IStorageFile`; `FileTypes` is a list of `FilePickerFileType` (e.g. `FilePickerFileTypes.ImageAll`); drop works wherever Avalonia supports it; Enter / Space open the picker |
@@ -983,6 +985,89 @@ never collapses), `IsMenuOpen` (two-way) · **Events:** `SelectedValueChanged`
 
 ---
 
+### BottomNav
+Mobile tab bar pinned to the bottom of the screen, the phone take on a sidebar: icon tabs with
+short labels, count badges and dots, and optionally a round action button in the middle. Put it
+in the last row of the page. ShellUI for Blazor has no bottom nav, so this one is native only.
+
+```bash
+shellui-native add bottom-nav
+```
+
+**Variants:** `Default` (64px bar, border on top; a line slides to the active item), `Pill`
+(80px; a pill grows behind the active icon, as in Material 3), `Floating` (an inset rounded bar
+with a shadow; a filled pill slides behind the active icon, with the label under it, so long
+labels stay readable), `Lifted` (the active icon rises into a ringed circle over the bar's top
+edge, and the circle slides from item to item), `Expanding` (a compact floating capsule of
+icons; the active one widens into a pill with its label). Switching items animates in about
+200 ms, and a press scales the icon in slightly. A badge on an active pill or circle takes its
+color as its ring.
+
+**Properties (BottomNav):** `SelectedValue` (two-way), `Variant`, `Labels` (`Always`, `Active`:
+only the active item shows its label and the others center their icon, `Never`; `Expanding`
+always labels the active item only), `ActiveToken` (the active color in `Default`; `Foreground`
+by default, e.g. `Primary` for a brand-colored bar), `ShowIndicator` (true), `BottomInset` (space
+for the home indicator: the full-width bars fill it with their color, the floating ones sit
+above it; by default it follows the safe area under the bar on phones, so only set it to
+override), `ScrollSource` (a scroll view: scrolling it down slides the bar away, scrolling up
+brings it back; put the bar over the content so the content can use the space), `IsHidden`
+(two-way; hide or show it from code) · **Events:** `SelectedValueChanged`
+
+**Properties (BottomNavItem):** `Text`, `Value`, `Icon`, `ActiveIcon` (shown while active),
+`IconContent` (any view instead of the icon, such as an `Avatar`), `Badge` (a count, e.g. "3" or
+"99+"), `Dot`, `Prominent` (a round action button; in a full-width bar it rises above the edge;
+it raises `Clicked` and never becomes the selected item), `IsEnabled` · **Events:** `Clicked`
+(on every press, also on the active item, e.g. to scroll to the top) · **Methods:** `Press()`
+
+```xml
+<ui:BottomNav SelectedValue="{Binding Page}" Variant="Floating" Labels="Active">
+    <ui:BottomNavItem Value="home" Icon="House" Text="Home" />
+    <ui:BottomNavItem Value="inbox" Icon="Inbox" Text="Inbox" Badge="3" />
+    <ui:BottomNavItem Icon="Plus" Text="New" Prominent="True" Clicked="OnNew" />
+    <ui:BottomNavItem Value="me" Text="Me" Dot="True">
+        <ui:BottomNavItem.IconContent>
+            <ui:Avatar Fallback="SS" Size="Sm" />
+        </ui:BottomNavItem.IconContent>
+    </ui:BottomNavItem>
+</ui:BottomNav>
+```
+
+---
+
+### EdgeMenu
+A menu docked to a screen edge: a small handle that slides out a rail of icon tiles, for tools and
+shortcuts that shouldn't take a tab in the bottom nav. Put it over the page, in the same cell
+after the content; only the handle and the open rail take input, so the page stays usable while
+it is closed. A tap outside, Escape (back on Android), the handle or a tile closes it.
+
+```bash
+shellui-native add edge-menu
+```
+
+**Variants:** `Default` (bg-popover, border, shadow; tiles turn bg-accent on hover and when
+selected), `Solid` (bg-primary with primary-foreground tiles, like a dark dock).
+
+**Properties (EdgeMenu):** `IsOpen` (two-way), `Side` (`Right`, `Left`), `Position` (where the
+handle sits along the edge: 0 top, 0.5 middle, 1 bottom), `Variant`, `Dim` (darkens the page while
+open), `CloseOnSelect` (true), `SelectedValue` (two-way; optional, tiles can be plain actions) ·
+**Events:** `IsOpenChanged` (every open and close, like the other overlays), `SelectedValueChanged`
+(user input only) · **Methods:** `Open()`, `Close()`, `Toggle()`
+
+**Properties (EdgeMenuItem):** `Icon`, `Text`, `Value`, `IsEnabled` · **Events:** `Clicked` ·
+**Methods:** `Press()`
+
+```xml
+<Grid>
+    <ScrollView>...</ScrollView>
+    <ui:EdgeMenu Side="Right" Position="0.4" Variant="Solid" Dim="True">
+        <ui:EdgeMenuItem Icon="Calendar" Text="Calendar" Clicked="OnCalendar" />
+        <ui:EdgeMenuItem Icon="Camera" Text="Camera" Clicked="OnCamera" />
+    </ui:EdgeMenu>
+</Grid>
+```
+
+---
+
 ### Sidebar
 App sidebar: a 256px column with a header, scrolling groups of items and a footer. Collapsed,
 it is a 56px rail that shows the icons only. Put it in a column next to your content (or
@@ -1794,6 +1879,40 @@ If you hit it, lay out less at once: split the page, or keep sections collapsed
 this, showing one category of components at a time.
 
 ---
+
+## Blocks
+
+Blocks are ready-made screens built from the components, numbered like ShellUI's `dashboard-01`.
+`add` writes one file you own to `Components/Blocks/` (namespace `<App>.Components.Blocks`, next to
+`Components/UI` or `Components/Native`) and installs the components it uses. Each block is a
+plain view in C#: use it as a page's content and edit it like any other code.
+
+| Block | What it is | Uses |
+|---|---|---|
+| `bottom-nav-01` | App shell: tab bar with a raised Pay button in the middle and an avatar tab (a wallet app) | bottom-nav, avatar |
+| `bottom-nav-02` | App shell: Material 3 tab bar, a pill behind the active icon | bottom-nav |
+| `bottom-nav-03` | App shell: floating tab bar over the page that hides while it scrolls; only the active tab is labelled | bottom-nav |
+| `bottom-nav-04` | App shell: compact capsule; the active tab widens into a pill with its label | bottom-nav |
+| `bottom-nav-05` | App shell: the active tab rises into a circle over the bar; the bar hides on scroll | bottom-nav |
+| `edge-menu-01` | A page with a solid dock of tools on its right edge that dims the page while open | edge-menu |
+
+```bash
+shellui-native add bottom-nav-01
+```
+
+```csharp
+// MAUI (Avalonia: the same, with Control instead of View)
+var shell = new BottomNav01();
+shell.Pages["home"] = new HomeView();      // one view per tab Value
+shell.Pages["cards"] = new CardsView();
+shell.ActionClicked += (_, _) => StartPayment();
+Content = shell;
+```
+
+The bottom-nav blocks expose `Pages` (a view per tab `Value`), `Nav` (the `BottomNav`, to change
+items or the selection; call `Show(value)` after setting `Nav.SelectedValue` from code) and, in
+01, `ActionClicked`. `edge-menu-01` exposes `Page` (the view under the menu), `Menu` and
+`ToolPicked` (the picked tile's `Value`).
 
 ## Adding Components
 

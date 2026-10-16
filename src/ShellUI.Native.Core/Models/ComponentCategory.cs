@@ -11,5 +11,8 @@ public enum ComponentCategory
     DataDisplay,
     Typography,
     Media,
-    Utility
+    Utility,
+
+    // Numbered presets built from components (bottom-nav-01), installed to Components/Blocks
+    Block
 }

@@ -12,9 +12,11 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
-  <!-- The components are the demo's own files, so a preview can never drift from them. -->
+  <!-- The components and blocks are the demo's own files, so a preview can never drift from them.
+       A preview uses a block with xmlns:blocks="using:AvaloniaDemo.Components.Blocks". -->
   <ItemGroup>
     <Compile Include="..\Avalonia.Demo\Components\UI\**\*.cs" LinkBase="Components\UI" />
+    <Compile Include="..\Avalonia.Demo\Components\Blocks\**\*.cs" LinkBase="Components\Blocks" />
   </ItemGroup>
 
   <!-- Previews are loaded by name at run time, which the trimmer can't follow. -->
