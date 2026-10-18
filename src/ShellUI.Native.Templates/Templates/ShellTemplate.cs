@@ -164,7 +164,12 @@ public static class ShellTheme
         app.RequestedThemeChanged += (_, _) => Apply();
         // Set up each page's overlay layer as it appears. Doing it on first use instead would
         // re-parent the page content under the user's finger (Android drops the scroll position).
-        app.PageAppearing += (_, page) => page.Dispatcher.Dispatch(() => ShellPortal.GetLayer(page));
+        // Android starts a new activity, with unthemed bars, when the app is reopened after Back.
+        app.PageAppearing += (_, page) => page.Dispatcher.Dispatch(() =>
+        {
+            ShellPortal.GetLayer(page);
+            if (SyncSystemBars) ApplySystemBars(retries: 0);
+        });
         Apply();
     }
 
