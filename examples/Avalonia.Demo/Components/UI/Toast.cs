@@ -75,7 +75,7 @@ public static class Toast
             toaster.Remove(id);
     }
 
-    private static TopLevel? ActiveTopLevel() => Application.Current?.ApplicationLifetime switch
+    private static TopLevel? ActiveTopLevel() => Avalonia.Application.Current?.ApplicationLifetime switch
     {
         IClassicDesktopStyleApplicationLifetime desktop => desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow,
         ISingleViewApplicationLifetime single when single.MainView is { } view => TopLevel.GetTopLevel(view),

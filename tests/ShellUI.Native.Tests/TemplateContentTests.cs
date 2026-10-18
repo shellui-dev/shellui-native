@@ -267,4 +267,17 @@ public class TemplateContentTests
         var content = ComponentRegistry.GetComponentContent(name, NativePlatform.MAUI)!;
         Assert.DoesNotMatch(@"(\b(is|as|case|new)\s+|typeof\(|[<(,]\s*)Layout\b(?![.\w])", content);
     }
+
+    // An app with an <App>.Application project (clean architecture) has that namespace, and a bare
+    // `Application` inside <App>.App.Components.* resolves to it (CS0234), so templates name the type in full.
+    [Theory]
+    [MemberData(nameof(AllRegisteredComponents))]
+    public void Templates_name_the_Application_type_in_full(string name)
+    {
+        foreach (var platform in new[] { NativePlatform.MAUI, NativePlatform.Avalonia })
+        {
+            if (ComponentRegistry.GetComponentContent(name, platform) is { } content)
+                Assert.DoesNotMatch(@"(?<![\w.])Application(\.|\?|\s+\w+\s*[=;),])", content);
+        }
+    }
 }
