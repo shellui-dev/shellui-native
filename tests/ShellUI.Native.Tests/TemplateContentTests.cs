@@ -268,6 +268,17 @@ public class TemplateContentTests
         Assert.DoesNotMatch(@"(\b(is|as|case|new)\s+|typeof\(|[<(,]\s*)Layout\b(?![.\w])", content);
     }
 
+    // Adding or removing a Shadow on Android re-wraps the native view, which takes focus from the field.
+    [Theory]
+    [InlineData("input")]
+    [InlineData("textarea")]
+    [InlineData("input-group")]
+    public void MAUI_text_fields_keep_their_focus_shadow(string name)
+    {
+        var content = ComponentRegistry.GetComponentContent(name, NativePlatform.MAUI)!;
+        Assert.DoesNotContain("ClearValue(VisualElement.ShadowProperty)", content);
+    }
+
     // An app with an <App>.Application project (clean architecture) has that namespace, and a bare
     // `Application` inside <App>.App.Components.* resolves to it (CS0234), so templates name the type in full.
     [Theory]

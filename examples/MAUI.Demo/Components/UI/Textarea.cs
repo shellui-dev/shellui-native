@@ -92,19 +92,14 @@ public partial class Textarea : ContentView
     {
         var stroke = HasError ? ShellToken.Destructive : _isFocused ? ShellToken.Ring : ShellToken.Input;
         _border.Token(Border.StrokeProperty, stroke);
-        if (_isFocused || HasError)
+        // The glow is always set and only turns transparent: adding or removing a shadow on Android
+        // re-wraps the native view, which takes focus away from the field being typed in.
+        _border.Shadow = new Shadow
         {
-            _border.Shadow = new Shadow
-            {
-                Brush = new SolidColorBrush(ShellTheme.Get(HasError ? ShellToken.Destructive : ShellToken.Ring)),
-                Offset = new Point(0, 0),
-                Radius = 6,
-                Opacity = 0.35f
-            };
-        }
-        else
-        {
-            _border.ClearValue(VisualElement.ShadowProperty);
-        }
+            Brush = new SolidColorBrush(ShellTheme.Get(HasError ? ShellToken.Destructive : ShellToken.Ring)),
+            Offset = new Point(0, 0),
+            Radius = 6,
+            Opacity = _isFocused || HasError ? 0.35f : 0f
+        };
     }
 }
