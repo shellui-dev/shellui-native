@@ -245,6 +245,32 @@ public static class ShellPlatform
         Strip(view, keepPadding);
     }
 
+    /* Android wraps a view (InputTransparent, Shadow, Clip) after its handler has applied the
+       view's translation, scale and rotation to the view itself. Later changes move only the
+       wrapper, so the inner view keeps the first values: an icon stuck at half size, an indicator
+       offset by where it first was. Call once for a view that is moved, scaled or turned. */
+    public static void KeepTransformsOnWrapper(View view)
+    {
+#if ANDROID
+        view.HandlerChanged += (_, _) =>
+        {
+            if (view.Handler is not { ContainerView: not null, PlatformView: Android.Views.View inner } handler) return;
+            inner.TranslationX = inner.TranslationY = 0;
+            inner.ScaleX = inner.ScaleY = 1;
+            inner.Rotation = inner.RotationX = inner.RotationY = 0;
+            foreach (var property in Transforms) handler.UpdateValue(property);
+        };
+#endif
+    }
+
+#if ANDROID
+    private static readonly string[] Transforms =
+    [
+        nameof(IView.TranslationX), nameof(IView.TranslationY), nameof(IView.Scale), nameof(IView.ScaleX), nameof(IView.ScaleY),
+        nameof(IView.Rotation), nameof(IView.RotationX), nameof(IView.RotationY), nameof(IView.AnchorX), nameof(IView.AnchorY)
+    ];
+#endif
+
     private static void Strip(View view, bool keepPadding)
     {
 #if WINDOWS
