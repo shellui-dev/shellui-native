@@ -126,7 +126,7 @@ public static class ShellTheme
     // anything they can't reach (shadows, native-control tweaks).
     public static event EventHandler? ThemeChanged;
 
-    public static bool IsDarkMode => Application.Current?.RequestedTheme == AppTheme.Dark;
+    public static bool IsDarkMode => Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
 
     public static string ColorKey(ShellToken token) => $"ShellUI{token}";
     public static string BrushKey(ShellToken token) => $"ShellUI{token}Brush";
@@ -137,20 +137,25 @@ public static class ShellTheme
     public static void EnsureInitialized()
     {
         if (_initialized) return;
-        var app = Application.Current;
+        var app = Microsoft.Maui.Controls.Application.Current;
         if (app is null) return;
         _initialized = true;
         app.RequestedThemeChanged += (_, _) => Apply();
         // Set up each page's overlay layer as it appears. Doing it on first use instead would
         // re-parent the page content under the user's finger (Android drops the scroll position).
-        app.PageAppearing += (_, page) => page.Dispatcher.Dispatch(() => ShellPortal.GetLayer(page));
+        // Android starts a new activity, with unthemed bars, when the app is reopened after Back.
+        app.PageAppearing += (_, page) => page.Dispatcher.Dispatch(() =>
+        {
+            ShellPortal.GetLayer(page);
+            if (SyncSystemBars) ApplySystemBars(retries: 0);
+        });
         Apply();
     }
 
     // Re-publishes the active palette. Call after editing Light/Dark at runtime.
     public static void Apply()
     {
-        var app = Application.Current;
+        var app = Microsoft.Maui.Controls.Application.Current;
         if (app is null) return;
         foreach (var (token, color) in IsDarkMode ? Dark : Light)
         {
@@ -169,7 +174,7 @@ public static class ShellTheme
         {
             // No activity yet (theme applied from App's constructor): try again shortly.
             if (retries > 0)
-                Application.Current?.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(200), () => ApplySystemBars(retries - 1));
+                Microsoft.Maui.Controls.Application.Current?.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(200), () => ApplySystemBars(retries - 1));
             return;
         }
 #pragma warning disable CA1422 // Android 15+ draws edge-to-edge and ignores these; older versions need them.
@@ -186,7 +191,7 @@ public static class ShellTheme
 
     public static void SetTheme(AppTheme theme)
     {
-        if (Application.Current is not { } app) return;
+        if (Microsoft.Maui.Controls.Application.Current is not { } app) return;
         EnsureInitialized();
         app.UserAppTheme = theme;
         Apply();
@@ -218,6 +223,32 @@ public static class ShellPlatform
         view.HandlerChanged += (_, _) => Strip(view, keepPadding);
         Strip(view, keepPadding);
     }
+
+    /* Android wraps a view (InputTransparent, Shadow, Clip) after its handler has applied the
+       view's translation, scale and rotation to the view itself. Later changes move only the
+       wrapper, so the inner view keeps the first values: an icon stuck at half size, an indicator
+       offset by where it first was. Call once for a view that is moved, scaled or turned. */
+    public static void KeepTransformsOnWrapper(View view)
+    {
+#if ANDROID
+        view.HandlerChanged += (_, _) =>
+        {
+            if (view.Handler is not { ContainerView: not null, PlatformView: Android.Views.View inner } handler) return;
+            inner.TranslationX = inner.TranslationY = 0;
+            inner.ScaleX = inner.ScaleY = 1;
+            inner.Rotation = inner.RotationX = inner.RotationY = 0;
+            foreach (var property in Transforms) handler.UpdateValue(property);
+        };
+#endif
+    }
+
+#if ANDROID
+    private static readonly string[] Transforms =
+    [
+        nameof(IView.TranslationX), nameof(IView.TranslationY), nameof(IView.Scale), nameof(IView.ScaleX), nameof(IView.ScaleY),
+        nameof(IView.Rotation), nameof(IView.RotationX), nameof(IView.RotationY), nameof(IView.AnchorX), nameof(IView.AnchorY)
+    ];
+#endif
 
     private static void Strip(View view, bool keepPadding)
     {
@@ -457,7 +488,7 @@ public static class ShellPortal
             if (e is ContentPage found) return found;
 
         // Not in a tree (e.g. Toast.Show from a view model): use the page on screen.
-        var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+        var page = Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page;
         while (true)
         {
             switch (page)
@@ -758,7 +789,7 @@ public static class ShellDismiss
 
     private static void Hook()
     {
-        if (Application.Current is not { } app) return;
+        if (Microsoft.Maui.Controls.Application.Current is not { } app) return;
         foreach (var window in app.Windows)
         {
             if (window.Handler?.PlatformView is not Microsoft.UI.Xaml.Window { Content: { } root }) continue;

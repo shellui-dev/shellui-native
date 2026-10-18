@@ -61,6 +61,7 @@ In code, bind any Color/Brush property to a token with the `Token` extension:
 `EnsureInitialized()` to make the status and navigation bars follow the theme: the bars turn
 transparent over the edge-to-edge page, the page layer draws a `Background`-colored strip behind
 the status bar (so dialog backdrops and sheets cover it), and the bar icons flip with light/dark.
+A new activity (the app reopened after Back) gets the same bars when its first page appears.
 Also set `colorPrimary` / `colorPrimaryDark` in `Platforms/Android/Resources/values/colors.xml` to
 your background so the splash-to-app transition doesn't flash the template's purple.
 

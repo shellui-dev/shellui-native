@@ -329,6 +329,7 @@ public partial class Icon : ContentView
         HorizontalOptions = LayoutOptions.Center;
         VerticalOptions = LayoutOptions.Center;
         InputTransparent = true;
+        ShellPlatform.KeepTransformsOnWrapper(this);
         UpdateGeometry();
         UpdateColor();
     }

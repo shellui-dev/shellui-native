@@ -144,6 +144,7 @@ public partial class BottomNav : ContentView
     public BottomNav()
     {
         _indicator = new Border { StrokeThickness = 0, Opacity = 0, InputTransparent = true, HorizontalOptions = LayoutOptions.Start };
+        ShellPlatform.KeepTransformsOnWrapper(_indicator);
         _layer.Children.Add(_indicator);
         _layer.Children.Add(_row);
 
@@ -552,6 +553,9 @@ public partial class BottomNavItem : ContentView
         _badge.Token(VisualElement.BackgroundColorProperty, ShellToken.Destructive);
         _badge.Token(Border.StrokeProperty, ShellToken.Background);
         _iconHost = new Grid { Children = { _pill, _circle, _glyph, _badge }, InputTransparent = true };
+        ShellPlatform.KeepTransformsOnWrapper(_glyph);
+        ShellPlatform.KeepTransformsOnWrapper(_circle);
+        ShellPlatform.KeepTransformsOnWrapper(_iconHost);
 
         _label = new Label
         {
