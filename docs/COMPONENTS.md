@@ -57,6 +57,28 @@ ShellTheme.Apply();
 In code, bind any Color/Brush property to a token with the `Token` extension:
 `myBorder.Token(Border.StrokeProperty, ShellToken.Border);`
 
+It works on any element, including the spans of mixed text, so their colors change with the
+theme (reading `ShellTheme.Get(...)` instead gives a color that stays put until the view is
+rebuilt):
+
+```csharp
+label.FormattedText = new FormattedString
+{
+    Spans =
+    {
+        new Span { Text = "Card declined" }.Token(Span.TextColorProperty, ShellToken.Foreground),
+        new Span { Text = " · 2 min ago" }.Token(Span.TextColorProperty, ShellToken.MutedForeground)
+    }
+};
+// Avalonia: new Run(" · 2 min ago").Token(Run.ForegroundProperty, ShellToken.MutedForeground)
+```
+
+**The page layer.** Overlays (dialogs, sheets, popups, toasts) draw in a layer above the page:
+the page's content is wrapped in a Grid, once, with the layer as its last child. This happens as
+the page joins the app, before its views load, so they get a single `Loaded`. A page whose
+content is set later (after it was pushed or shown) is wrapped as it appears, which unloads and
+loads its views once; set `Content` in the constructor to avoid that.
+
 **Android system bars (opt-in).** Set `ShellTheme.SyncSystemBars = true` before
 `EnsureInitialized()` to make the status and navigation bars follow the theme: the bars turn
 transparent over the edge-to-edge page, the page layer draws a `Background`-colored strip behind
@@ -168,7 +190,7 @@ Same names, properties and variants as MAUI, except:
 
 Stroke icons from [ShellIcons](../../../icons/shell-icons) (Lucide 0.475.0 — the set ShellUI
 uses), drawn with MAUI shapes: no icon font or package, crisp at any size, theme-aware. The
-template ships a curated set of ~110 icons with exact Lucide names (`trash-2` → `Trash2`).
+template ships a curated set of ~114 icons with exact Lucide names (`trash-2` → `Trash2`).
 To include more, add their names to `ICONS` in `scripts/generate-icons.py`, then run it and
 `scripts/sync-templates.py`.
 
@@ -200,7 +222,7 @@ content (set `HorizontalOptions="Fill"` for a full-width button).
 shellui-native add button
 ```
 
-**Variants:** Default, Secondary, Outline, Destructive, Ghost, Link · **Sizes:** Sm (36), Default (40), Lg (44), Icon (40×40)
+**Variants:** Default, Secondary, Outline, Destructive, Ghost, Link · **Sizes:** Sm (36), Default (40), Lg (44), Icon (40×40), Inline (no height or padding)
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -217,6 +239,16 @@ shellui-native add button
 <ui:Button Text="New item" Icon="Plus" />
 <ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" />
 <ui:Button Icon="Settings" Size="Icon" Variant="Ghost" />
+```
+
+`Size="Inline"` (shadcn's `h-auto p-0`) is for a `Link` button inside a line of text or at a
+card's edge, where the usual padding would push it in:
+
+```xml
+<HorizontalStackLayout Spacing="4">
+    <Label Text="Already have an account?" />
+    <ui:Button Text="Sign in" Variant="Link" Size="Inline" />
+</HorizontalStackLayout>
 ```
 
 **Events:** `Clicked`. On Windows buttons are keyboard tab stops (Enter/Space activate).
@@ -301,7 +333,8 @@ shellui-native add input
 |----------|------|---------|-------------|
 | Text | string | "" | Value (two-way) |
 | Placeholder | string | "" | Placeholder text |
-| IsPassword | bool | false | Mask input |
+| Variant | InputVariant | Default | `Password`: masked, with an eye button that shows the text |
+| IsPassword | bool | false | Mask input, without the eye button |
 | HasError | bool | false | Error state |
 | IsReadOnly | bool | false | Prevent editing |
 | MaxLength | int | int.MaxValue | Maximum characters |
@@ -309,9 +342,14 @@ shellui-native add input
 
 ```xml
 <ui:Input Placeholder="you@example.com" Keyboard="Email" Text="{Binding Email}" />
-<ui:Input Placeholder="Password" IsPassword="True" />
+<ui:Input Placeholder="Password" Variant="Password" />
 <ui:Input Text="taken-name" HasError="True" />
 ```
+
+`Variant="Password"` is a password field with a show / hide button: a ghost icon button inside
+the field (`Eye` / `EyeOff`, named "Show password" / "Hide password" for screen readers, a tab
+stop). Pressing it keeps the field focused, and the text is masked again when the variant changes.
+For a masked field without the button, set `IsPassword`.
 
 **Events:** `TextChanged`, `Completed`
 
@@ -322,16 +360,18 @@ An input with something before or after the text, inside the same border: an ico
 text, or any view. Same height, focus ring and error state as `Input`.
 
 ```bash
-shellui-native add input-group
+shellui-native add input-group   # also installs input (for InputVariant)
 ```
 
-**Properties:** `Text` (two-way), `Placeholder`, `IsPassword`, `HasError`, `Keyboard` (MAUI),
+**Properties:** `Text` (two-way), `Placeholder`, `IsPassword`, `Variant` (`Password`: masked, with
+an eye button after the suffix, as on `Input`), `HasError`, `Keyboard` (MAUI),
 `PrefixIcon`, `SuffixIcon`, `PrefixText`, `SuffixText`, `Prefix`, `Suffix` (a view; replaces the
 icon and text on that side) · **Events:** `TextChanged`, `Completed` · **Methods:** `Focus()`
 
 ```xml
 <ui:InputGroup PrefixIcon="Search" Placeholder="Search..." />
 <ui:InputGroup PrefixText="https://" SuffixText=".com" Placeholder="example" />
+<ui:InputGroup PrefixIcon="Lock" Placeholder="Password" Variant="Password" />
 <ui:InputGroup Placeholder="you@example.com">
     <ui:InputGroup.Suffix>
         <ui:Badge Text="Required" Variant="Secondary" />
@@ -774,7 +814,9 @@ shellui-native add card   # also installs card-header, card-content, card-footer
 ```
 
 **Properties (Card):** `Variant` (Default, Elevated), `IsPressable` · **Events:** `Clicked` (when pressable)
-**CardHeader:** `Title`, `Description` · **CardContent:** any content · **CardFooter:** actions, right-aligned
+**CardHeader:** `Title`, `Description`, `Action` (a view at the top right, shadcn's `CardAction`),
+and views inside it, which sit on the title's line (badges, a count) and wrap under it when
+there is no room · **CardContent:** any content · **CardFooter:** actions, right-aligned
 
 ```xml
 <ui:Card WidthRequest="380" HorizontalOptions="Start">
@@ -784,6 +826,16 @@ shellui-native add card   # also installs card-header, card-content, card-footer
         <ui:Button Text="Cancel" Variant="Outline" />
         <ui:Button Text="Deploy" />
     </ui:CardFooter>
+</ui:Card>
+
+<ui:Card>
+    <ui:CardHeader Title="Needs review" Description="Orders waiting for approval.">
+        <ui:Badge Text="2" Variant="Destructive" />
+        <ui:CardHeader.Action>
+            <ui:Button Text="Export" Icon="Download" Variant="Outline" Size="Sm" />
+        </ui:CardHeader.Action>
+    </ui:CardHeader>
+    ...
 </ui:Card>
 ```
 
@@ -1282,14 +1334,24 @@ Dashboard metric: a muted title with an optional icon, the value in large bold t
 pill tinted by trend, and an optional description.
 
 ```bash
-shellui-native add stat-card
+shellui-native add stat-card   # also installs skeleton
 ```
 
-**Properties:** `Title`, `Value`, `Change`, `Trend` (Neutral, Up, Down), `Description`, `Icon`
+**Properties:** `Title`, `Value`, `Change`, `Trend` (Neutral, Up, Down), `Description`, `Icon`,
+`ValueTone` (Default, Success, Warning, Destructive: tints the value), `IsLoading` (skeletons in
+place of the value and description), `Size` (Default, or Sm: p-4 and a smaller value, for six
+tiles to a row)
+
+A long value wraps, and the change pill drops under it instead of being cut off at the card's
+edge.
 
 ```xml
 <ui:StatCard Title="Total revenue" Value="$45,231.89" Change="+20.1%" Trend="Up"
              Icon="DollarSign" Description="from last month" />
+<ui:StatCard Title="Last backup" Value="Backup failed" ValueTone="Destructive"
+             Change="Action needed" Trend="Down" />
+<ui:StatCard Title="Queue" Value="{Binding Count}" IsLoading="{Binding IsBusy}" />
+<ui:StatCard Title="Failed" Value="3" ValueTone="Destructive" Size="Sm" />
 ```
 
 ### Timeline
@@ -1373,7 +1435,8 @@ table as it changes), `ShowFilter` (true), `FilterPlaceholder`, `Filter` (the fi
 **Properties (DataTableColumn):** `Header`, `Property` (the item property to show), `Format` (a
 .NET format string such as `C` or `MMM d, yyyy`), `Width` (`*`, `2*` or a fixed number),
 `IsSortable` (true), `IsBold`, `HorizontalTextAlignment`, `Value` (a function that reads the
-value; set in code, replaces `Property`)
+value; set in code, replaces `Property`), `Cell` (a function that draws the cell as any view; set
+in code, replaces the text)
 
 ```xml
 <ui:DataTable ItemsSource="{Binding Invoices}" ShowSelection="True" PageSize="5">
@@ -1385,8 +1448,21 @@ value; set in code, replaces `Property`)
 
 The filter matches every typed word against the text of any column. A sortable header cycles
 ascending, descending and unsorted; numbers and dates sort by value. The header checkbox selects
-every row that passes the filter, across pages. Cells show text only: for badges or buttons in
-cells, build the rows yourself with `Table`.
+every row that passes the filter, across pages.
+
+For a link, a badge or a formatted amount in a cell, set the column's `Cell` (the counterpart of
+ShellUI's `CellTemplate`). The filter and sorting still use `Property` or `Value`, so keep one
+set. Set `Cell` before `ItemsSource`, or call `Refresh()` after:
+
+```csharp
+InvoiceTable.Columns[1].Cell = item => new Badge
+{
+    Text = ((Invoice)item).Status,
+    Variant = ((Invoice)item).Status == "Paid" ? BadgeVariant.Success : BadgeVariant.Warning,
+    HorizontalOptions = LayoutOptions.Start   // Avalonia: HorizontalAlignment = HorizontalAlignment.Left
+};
+InvoiceTable.ItemsSource = invoices;
+```
 
 `Property` is read by name at run time. In an app published with trimming or NativeAOT, set
 `Value` in code instead, so the property is not trimmed away:
@@ -1722,6 +1798,22 @@ shellui-native add sheet
         </ui:DialogFooter>
     </ui:DialogContent>
 </ui:Dialog>
+```
+
+A sheet has the same parts: `SheetHeader` (title and description stack), `SheetTitle`,
+`SheetDescription` and `SheetFooter` (actions on the right), installed with `sheet`:
+
+```xml
+<ui:Sheet x:Name="InvoiceSheet">
+    <ui:SheetContent MaxPanelWidth="672">
+        <ui:SheetHeader>
+            <ui:SheetTitle Text="Order #1042" />
+            <ui:SheetDescription Text="On hold: the card was declined." />
+        </ui:SheetHeader>
+        ...
+        <ui:SheetFooter><ui:Button Text="Retry payment" /></ui:SheetFooter>
+    </ui:SheetContent>
+</ui:Sheet>
 ```
 
 `DialogTrigger` / `DrawerTrigger` / `SheetTrigger` and `DialogClose` wrap a Button or any view.

@@ -223,6 +223,7 @@ Icons: `python scripts/generate-icons.py` regenerates `Icon.cs` from the ShellIc
 | **blocks** ✅ | — | Done 2026-10-16, MAUI and Avalonia — numbered presets like ShellUI's `dashboard-01`, installed to `Components/Blocks`: `bottom-nav-01`…`05`, `edge-menu-01` |
 | **edge-menu** ✅ | — | Done 2026-10-16, MAUI and Avalonia — native only: a handle on a screen edge slides out a rail of tool tiles; Default / Solid, left or right, optional dimming |
 | **bottom-nav** ✅ | — | Done 2026-10-16, MAUI and Avalonia — native only (ShellUI for Blazor has none): Default, Pill, Floating, Lifted and Expanding styles, badges and dots, a raised action button, avatar items, hide on scroll, the safe area under the bar |
+| **Slots and states** ✅ | — | Done 2026-10-18, MAUI and Avalonia — `DataTableColumn.Cell` (views in cells), `ButtonSize.Inline`, `SheetHeader` / `SheetTitle` / `SheetDescription` / `SheetFooter`, `CardHeader.Action` and title-line items, `StatCard.ValueTone` / `IsLoading` / `Size` and a wrapping value row, `Variant="Password"` (show / hide button) on input and input-group, `Receipt` / `ListChecks` / `CalendarClock` / `KeyRound` icons, theme tokens on spans, and (MAUI) the page layer set up before a page's views load |
 
 ---
 
