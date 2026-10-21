@@ -5,6 +5,7 @@ namespace MAUI.Demo.Components.UI;
 // Text input — h-10 rounded-md border border-input px-3 text-sm.
 // Focus: border-ring + soft ring glow. Error: border-destructive.
 // The native Entry's own frame is stripped so this Border is the only chrome.
+// Variant="Password" masks the text and adds an eye button that shows it; IsPassword only masks.
 public partial class Input : ContentView
 {
     public static readonly BindableProperty TextProperty =
@@ -17,7 +18,11 @@ public partial class Input : ContentView
 
     public static readonly BindableProperty IsPasswordProperty =
         BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(Input),
-            false, propertyChanged: (b, o, n) => ((Input)b)._entry.IsPassword = (bool)n);
+            false, propertyChanged: (b, o, n) => ((Input)b).UpdatePassword());
+
+    public static readonly BindableProperty VariantProperty =
+        BindableProperty.Create(nameof(Variant), typeof(InputVariant), typeof(Input), InputVariant.Default,
+            propertyChanged: (b, o, n) => ((Input)b).UpdatePassword());
 
     public static readonly BindableProperty HasErrorProperty =
         BindableProperty.Create(nameof(HasError), typeof(bool), typeof(Input),
@@ -37,7 +42,10 @@ public partial class Input : ContentView
 
     private readonly Entry _entry;
     private readonly Border _border;
+    private readonly Border _reveal;
+    private readonly Icon _revealIcon;
     private bool _isFocused;
+    private bool _revealed;
 
     public string Text
     {
@@ -55,6 +63,12 @@ public partial class Input : ContentView
     {
         get => (bool)GetValue(IsPasswordProperty);
         set => SetValue(IsPasswordProperty, value);
+    }
+
+    public InputVariant Variant
+    {
+        get => (InputVariant)GetValue(VariantProperty);
+        set => SetValue(VariantProperty, value);
     }
 
     public bool HasError
@@ -108,9 +122,17 @@ public partial class Input : ContentView
         _entry.Focused += (s, e) => { _isFocused = true; UpdateVisualState(); };
         _entry.Unfocused += (s, e) => { _isFocused = false; UpdateVisualState(); };
 
+        (_reveal, _revealIcon) = CreateRevealButton();
+        var row = new Grid
+        {
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) }
+        };
+        row.Add(_entry, 0, 0);
+        row.Add(_reveal, 1, 0);
+
         _border = new Border
         {
-            Content = _entry,
+            Content = row,
             Padding = new Thickness(12, 0),
             HeightRequest = 40,
             StrokeThickness = 1,
@@ -125,6 +147,50 @@ public partial class Input : ContentView
 
         Content = _border;
         UpdateVisualState();
+    }
+
+    // A ghost icon button, h-7 w-7, that pulls into the padding a little.
+    private (Border, Icon) CreateRevealButton()
+    {
+        var icon = new Icon { Name = IconName.Eye, Size = 16, Token = ShellToken.MutedForeground };
+        var button = new Border
+        {
+            Content = icon,
+            WidthRequest = 28,
+            HeightRequest = 28,
+            StrokeThickness = 0,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusSm },
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.Center,
+            Margin = new Thickness(4, 0, -6, 0),
+            IsVisible = false
+        };
+        SemanticProperties.SetDescription(button, "Show password");
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => button.Token(VisualElement.BackgroundColorProperty, ShellToken.Accent);
+        pointer.PointerExited += (_, _) => { button.ClearValue(VisualElement.BackgroundColorProperty); button.BackgroundColor = Colors.Transparent; };
+        button.GestureRecognizers.Add(pointer);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => ToggleReveal();
+        button.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(button, ToggleReveal);
+        return (button, icon);
+    }
+
+    private void ToggleReveal()
+    {
+        _revealed = !_revealed;
+        UpdatePassword();
+    }
+
+    private void UpdatePassword()
+    {
+        var password = Variant == InputVariant.Password;
+        if (!password) _revealed = false;
+        _entry.IsPassword = (IsPassword || password) && !_revealed;
+        _reveal.IsVisible = password;
+        _revealIcon.Name = _revealed ? IconName.EyeOff : IconName.Eye;
+        SemanticProperties.SetDescription(_reveal, _revealed ? "Hide password" : "Show password");
     }
 
     private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
@@ -158,3 +224,6 @@ public partial class Input : ContentView
     public new void Focus() => _entry.Focus();
     public new void Unfocus() => _entry.Unfocus();
 }
+
+// Password masks the text and shows an eye button that reveals it.
+public enum InputVariant { Default, Password }

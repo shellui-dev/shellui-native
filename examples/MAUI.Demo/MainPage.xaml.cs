@@ -9,6 +9,14 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+        // The status column draws a badge; sorting and the filter still use Property.
+        DataTableDemo.Columns[2].Cell = item => new Badge
+        {
+            Text = ((DemoInvoice)item).Status,
+            Variant = ((DemoInvoice)item).Status switch { "Paid" => BadgeVariant.Success, "Pending" => BadgeVariant.Warning, _ => BadgeVariant.Destructive },
+            HorizontalOptions = LayoutOptions.Start,
+            VerticalOptions = LayoutOptions.Center
+        };
         DataTableDemo.ItemsSource = new List<DemoInvoice>
         {
             new DemoInvoice("INV001", "Shewart Shepherd", "Paid", 250.00m, new DateTime(2026, 9, 2)),
@@ -23,6 +31,15 @@ public partial class MainPage : ContentPage
             new DemoInvoice("INV010", "ShellUI Native", "Pending", 89.99m, new DateTime(2026, 10, 1)),
             new DemoInvoice("INV011", "Shewart Shepherd", "Unpaid", 640.00m, new DateTime(2026, 10, 4)),
             new DemoInvoice("INV012", "ShellUI", "Paid", 310.25m, new DateTime(2026, 10, 8)),
+        };
+        // Spans take theme tokens like any element, so they follow the theme when it changes.
+        RichTextLabel.FormattedText = new FormattedString
+        {
+            Spans =
+            {
+                new Span { Text = "Order #1042 is on hold: card declined" }.Token(Span.TextColorProperty, ShellToken.Foreground),
+                new Span { Text = " · 2 min ago" }.Token(Span.TextColorProperty, ShellToken.MutedForeground)
+            }
         };
         CountrySelect.ItemsSource = new List<string> { "United States", "Canada", "United Kingdom", "Germany", "Japan" };
         TagsInput.Tags = new List<string> { "maui", "design-system" };

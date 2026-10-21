@@ -11,7 +11,7 @@ public static class SheetTemplate
         Description = "Bottom/top sheet overlay - use with SheetTrigger and SheetContent",
         Category = ComponentCategory.Overlay,
         FilePath = "Sheet.cs",
-        Dependencies = new List<string> { "shell", "sheet-trigger", "sheet-content" },
+        Dependencies = new List<string> { "shell", "sheet-trigger", "sheet-content", "sheet-header", "sheet-footer", "sheet-title", "sheet-description" },
         Variants = new List<string> { "bottom", "top", "left", "right" },
         Tags = new List<string> { "overlay", "sheet", "panel" }
     };

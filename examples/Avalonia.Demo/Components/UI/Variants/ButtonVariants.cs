@@ -17,7 +17,9 @@ public enum ButtonSize
     Default,
     Sm,
     Lg,
-    Icon
+    Icon,
+    // No height or padding: a Link button that sits in a line of text or at a card's edge (h-auto p-0).
+    Inline
 }
 
 // Token-based style for one variant + size. Null background/border = transparent.
@@ -92,6 +94,10 @@ public static class ButtonVariants
             case ButtonSize.Icon:            // h-10 w-10
                 style.Height = 40;
                 style.Width = 40;
+                style.Padding = new Thickness(0);
+                break;
+            case ButtonSize.Inline:          // h-auto p-0
+                style.Height = double.NaN;
                 style.Padding = new Thickness(0);
                 break;
         }

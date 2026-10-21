@@ -16,6 +16,8 @@ namespace MAUI.Demo.Components.UI;
 //   </ui:DataTable>
 // A column reads its Property from each item by name. With trimming or NativeAOT, set the
 // column's Value in code instead: column.Value = item => ((Invoice)item).Number;
+// For a view in a cell (a badge, a link), set Cell in code:
+//   column.Cell = item => new Badge { Text = ((Invoice)item).Status };   (before ItemsSource)
 [ContentProperty(nameof(Columns))]
 public partial class DataTable : ContentView
 {
@@ -290,7 +292,9 @@ public partial class DataTable : ContentView
             }
             _rowViews.Add((item, row, check));
             foreach (var column in _columns)
-                row.Children.Add(new TableCell { Text = column.Text(item), IsBold = column.IsBold, HorizontalTextAlignment = column.HorizontalTextAlignment });
+                row.Children.Add(column.Cell is { } cell
+                    ? new TableCell { Content = cell(item) }
+                    : new TableCell { Text = column.Text(item), IsBold = column.IsBold, HorizontalTextAlignment = column.HorizontalTextAlignment });
             _table.Rows.Add(row);
         }
 
@@ -414,6 +418,11 @@ public partial class DataTableColumn
 
     // Reads the column's value from an item; replaces Property.
     public Func<object, object?>? Value { get; set; }
+
+    // Draws the cell as any view (a link, a badge, an amount); replaces the text. Filter and sort
+    // still use Value or Property, so set one of them for a column that sorts or is searched. Set it
+    // before ItemsSource, or call Refresh() after.
+    public Func<object, View>? Cell { get; set; }
 
     // A .NET format string for the value, e.g. "C" or "MMM d, yyyy".
     public string? Format { get; set; }

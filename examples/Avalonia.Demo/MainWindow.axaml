@@ -52,6 +52,10 @@
                 <ui:Button x:Name="LoadingButton" Text="Save" />
                 <ui:Button Text="Disabled" IsEnabled="False" />
             </WrapPanel>
+            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,8,0,0">
+                <TextBlock Classes="hint" Text="Already have an account?" Margin="0" VerticalAlignment="Center" />
+                <ui:Button x:Name="InlineLink" Text="Sign in" Variant="Link" Size="Inline" VerticalAlignment="Center" />
+            </StackPanel>
             <TextBlock x:Name="ClickCount" Classes="hint" Margin="0,8,0,0" Text="Click Save to see the loading state." />
 
             <TextBlock Classes="title" Text="Form controls" />
@@ -59,7 +63,7 @@
             <StackPanel Spacing="12" Width="360" HorizontalAlignment="Left">
                 <ui:ShellLabel Text="Email" Size="Sm" Weight="Medium" />
                 <ui:Input Placeholder="you@example.com" />
-                <ui:Input Placeholder="Password" IsPassword="True" />
+                <ui:Input x:Name="RevealInput" Placeholder="Password" Text="hunter2" Variant="Password" />
                 <ui:Input Text="Invalid value" HasError="True" />
                 <ui:Checkbox Label="Accept terms and conditions" />
                 <ui:Checkbox Label="Required" HasError="True" />
@@ -105,6 +109,18 @@
                     <ui:CardHeader Title="Elevated" Description="A larger shadow for cards that float." />
                     <ui:CardContent>
                         <ui:ShellLabel Text="Body text in the card." Size="Sm" Variant="Muted" />
+                    </ui:CardContent>
+                </ui:Card>
+                <ui:Card x:Name="ActionCard" Width="380">
+                    <ui:CardHeader Title="Needs review" Description="Orders waiting for approval.">
+                        <ui:Badge Text="2" Variant="Destructive" />
+                        <ui:Badge Text="Today" Variant="Outline" />
+                        <ui:CardHeader.Action>
+                            <ui:Button Text="Export" Icon="Download" Variant="Outline" Size="Sm" />
+                        </ui:CardHeader.Action>
+                    </ui:CardHeader>
+                    <ui:CardContent>
+                        <TextBlock x:Name="RichText" FontSize="14" TextWrapping="Wrap" />
                     </ui:CardContent>
                 </ui:Card>
             </WrapPanel>
@@ -173,10 +189,15 @@
                 <ui:Sheet x:Name="DemoSheet">
                     <ui:SheetTrigger><ui:Button x:Name="OpenSheet" Text="Open sheet" Variant="Outline" /></ui:SheetTrigger>
                     <ui:SheetContent>
-                        <ui:DialogTitle Text="Settings" />
-                        <ui:DialogDescription Text="Adjust your preferences." />
+                        <ui:SheetHeader>
+                            <ui:SheetTitle Text="Settings" />
+                            <ui:SheetDescription Text="Adjust your preferences." />
+                        </ui:SheetHeader>
                         <ui:Switch Label="Notifications" IsToggled="True" />
                         <ui:Switch Label="Airplane mode" />
+                        <ui:SheetFooter>
+                            <ui:Button x:Name="SheetSave" Text="Save changes" />
+                        </ui:SheetFooter>
                     </ui:SheetContent>
                 </ui:Sheet>
 
@@ -478,6 +499,16 @@
                 <ui:StatCard Title="Churn" Value="2.4%" Change="-0.6%" Trend="Down" Icon="Users"
                              Description="from last month" Width="230" />
                 <ui:StatCard Title="Active now" Value="573" Change="steady" Icon="Activity" Width="230" />
+                <ui:StatCard Title="Last backup" Value="Backup failed" ValueTone="Destructive" Change="Action needed" Trend="Down"
+                             Icon="CalendarClock" Description="ValueTone tints the value; the pill wraps" Width="230" />
+                <ui:StatCard x:Name="LoadingStat" Title="Queue" Value="12" IsLoading="True" Icon="ListChecks"
+                             Description="waiting to be sent" Width="230" />
+            </ui:WrapLayout>
+            <ui:WrapLayout Spacing="8" LineSpacing="8" Margin="0,8,0,0">
+                <ui:StatCard Title="Sent" Value="1,204" Size="Sm" ValueTone="Success" Width="140" />
+                <ui:StatCard Title="Pending" Value="18" Size="Sm" ValueTone="Warning" Width="140" />
+                <ui:StatCard Title="Failed" Value="3" Size="Sm" ValueTone="Destructive" Width="140" />
+                <ui:StatCard Title="Receipts" Value="96" Size="Sm" Icon="Receipt" Width="140" />
             </ui:WrapLayout>
             <StackPanel Spacing="12" Width="420" HorizontalAlignment="Left" Margin="0,12,0,0">
                 <ui:LinkCard x:Name="DocsCard" Title="Documentation" Description="Guides, theming and the full component reference."
@@ -785,6 +816,7 @@
             <StackPanel Spacing="8" Width="360" HorizontalAlignment="Left" Margin="0,12,0,0">
                 <ui:InputGroup x:Name="DemoInputSearch" PrefixIcon="Search" Placeholder="Search components..." />
                 <ui:InputGroup x:Name="DemoInputUrl" PrefixText="https://" SuffixText=".com" Placeholder="example" />
+                <ui:InputGroup x:Name="RevealGroup" PrefixIcon="Lock" Placeholder="Password" Text="correct horse" Variant="Password" />
                 <ui:InputGroup PrefixIcon="Mail" Placeholder="you@example.com">
                     <ui:InputGroup.Suffix>
                         <ui:Badge Text="Required" Variant="Secondary" />

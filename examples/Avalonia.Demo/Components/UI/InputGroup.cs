@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -15,6 +16,7 @@ namespace AvaloniaDemo.Components.UI;
 //   <ui:InputGroup Placeholder="Amount">
 //       <ui:InputGroup.Suffix> ...any control... </ui:InputGroup.Suffix>
 //   </ui:InputGroup>
+// Variant="Password" masks the text and adds an eye button after the suffix that shows it; IsPassword only masks.
 public class InputGroup : Border
 {
     public static readonly StyledProperty<string?> TextProperty =
@@ -25,6 +27,9 @@ public class InputGroup : Border
 
     public static readonly StyledProperty<bool> IsPasswordProperty =
         AvaloniaProperty.Register<InputGroup, bool>(nameof(IsPassword));
+
+    public static readonly StyledProperty<InputVariant> VariantProperty =
+        AvaloniaProperty.Register<InputGroup, InputVariant>(nameof(Variant));
 
     public static readonly StyledProperty<bool> HasErrorProperty =
         AvaloniaProperty.Register<InputGroup, bool>(nameof(HasError));
@@ -50,6 +55,9 @@ public class InputGroup : Border
         AvaloniaProperty.Register<InputGroup, Control?>(nameof(Suffix));
 
     private readonly TextBox _textBox;
+    private readonly Border _reveal;
+    private readonly Icon _revealIcon;
+    private bool _revealed;
     private readonly Border _prefix = new() { VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
     private readonly Border _suffix = new() { VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
     private bool _isFocused;
@@ -61,7 +69,8 @@ public class InputGroup : Border
             if (g._textBox.Text != (string?)e.NewValue) g._textBox.Text = (string?)e.NewValue;
         });
         PlaceholderProperty.Changed.AddClassHandler<InputGroup>((g, e) => g._textBox.PlaceholderText = (string?)e.NewValue);
-        IsPasswordProperty.Changed.AddClassHandler<InputGroup>((g, e) => g._textBox.PasswordChar = (bool)e.NewValue! ? '•' : default);
+        IsPasswordProperty.Changed.AddClassHandler<InputGroup>((g, _) => g.UpdatePassword());
+        VariantProperty.Changed.AddClassHandler<InputGroup>((g, _) => g.UpdatePassword());
         HasErrorProperty.Changed.AddClassHandler<InputGroup>((g, _) => g.UpdateVisualState());
         IsEnabledProperty.Changed.AddClassHandler<InputGroup>((g, _) => g.Opacity = g.IsEnabled ? 1.0 : 0.5);
         PrefixIconProperty.Changed.AddClassHandler<InputGroup>((g, _) => g.UpdateSlots());
@@ -88,6 +97,12 @@ public class InputGroup : Border
     {
         get => GetValue(IsPasswordProperty);
         set => SetValue(IsPasswordProperty, value);
+    }
+
+    public InputVariant Variant
+    {
+        get => GetValue(VariantProperty);
+        set => SetValue(VariantProperty, value);
     }
 
     public bool HasError
@@ -160,11 +175,13 @@ public class InputGroup : Border
 
         Grid.SetColumn(_textBox, 1);
         Grid.SetColumn(_suffix, 2);
+        (_reveal, _revealIcon) = CreateRevealButton();
+        Grid.SetColumn(_reveal, 3);
         Child = new Grid
         {
-            ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto"),
+            ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto,Auto"),
             ColumnSpacing = 8,
-            Children = { _prefix, _textBox, _suffix }
+            Children = { _prefix, _textBox, _suffix, _reveal }
         };
         Height = 40;
         Padding = new Thickness(12, 0);
@@ -223,6 +240,58 @@ public class InputGroup : Border
             row.Children.Add(label);
         }
         return row;
+    }
+
+    // A ghost icon button, h-7 w-7, that pulls into the padding a little.
+    private (Border, Icon) CreateRevealButton()
+    {
+        var icon = new Icon { Kind = IconName.Eye, Size = 16, Token = ShellToken.MutedForeground };
+        var button = new Border
+        {
+            Child = icon,
+            Width = 28,
+            Height = 28,
+            CornerRadius = new CornerRadius(ShellTheme.RadiusSm),
+            Background = Brushes.Transparent,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(-4, 0, -6, 0),
+            Cursor = new Cursor(StandardCursorType.Hand),
+            IsVisible = false
+        };
+        AutomationProperties.SetName(button, "Show password");
+        button.PointerEntered += (_, _) => button.Token(BackgroundProperty, ShellToken.Accent);
+        button.PointerExited += (_, _) => { button.ClearToken(BackgroundProperty); button.Background = Brushes.Transparent; };
+        // Handled, so the press neither focuses the button nor leaves the text box.
+        button.PointerPressed += (_, e) =>
+        {
+            ToggleReveal();
+            _textBox.Focus();
+            e.Handled = true;
+        };
+        ShellFocus.Ring(button, button);
+        button.KeyDown += (_, e) =>
+        {
+            if (e.Key is not (Key.Enter or Key.Space)) return;
+            ToggleReveal();
+            e.Handled = true;
+        };
+        return (button, icon);
+    }
+
+    private void ToggleReveal()
+    {
+        _revealed = !_revealed;
+        UpdatePassword();
+    }
+
+    private void UpdatePassword()
+    {
+        var password = Variant == InputVariant.Password;
+        if (!password) _revealed = false;
+        _textBox.PasswordChar = (IsPassword || password) && !_revealed ? '•' : default;
+        _reveal.IsVisible = password;
+        _revealIcon.Kind = _revealed ? IconName.EyeOff : IconName.Eye;
+        AutomationProperties.SetName(_reveal, _revealed ? "Hide password" : "Show password");
     }
 
     private void UpdateVisualState()
