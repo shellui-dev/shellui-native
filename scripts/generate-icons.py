@@ -50,10 +50,10 @@ ICONS = [
     "info", "circle-alert", "circle-check", "circle-x", "circle-help", "triangle-alert", "ban",
     "loader", "loader-circle", "bell", "circle", "circle-plus", "dot",
     # people / account
-    "user", "users", "user-plus", "lock", "lock-open", "key", "shield", "eye", "eye-off",
+    "user", "users", "user-plus", "lock", "lock-open", "key", "key-round", "shield", "eye", "eye-off",
     # content / objects
-    "mail", "inbox", "archive", "message-circle", "phone", "calendar", "clock", "globe",
-    "map-pin", "image", "file", "file-text", "folder", "tag", "bookmark", "heart", "star",
+    "mail", "inbox", "archive", "message-circle", "phone", "calendar", "calendar-clock", "clock", "globe",
+    "map-pin", "image", "file", "file-text", "receipt", "list-checks", "folder", "tag", "bookmark", "heart", "star",
     "thumbs-up", "shopping-cart", "credit-card", "dollar-sign", "activity", "trending-up",
     "chart-column", "zap", "sparkles", "command", "terminal", "code", "moon", "sun", "monitor",
     "smartphone", "laptop", "wifi", "camera", "mic", "play", "pause", "volume-2", "lightbulb",
