@@ -11,7 +11,7 @@ public static class StatCardTemplate
         Description = "Dashboard metric with trend and description",
         Category = ComponentCategory.DataDisplay,
         FilePath = "StatCard.cs",
-        Dependencies = new List<string> { "shell", "icon" },
+        Dependencies = new List<string> { "shell", "icon", "skeleton" },
         Tags = new List<string> { "stat", "metric", "kpi", "dashboard" }
     };
 
@@ -25,6 +25,8 @@ namespace YourProjectNamespace.Components.UI;
 // value in text-2xl bold, a change pill tinted by trend, and an optional description.
 // Usage: <ui:StatCard Title=""Revenue"" Value=""$45,231"" Change=""+20.1%"" Trend=""Up"" Icon=""DollarSign""
 //                     Description=""from last month"" />
+// ValueTone tints the value (""Backup failed"" in red); a long value wraps and the pill drops under it.
+// IsLoading shows skeletons in place of the value and description; Size=""Sm"" fits six to a row.
 public partial class StatCard : ContentView
 {
     public static readonly BindableProperty TitleProperty =
@@ -49,6 +51,18 @@ public partial class StatCard : ContentView
 
     public static readonly BindableProperty IconProperty =
         BindableProperty.Create(nameof(Icon), typeof(IconName), typeof(StatCard), IconName.None,
+            propertyChanged: (b, o, n) => ((StatCard)b).Update());
+
+    public static readonly BindableProperty ValueToneProperty =
+        BindableProperty.Create(nameof(ValueTone), typeof(StatTone), typeof(StatCard), StatTone.Default,
+            propertyChanged: (b, o, n) => ((StatCard)b).Update());
+
+    public static readonly BindableProperty IsLoadingProperty =
+        BindableProperty.Create(nameof(IsLoading), typeof(bool), typeof(StatCard), false,
+            propertyChanged: (b, o, n) => ((StatCard)b).Update());
+
+    public static readonly BindableProperty SizeProperty =
+        BindableProperty.Create(nameof(Size), typeof(StatCardSize), typeof(StatCard), StatCardSize.Default,
             propertyChanged: (b, o, n) => ((StatCard)b).Update());
 
     public string Title
@@ -87,6 +101,28 @@ public partial class StatCard : ContentView
         set => SetValue(IconProperty, value);
     }
 
+    public StatTone ValueTone
+    {
+        get => (StatTone)GetValue(ValueToneProperty);
+        set => SetValue(ValueToneProperty, value);
+    }
+
+    public bool IsLoading
+    {
+        get => (bool)GetValue(IsLoadingProperty);
+        set => SetValue(IsLoadingProperty, value);
+    }
+
+    public StatCardSize Size
+    {
+        get => (StatCardSize)GetValue(SizeProperty);
+        set => SetValue(SizeProperty, value);
+    }
+
+    private readonly Border _card;
+    private readonly FlexLayout _valueRow;
+    private readonly Skeleton _valueSkeleton;
+    private readonly Skeleton _descriptionSkeleton;
     private readonly Label _title;
     private readonly Icon _icon;
     private readonly Label _value;
@@ -108,8 +144,8 @@ public partial class StatCard : ContentView
         header.Add(_title, 0, 0);
         header.Add(_icon, 1, 0);
 
-        _value = new Label { FontSize = 24, FontAttributes = FontAttributes.Bold, VerticalTextAlignment = TextAlignment.Center };
-        _value.Token(Label.TextColorProperty, ShellToken.CardForeground);
+        // FlexLayout has no gap: the value keeps 8 on its right, so the pill wraps under a long value.
+        _value = new Label { FontSize = 24, FontAttributes = FontAttributes.Bold, VerticalTextAlignment = TextAlignment.Center, LineBreakMode = LineBreakMode.WordWrap, Margin = new Thickness(0, 0, 8, 0) };
 
         // The pill is the trend color at low strength behind text in the full color.
         _pillTint = new BoxView { BackgroundColor = Colors.Transparent };
@@ -120,13 +156,23 @@ public partial class StatCard : ContentView
             StrokeThickness = 0,
             StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusMd },
             VerticalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 2),
             BackgroundColor = Colors.Transparent
         };
+        _valueRow = new FlexLayout
+        {
+            Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap,
+            AlignItems = Microsoft.Maui.Layouts.FlexAlignItems.Center,
+            Margin = new Thickness(0, 8, 0, 0),
+            Children = { _value, _pill }
+        };
+        _valueSkeleton = new Skeleton { WidthRequest = 96, HeightRequest = 28, HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(0, 10, 0, 2), IsVisible = false };
+        _descriptionSkeleton = new Skeleton { WidthRequest = 128, HeightRequest = 12, HorizontalOptions = LayoutOptions.Start, Margin = new Thickness(0, 6, 0, 0), IsVisible = false };
 
         _description = new Label { FontSize = 12 };
         _description.Token(Label.TextColorProperty, ShellToken.MutedForeground);
 
-        var card = new Border
+        _card = new Border
         {
             Content = new VerticalStackLayout
             {
@@ -134,17 +180,19 @@ public partial class StatCard : ContentView
                 Children =
                 {
                     header,
-                    new HorizontalStackLayout { Spacing = 8, Margin = new Thickness(0, 8, 0, 0), Children = { _value, _pill } },
-                    _description
+                    _valueRow,
+                    _valueSkeleton,
+                    _description,
+                    _descriptionSkeleton
                 }
             },
             Padding = new Thickness(20),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusLg }
         };
-        card.Token(VisualElement.BackgroundColorProperty, ShellToken.Card);
-        card.Token(Border.StrokeProperty, ShellToken.Border);
-        Content = card;
+        _card.Token(VisualElement.BackgroundColorProperty, ShellToken.Card);
+        _card.Token(Border.StrokeProperty, ShellToken.Border);
+        Content = _card;
         Update();
     }
 
@@ -154,6 +202,20 @@ public partial class StatCard : ContentView
         _icon.Name = Icon;
         _icon.IsVisible = Icon != IconName.None;
         _value.Text = Value ?? string.Empty;
+        _value.Token(Label.TextColorProperty, ValueTone switch
+        {
+            StatTone.Success => ShellToken.Success,
+            StatTone.Warning => ShellToken.Warning,
+            StatTone.Destructive => ShellToken.Destructive,
+            _ => ShellToken.CardForeground
+        });
+
+        // Sm — p-4, text-xl value, text-xs title.
+        var small = Size == StatCardSize.Sm;
+        _card.Padding = small ? new Thickness(16) : new Thickness(20);
+        _title.FontSize = small ? 12 : 14;
+        _value.FontSize = small ? 20 : 24;
+        _valueSkeleton.HeightRequest = small ? 24 : 28;
 
         _change.Text = Change ?? string.Empty;
         _pill.IsVisible = !string.IsNullOrEmpty(Change);
@@ -168,12 +230,20 @@ public partial class StatCard : ContentView
         _change.Token(Label.TextColorProperty, text);
 
         _description.Text = Description ?? string.Empty;
-        _description.IsVisible = !string.IsNullOrEmpty(Description);
+        _description.IsVisible = !string.IsNullOrEmpty(Description) && !IsLoading;
         _description.Margin = new Thickness(0, 4, 0, 0);
+
+        _valueRow.IsVisible = !IsLoading;
+        _valueSkeleton.IsVisible = IsLoading;
+        _descriptionSkeleton.IsVisible = IsLoading && !string.IsNullOrEmpty(Description);
     }
 }
 
 public enum StatTrend { Neutral, Up, Down }
+
+public enum StatTone { Default, Success, Warning, Destructive }
+
+public enum StatCardSize { Default, Sm }
 ",
         [NativePlatform.Avalonia] = @"using Avalonia;
 using Avalonia.Controls;
@@ -186,6 +256,8 @@ namespace YourProjectNamespace.Components.UI;
 // value in text-2xl bold, a change pill tinted by trend, and an optional description.
 // Usage: <ui:StatCard Title=""Revenue"" Value=""$45,231"" Change=""+20.1%"" Trend=""Up"" Icon=""DollarSign""
 //                     Description=""from last month"" />
+// ValueTone tints the value (""Backup failed"" in red); a long value wraps and the pill drops under it.
+// IsLoading shows skeletons in place of the value and description; Size=""Sm"" fits six to a row.
 public class StatCard : Border
 {
     public static readonly StyledProperty<string?> TitleProperty =
@@ -206,6 +278,15 @@ public class StatCard : Border
     public static readonly StyledProperty<IconName> IconProperty =
         AvaloniaProperty.Register<StatCard, IconName>(nameof(Icon));
 
+    public static readonly StyledProperty<StatTone> ValueToneProperty =
+        AvaloniaProperty.Register<StatCard, StatTone>(nameof(ValueTone));
+
+    public static readonly StyledProperty<bool> IsLoadingProperty =
+        AvaloniaProperty.Register<StatCard, bool>(nameof(IsLoading));
+
+    public static readonly StyledProperty<StatCardSize> SizeProperty =
+        AvaloniaProperty.Register<StatCard, StatCardSize>(nameof(Size));
+
     private readonly TextBlock _title;
     private readonly Icon _icon;
     private readonly TextBlock _value;
@@ -213,6 +294,9 @@ public class StatCard : Border
     private readonly Border _pillTint;
     private readonly TextBlock _change;
     private readonly TextBlock _description;
+    private readonly WrapPanel _valueRow;
+    private readonly Skeleton _valueSkeleton;
+    private readonly Skeleton _descriptionSkeleton;
 
     static StatCard()
     {
@@ -222,6 +306,9 @@ public class StatCard : Border
         TrendProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
         DescriptionProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
         IconProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
+        ValueToneProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
+        IsLoadingProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
+        SizeProperty.Changed.AddClassHandler<StatCard>((c, _) => c.Update());
     }
 
     public string? Title
@@ -260,6 +347,24 @@ public class StatCard : Border
         set => SetValue(IconProperty, value);
     }
 
+    public StatTone ValueTone
+    {
+        get => GetValue(ValueToneProperty);
+        set => SetValue(ValueToneProperty, value);
+    }
+
+    public bool IsLoading
+    {
+        get => GetValue(IsLoadingProperty);
+        set => SetValue(IsLoadingProperty, value);
+    }
+
+    public StatCardSize Size
+    {
+        get => GetValue(SizeProperty);
+        set => SetValue(SizeProperty, value);
+    }
+
     public StatCard()
     {
         _title = new TextBlock { FontSize = 14, FontWeight = FontWeight.Medium, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis };
@@ -268,13 +373,16 @@ public class StatCard : Border
         Grid.SetColumn(_icon, 1);
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions(""*,Auto""), ColumnSpacing = 8, Children = { _title, _icon } };
 
-        _value = new TextBlock { FontSize = 24, FontWeight = FontWeight.Bold, VerticalAlignment = VerticalAlignment.Center };
-        _value.Token(TextBlock.ForegroundProperty, ShellToken.CardForeground);
+        _value = new TextBlock { FontSize = 24, FontWeight = FontWeight.Bold, VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap };
 
         // The pill is the trend color at low strength behind text in the full color.
         _pillTint = new Border { CornerRadius = new CornerRadius(ShellTheme.RadiusMd) };
         _change = new TextBlock { FontSize = 12, FontWeight = FontWeight.Medium, Margin = new Thickness(6, 2), VerticalAlignment = VerticalAlignment.Center };
-        _pill = new Panel { VerticalAlignment = VerticalAlignment.Center, Children = { _pillTint, _change } };
+        _pill = new Panel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 2), Children = { _pillTint, _change } };
+        // The pill wraps under a long value.
+        _valueRow = new WrapPanel { ItemSpacing = 8, Margin = new Thickness(0, 8, 0, 0), Children = { _value, _pill } };
+        _valueSkeleton = new Skeleton { Width = 96, Height = 28, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 10, 0, 2), IsVisible = false };
+        _descriptionSkeleton = new Skeleton { Width = 128, Height = 12, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 6, 0, 0), IsVisible = false };
 
         _description = new TextBlock { FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
         _description.Token(TextBlock.ForegroundProperty, ShellToken.MutedForeground);
@@ -284,11 +392,12 @@ public class StatCard : Border
             Children =
             {
                 header,
-                new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(0, 8, 0, 0), Children = { _value, _pill } },
-                _description
+                _valueRow,
+                _valueSkeleton,
+                _description,
+                _descriptionSkeleton
             }
         };
-        Padding = new Thickness(20);
         BorderThickness = new Thickness(1);
         CornerRadius = new CornerRadius(ShellTheme.RadiusLg);
         this.Token(BackgroundProperty, ShellToken.Card).Token(BorderBrushProperty, ShellToken.Border);
@@ -301,6 +410,20 @@ public class StatCard : Border
         _icon.Kind = Icon;
         _icon.IsVisible = Icon != IconName.None;
         _value.Text = Value ?? string.Empty;
+        _value.Token(TextBlock.ForegroundProperty, ValueTone switch
+        {
+            StatTone.Success => ShellToken.Success,
+            StatTone.Warning => ShellToken.Warning,
+            StatTone.Destructive => ShellToken.Destructive,
+            _ => ShellToken.CardForeground
+        });
+
+        // Sm — p-4, text-xl value, text-xs title.
+        var small = Size == StatCardSize.Sm;
+        Padding = small ? new Thickness(16) : new Thickness(20);
+        _title.FontSize = small ? 12 : 14;
+        _value.FontSize = small ? 20 : 24;
+        _valueSkeleton.Height = small ? 24 : 28;
 
         _change.Text = Change ?? string.Empty;
         _pill.IsVisible = !string.IsNullOrEmpty(Change);
@@ -315,11 +438,19 @@ public class StatCard : Border
         _change.Token(TextBlock.ForegroundProperty, text);
 
         _description.Text = Description ?? string.Empty;
-        _description.IsVisible = !string.IsNullOrEmpty(Description);
+        _description.IsVisible = !string.IsNullOrEmpty(Description) && !IsLoading;
+
+        _valueRow.IsVisible = !IsLoading;
+        _valueSkeleton.IsVisible = IsLoading;
+        _descriptionSkeleton.IsVisible = IsLoading && !string.IsNullOrEmpty(Description);
     }
 }
 
 public enum StatTrend { Neutral, Up, Down }
+
+public enum StatTone { Default, Success, Warning, Destructive }
+
+public enum StatCardSize { Default, Sm }
 "
     };
 }

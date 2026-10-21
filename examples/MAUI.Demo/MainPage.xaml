@@ -92,6 +92,10 @@
                     <ui:Button Text="Continue" Icon="ArrowRight" IconPosition="Right" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Text="Delete" Icon="Trash2" Variant="Destructive" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                 </ui:WrapLayout>
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="Already have an account?" FontSize="14" VerticalOptions="Center" TextColor="{DynamicResource ShellUIMutedForeground}" />
+                    <ui:Button x:Name="InlineLink" Text="Sign in" Variant="Link" Size="Inline" VerticalOptions="Center" Clicked="OnButtonClicked" />
+                </HorizontalStackLayout>
                 <ui:WrapLayout>
                     <ui:Button Icon="Heart" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
                     <ui:Button Icon="Share2" Size="Icon" Variant="Outline" Margin="0,0,8,8" Clicked="OnButtonClicked" />
@@ -185,7 +189,7 @@
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Password" Style="{StaticResource FieldLabel}" />
-                    <ui:Input Placeholder="••••••••" IsPassword="True" />
+                    <ui:Input x:Name="RevealInput" Placeholder="••••••••" Text="hunter2" Variant="Password" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Username" Style="{StaticResource FieldLabel}" />
@@ -199,6 +203,7 @@
                 <VerticalStackLayout Spacing="8" WidthRequest="{OnIdiom Phone=-1, Default=360}" HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
                     <ui:InputGroup x:Name="InputGroupSearch" PrefixIcon="Search" Placeholder="Search components..." TextChanged="OnInputGroupChanged" />
                     <ui:InputGroup x:Name="InputGroupUrl" PrefixText="https://" SuffixText=".com" Placeholder="example" TextChanged="OnInputGroupChanged" />
+                    <ui:InputGroup x:Name="RevealGroup" PrefixIcon="Lock" Placeholder="Password" Text="correct horse" Variant="Password" />
                     <ui:InputGroup PrefixIcon="Mail" Placeholder="you@example.com" Keyboard="Email">
                         <ui:InputGroup.Suffix>
                             <ui:Badge Text="Required" Variant="Secondary" />
@@ -309,6 +314,19 @@
                         <ui:Button Text="Deploy" Clicked="OnButtonClicked" />
                     </ui:CardFooter>
                 </ui:Card>
+                <ui:Card x:Name="ActionCard" WidthRequest="{OnIdiom Phone=-1, Default=380}"
+                         HorizontalOptions="{OnIdiom Phone=Fill, Default=Start}">
+                    <ui:CardHeader Title="Needs review" Description="Orders waiting for approval.">
+                        <ui:Badge Text="2" Variant="Destructive" />
+                        <ui:Badge Text="Today" Variant="Outline" />
+                        <ui:CardHeader.Action>
+                            <ui:Button Text="Export" Icon="Download" Variant="Outline" Size="Sm" Clicked="OnButtonClicked" />
+                        </ui:CardHeader.Action>
+                    </ui:CardHeader>
+                    <ui:CardContent>
+                        <Label x:Name="RichTextLabel" FontSize="14" />
+                    </ui:CardContent>
+                </ui:Card>
 
                 <!-- Stat card -->
                 <Label Text="Stat Card" Style="{StaticResource SectionTitle}" />
@@ -319,6 +337,16 @@
                                  Description="from last month" WidthRequest="230" Margin="0,0,12,12" />
                     <ui:StatCard Title="Active now" Value="573" Change="steady" Icon="Activity"
                                  WidthRequest="230" Margin="0,0,12,12" />
+                    <ui:StatCard Title="Last backup" Value="Backup failed" ValueTone="Destructive" Change="Action needed" Trend="Down"
+                                 Icon="CalendarClock" Description="ValueTone tints the value; the pill wraps" WidthRequest="230" Margin="0,0,12,12" />
+                    <ui:StatCard x:Name="LoadingStat" Title="Queue" Value="12" IsLoading="True" Icon="ListChecks"
+                                 Description="waiting to be sent" WidthRequest="230" Margin="0,0,12,12" />
+                </ui:WrapLayout>
+                <ui:WrapLayout>
+                    <ui:StatCard Title="Sent" Value="1,204" Size="Sm" ValueTone="Success" WidthRequest="140" Margin="0,0,8,8" />
+                    <ui:StatCard Title="Pending" Value="18" Size="Sm" ValueTone="Warning" WidthRequest="140" Margin="0,0,8,8" />
+                    <ui:StatCard Title="Failed" Value="3" Size="Sm" ValueTone="Destructive" WidthRequest="140" Margin="0,0,8,8" />
+                    <ui:StatCard Title="Receipts" Value="96" Size="Sm" Icon="Receipt" WidthRequest="140" Margin="0,0,8,8" />
                 </ui:WrapLayout>
 
                 <!-- Link card -->
@@ -424,8 +452,10 @@
                     <ui:Sheet x:Name="DemoSheet" Margin="0,0,8,8">
                         <ui:SheetTrigger><ui:Button Text="Open sheet" Variant="Outline" /></ui:SheetTrigger>
                         <ui:SheetContent>
-                            <Label Text="Edit profile" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource ShellUIForeground}" />
-                            <Label Text="Make changes to your profile here." Style="{StaticResource Muted}" />
+                            <ui:SheetHeader>
+                                <ui:SheetTitle Text="Edit profile" />
+                                <ui:SheetDescription Text="Make changes to your profile here." />
+                            </ui:SheetHeader>
                             <VerticalStackLayout Spacing="8">
                                 <Label Text="Name" Style="{StaticResource FieldLabel}" />
                                 <ui:Input Text="Shewart Shepherd" />
@@ -434,7 +464,9 @@
                                 <Label Text="Username" Style="{StaticResource FieldLabel}" />
                                 <ui:Input Text="@shewart" />
                             </VerticalStackLayout>
-                            <ui:Button Text="Save changes" Clicked="OnSheetSave" />
+                            <ui:SheetFooter>
+                                <ui:Button Text="Save changes" Clicked="OnSheetSave" />
+                            </ui:SheetFooter>
                         </ui:SheetContent>
                     </ui:Sheet>
                 </ui:WrapLayout>

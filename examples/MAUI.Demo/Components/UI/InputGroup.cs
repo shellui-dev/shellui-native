@@ -9,6 +9,7 @@ namespace MAUI.Demo.Components.UI;
 //   <ui:InputGroup Placeholder="Amount">
 //       <ui:InputGroup.Suffix> ...any view... </ui:InputGroup.Suffix>
 //   </ui:InputGroup>
+// Variant="Password" masks the text and adds an eye button after the suffix that shows it; IsPassword only masks.
 public partial class InputGroup : ContentView
 {
     public static readonly BindableProperty TextProperty =
@@ -25,7 +26,11 @@ public partial class InputGroup : ContentView
 
     public static readonly BindableProperty IsPasswordProperty =
         BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(InputGroup), false,
-            propertyChanged: (b, o, n) => ((InputGroup)b)._entry.IsPassword = (bool)n);
+            propertyChanged: (b, o, n) => ((InputGroup)b).UpdatePassword());
+
+    public static readonly BindableProperty VariantProperty =
+        BindableProperty.Create(nameof(Variant), typeof(InputVariant), typeof(InputGroup), InputVariant.Default,
+            propertyChanged: (b, o, n) => ((InputGroup)b).UpdatePassword());
 
     public static readonly BindableProperty HasErrorProperty =
         BindableProperty.Create(nameof(HasError), typeof(bool), typeof(InputGroup), false,
@@ -77,6 +82,12 @@ public partial class InputGroup : ContentView
     {
         get => (bool)GetValue(IsPasswordProperty);
         set => SetValue(IsPasswordProperty, value);
+    }
+
+    public InputVariant Variant
+    {
+        get => (InputVariant)GetValue(VariantProperty);
+        set => SetValue(VariantProperty, value);
     }
 
     public bool HasError
@@ -134,7 +145,10 @@ public partial class InputGroup : ContentView
     private readonly Border _border;
     private readonly ContentView _prefix;
     private readonly ContentView _suffix;
+    private readonly Border _reveal;
+    private readonly Icon _revealIcon;
     private bool _isFocused;
+    private bool _revealed;
 
     public InputGroup()
     {
@@ -167,12 +181,15 @@ public partial class InputGroup : ContentView
             ColumnSpacing = 8,
             ColumnDefinitions =
             {
-                new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto)
+                new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Auto)
             }
         };
+        (_reveal, _revealIcon) = CreateRevealButton();
         row.Add(_prefix, 0, 0);
         row.Add(_entry, 1, 0);
         row.Add(_suffix, 2, 0);
+        row.Add(_reveal, 3, 0);
 
         _border = new Border
         {
@@ -200,6 +217,50 @@ public partial class InputGroup : ContentView
         base.OnPropertyChanged(propertyName);
         if (propertyName == IsEnabledProperty.PropertyName)
             Opacity = IsEnabled ? 1.0 : 0.5;
+    }
+
+    // A ghost icon button, h-7 w-7, that pulls into the padding a little.
+    private (Border, Icon) CreateRevealButton()
+    {
+        var icon = new Icon { Name = IconName.Eye, Size = 16, Token = ShellToken.MutedForeground };
+        var button = new Border
+        {
+            Content = icon,
+            WidthRequest = 28,
+            HeightRequest = 28,
+            StrokeThickness = 0,
+            StrokeShape = new RoundRectangle { CornerRadius = ShellTheme.RadiusSm },
+            BackgroundColor = Colors.Transparent,
+            VerticalOptions = LayoutOptions.Center,
+            Margin = new Thickness(-4, 0, -6, 0),
+            IsVisible = false
+        };
+        SemanticProperties.SetDescription(button, "Show password");
+        var pointer = new PointerGestureRecognizer();
+        pointer.PointerEntered += (_, _) => button.Token(VisualElement.BackgroundColorProperty, ShellToken.Accent);
+        pointer.PointerExited += (_, _) => { button.ClearValue(VisualElement.BackgroundColorProperty); button.BackgroundColor = Colors.Transparent; };
+        button.GestureRecognizers.Add(pointer);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) => ToggleReveal();
+        button.GestureRecognizers.Add(tap);
+        ShellFocus.MakeFocusable(button, ToggleReveal);
+        return (button, icon);
+    }
+
+    private void ToggleReveal()
+    {
+        _revealed = !_revealed;
+        UpdatePassword();
+    }
+
+    private void UpdatePassword()
+    {
+        var password = Variant == InputVariant.Password;
+        if (!password) _revealed = false;
+        _entry.IsPassword = (IsPassword || password) && !_revealed;
+        _reveal.IsVisible = password;
+        _revealIcon.Name = _revealed ? IconName.EyeOff : IconName.Eye;
+        SemanticProperties.SetDescription(_reveal, _revealed ? "Hide password" : "Show password");
     }
 
     private void UpdateSlots()

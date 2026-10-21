@@ -128,6 +128,10 @@ public class ComponentRegistryTests
     [InlineData("dialog-close", "dialog")]
     [InlineData("drawer-content", "drawer")]
     [InlineData("sheet-trigger", "sheet")]
+    [InlineData("sheet-header", "sheet")]
+    [InlineData("sheet-title", "sheet")]
+    [InlineData("sheet-description", "sheet")]
+    [InlineData("sheet-footer", "sheet")]
     [InlineData("dropdown-item", "dropdown")]
     [InlineData("popover-trigger", "popover")]
     [InlineData("hover-card-trigger", "hover-card")]
@@ -139,6 +143,27 @@ public class ComponentRegistryTests
     public void GetFamily_maps_a_part_to_its_parent(string part, string family)
     {
         Assert.Equal(family, ComponentRegistry.GetFamily(part));
+    }
+
+    // A loading stat card draws skeletons, so `add stat-card` installs skeleton too.
+    [Fact]
+    public void Stat_card_depends_on_skeleton()
+    {
+        Assert.Contains("skeleton", ComponentRegistry.Components["stat-card"].Dependencies);
+    }
+
+    // InputVariant (Password) is declared with Input and shared by InputGroup.
+    [Fact]
+    public void Input_group_depends_on_input()
+    {
+        Assert.Contains("input", ComponentRegistry.Components["input-group"].Dependencies);
+    }
+
+    [Fact]
+    public void Sheet_parts_have_both_platforms()
+    {
+        foreach (var part in new[] { "sheet-header", "sheet-title", "sheet-description", "sheet-footer" })
+            Assert.Equal(new[] { NativePlatform.MAUI, NativePlatform.Avalonia }, ComponentRegistry.GetSupportedPlatforms(part).OrderBy(p => p));
     }
 
     [Theory]

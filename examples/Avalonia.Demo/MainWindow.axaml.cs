@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Layout;
 using AvaloniaDemo.Components.UI;
 
@@ -85,6 +86,18 @@ public partial class MainWindow : Window
         DemoCommand.ItemSelected += (_, item) => CommandChoice.Text = $"Command: {item.Value}.";
         DemoPalette.ItemSelected += (_, item) => CommandChoice.Text = $"Palette: {item.Value}.";
         OpenPalette.Clicked += (_, _) => DemoPalette.SetOpen(true);
+        // The status column draws a badge; sorting and the filter still use Property.
+        DemoDataTable.Columns[2].Cell = item => new Badge
+        {
+            Text = ((DemoInvoice)item).Status,
+            Variant = ((DemoInvoice)item).Status switch { "Paid" => BadgeVariant.Success, "Pending" => BadgeVariant.Warning, _ => BadgeVariant.Destructive },
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        // Runs take theme tokens like any element, so they follow the theme when it changes.
+        RichText.Inlines!.Add(new Run("Order #1042 is on hold: card declined").Token(Run.ForegroundProperty, ShellToken.Foreground));
+        RichText.Inlines.Add(new Run(" · 2 min ago").Token(Run.ForegroundProperty, ShellToken.MutedForeground));
+        SheetSave.Clicked += (_, _) => DemoSheet.SetOpen(false);
         DemoDataTable.ItemsSource = new List<DemoInvoice>
         {
             new DemoInvoice("INV001", "Shewart Shepherd", "Paid", 250.00m, new DateTime(2026, 9, 2)),
